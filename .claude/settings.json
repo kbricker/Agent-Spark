@@ -1,0 +1,56 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash",
+      "Edit",
+      "Glob",
+      "Grep",
+      "Read",
+      "WebFetch",
+      "WebSearch",
+      "Write",
+      "mcp__hive__*"
+    ],
+    "additionalDirectories": [
+      "C:/Projects/webstorm/orbital"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c \"export HIVE_AGENT_KEY=spark && bash C:/Projects/wfa2/hooks/hive-status-working.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c \"export HIVE_AGENT_KEY=spark && bash C:/Projects/wfa2/hooks/hive-status-idle.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "grep -q 'gh pr create' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"REMINDER: CodeRabbit reviews arrive via GitHub webhook into the hive-channel as chat_message events. Do NOT poll gh pr view. Do NOT ScheduleWakeup to check CR status. Wait for the channel event.\"}}' || true",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
+  "autoMemoryDirectory": ".claude/memory"
+}

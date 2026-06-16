@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "hive": {
+      "command": "node",
+      "args": ["C:/Projects/wfa2/McpBridge/dist/index.js"],
+      "env": {
+        "HIVE_URL": "https://hive.wonderforge.io",
+        "HIVE_API_KEY": "${HIVE_API_KEY}",
+        "HIVE_AGENT_KEY": "spark"
+      }
+    }
+  }
+}
