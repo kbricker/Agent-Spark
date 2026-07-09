@@ -8,7 +8,7 @@ Sections: the managed **GLOBAL** block (shared across all orchestrators, synced 
 
 ## Global (shared — managed by propagate-shared-config)
 
-All memories in this section are copies of the canonical source at `C:\Projects\wfa2\orchestrator-shared\memory\`. Edit those originals, not these copies.
+All memories in this section are copies of the canonical source at `C:\Projects\wfa2\orchestrator-shared\memory\`. Edit those originals, not these copies. Local memories live in other sections below.
 
 ### See [feedback_always_plan.md](feedback_always_plan.md)
 - Kyle requires a researched plan in the Hive plan system before writing any code
@@ -128,7 +128,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Research findings on multi-agent patterns, failure modes, and scaling limits for software development tasks
 
 ### See [reference_virtual_orchestrators.md](reference_virtual_orchestrators.md)
-- The four interactive Claude orchestrators are overwatch, verletdev, vaexdev, and 3dproppipeline — use this list whenever a change must propagate to "the other orchestrators"
+- Active interactive Claude orchestrators are overwatch, vaexdev, spark, and 3dproppipeline (verletDev retired 2026-07-09; codexhive parked R&D) — use this list whenever a change must propagate to "the other orchestrators"
 
 <!-- END GLOBAL SECTION -->
 
