@@ -32,6 +32,7 @@ Single rule or lookup fact → memory. "Steps you follow when X happens" → ski
 | Project | Repo | Hive app | Notes |
 |---|---|---|---|
 | **Orbital** | `C:\Projects\webstorm\orbital` (github.com/kbricker/Orbital, personal SSH) | 7 | Gravity-slingshot puzzle game. Vanilla JS ES modules + Vite, no deps. See `project_orbital` + the repo's CLAUDE.md. |
+| **TendWright** | `C:\Projects\TendWright` (github.com/kbricker/TendWright, public, personal SSH) | 8 | Robotic CNC machine-tending cell, Python learning project — prototype ladder P0–P6 (plans #604–#610). Spec `spec-tendwright-overview`. See the repo's CLAUDE.md. |
 
 ## Charter boundary with overwatch
 
