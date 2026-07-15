@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "Bash",
+      "PowerShell",
       "Edit",
       "Glob",
       "Grep",
@@ -9,10 +10,12 @@
       "WebFetch",
       "WebSearch",
       "Write",
-      "mcp__hive__*"
+      "mcp__hive__*",
+      "Skill(fast-track-plan)"
     ],
     "additionalDirectories": [
-      "C:/Projects/webstorm/orbital"
+      "C:/Projects/webstorm/orbital",
+      "C:/Projects/TendWright"
     ]
   },
   "enableAllProjectMcpServers": true,
