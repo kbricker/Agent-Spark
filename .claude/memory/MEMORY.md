@@ -160,4 +160,4 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ## TendWright
 
 ### See [project_tendwright.md](project_tendwright.md)
-- TendWright — robotic CNC machine-tending cell (Hive app 8, epic #612, rungs #604–#610 in order); MuJoCo+mink+uv stack (PyBullet rejected as stale); P0 built on plan604 branch; deep guide is the repo's own CLAUDE.md
+- TendWright — robotic CNC machine-tending cell (Hive app 8, epic #612, rungs #604–#610 in order); MuJoCo+mink+uv stack; P0/P1/bench-toolkit/#619/#631 done, SO-101 arm BUILT 2026-07-23, next = bring-up per repo docs/arm-bring-up.md; deep guide is the repo's own CLAUDE.md
