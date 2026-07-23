@@ -20,11 +20,10 @@ Step 3 was redundant. The push in step 1 already triggered a review. The manual 
 ## The correct flow
 
 1. Dev pushes fixes → **CR auto-reviews** in the background
-2. Post `@coderabbitai resolve` to clear stale thread state from the previous iteration
-3. Wait for the auto-triggered review to publish (watch the channel / `gh pr view --comments`)
-4. Read the verdict, sift findings, loop
+2. Wait for the auto-triggered review to publish (watch the channel / `gh pr view --comments`)
+3. Read the verdict, sift findings, loop
 
-No manual `full review` needed.
+No manual `full review` needed. **No routine `@coderabbitai resolve` either** — CR marks its own comments addressed on the next pass (the `(edited)` inline-comment events); only post resolve when stale threads genuinely linger after a clean review and the PR is about to merge. Every `@coderabbitai` command costs quota against the adaptive rate limit (Kyle 2026-07-11, plan #581: "learn to not be so chatty with CR").
 
 ## When to still use `@coderabbitai full review`
 

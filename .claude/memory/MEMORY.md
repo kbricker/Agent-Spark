@@ -16,6 +16,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_can_kill_processes.md](feedback_can_kill_processes.md)
 - You may kill a process you started, but NEVER use taskkill //IM dotnet.exe or //IM claude.exe — those are blanket kills that nuke Kyle's other sessions
 
+### See [feedback_channel_handoff_continuity.md](feedback_channel_handoff_continuity.md)
+- Kyle often moves a live conversation between his desk session and Hive channel chat mid-stream — treat it as the same conversation continuing on a new transport, not a new request
+
 ### See [feedback_channel_rewatch_after_spawn.md](feedback_channel_rewatch_after_spawn.md)
 - hive_kill_agent silently removes the agent key from the hive-channel watch list. After any respawn — especially same-key respawn — call hive_channel_watch again or events go silent.
 
@@ -137,7 +140,15 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_personal_repo_git_identity.md](feedback_personal_repo_git_identity.md)
 - Spark's projects are Kyle's PERSONAL repos — commit as Kyle Bricker <kyle.bricker@gmail.com>, never the WonderForge identity (each repo carries a local git config override; don't reset it)
 
+### See [reference_gh_cli_is_wonderforge_account.md](reference_gh_cli_is_wonderforge_account.md)
+- gh CLI is authenticated as kyle-wf (WonderForge) — pushes to personal repos work (SSH), but gh PR create/merge fails until Kyle adds the kbricker account or adds kyle-wf as collaborator
+
 ## Orbital
 
 ### See [project_orbital.md](project_orbital.md)
 - Orbital — gravity-slingshot puzzle game, Spark's first project; repo (github.com/kbricker/Orbital, personal SSH) + Hive app 7 + vanilla-JS/Vite stack + status; deep guide is the repo's own CLAUDE.md
+
+## TendWright
+
+### See [project_tendwright.md](project_tendwright.md)
+- TendWright — robotic CNC machine-tending cell (Hive app 8, epic #612, rungs #604–#610 in order); MuJoCo+mink+uv stack (PyBullet rejected as stale); P0 built on plan604 branch; deep guide is the repo's own CLAUDE.md

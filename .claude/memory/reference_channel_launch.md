@@ -27,9 +27,9 @@ The wrapper spawns `claude --dangerously-load-development-channels server:hive` 
 All Kyle-box clients (wrapper, hooks, McpBridge, wait-for-* helpers) look up the per-agent key in this order:
 
 1. **Windows Credential Manager** — `Hive:<agent-key>` via `keytar` / DPAPI. Install with `node C:\Projects\wfa2\hive-key\dist\index.js install <agent>` after generating a key in the dashboard `/admin/identities.html` page. **Agent keys are case-sensitive** — use the authoritative mixed-case form the dashboard shows (e.g. `verletDev`, not `verletdev`).
-2. **`HIVE_API_KEY` env var** — transitional fallback retired in plan #242.
+2. There is no fallback — plan #242 retired the shared `HIVE_API_KEY` env var; a missing credential-store entry is a visible failure (`hive-key install <agent>` fixes it).
 
-The wrapper uses `keytar` directly; hooks + McpBridge + wait-for-* shell out to the `hive-key get <agent>` CLI with a 2s timeout. All three client classes fall back to `HIVE_API_KEY` env on CLI failure and log a warning.
+The wrapper uses `keytar` directly; hooks + McpBridge + wait-for-* shell out to the `hive-key get <agent>` CLI with a 2s timeout. McpBridge/wait-for-* additionally accept an injected `HIVE_API_KEY` env value — that is the wire mechanism spawned agents receive their per-agent identity key through (never a shared secret, per #242).
 
 **Debug-only direct launch:**
 
@@ -49,4 +49,4 @@ Historical notes:
 - **2026-04-17 (plan #183):** merged the separate `hive-channel` MCP server (HiveChannel/index.mjs) into `hive` (McpBridge). The old `server:hive-channel` flag now errors with "no MCP server configured with that name".
 - **2026-04-17 (plan #188):** introduced the `virtual-launcher` wrapper + desktop icons.
 - **2026-04-18 (plan #239):** moved the wrapper's API key source to Windows Credential Manager via `keytar`. Desktop `.lnk` launches no longer depend on `HIVE_API_KEY` being set in the shell that spawned Explorer.
-- **2026-04-18 (plan #240):** migrated hooks (`hive-status-*.sh`, `hive-orchestrator.mjs`, `hive-agent-watcher.mjs`) and McpBridge (`index.ts`, `wait-for-message.js`, `wait-for-idle.js`) off `HIVE_API_KEY` env var onto `hive-key get` CLI. Env fallback stays as safety net until #242.
+- **2026-04-18 (plan #240):** migrated hooks (`hive-status-*.sh`, `hive-orchestrator.mjs`, `hive-agent-watcher.mjs`) and McpBridge (`index.ts`, `wait-for-message.js`, `wait-for-idle.js`) off `HIVE_API_KEY` env var onto `hive-key get` CLI. Plan #242 (2026-07-10) removed the shared-secret fallback everywhere.

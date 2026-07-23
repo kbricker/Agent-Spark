@@ -1,6 +1,6 @@
 ---
 name: handle-coderabbit-feedback
-description: Autonomous CodeRabbit review-response loop on an open PR — fix → push (auto-triggers review) → resolve old threads → read verdict → loop. Includes rate-limit retry + terminal-signal recognition.
+description: Autonomous CodeRabbit review-response loop on an open PR — fix → push (auto-triggers review) → read verdict → loop, with minimal @coderabbitai chatter (quota). Includes rate-limit retry + terminal-signal recognition.
 ---
 
 # Handle CodeRabbit Feedback
@@ -27,9 +27,10 @@ Repeat until CodeRabbit comes back clean, then merge.
 2. **Distinguish actionable from informational.** Focus on actionable findings and nits you decide to absorb. Apply `manage-scope-creep` sift to anything adjacent-but-outside the diff.
 3. **Fix or push back.**
    - If findings are correct: dispatch the dev agent (already alive from `run-plan-workflow`) with a concrete briefing. Dev fixes, runs tests, commits, **pushes — that push automatically triggers CR pass N+1**. For fast-track plans, the orchestrator fixes directly.
+   - **Piggyback the fix-push when possible.** If more work is about to land on the same PR anyway (long-lived ticket branch, next slice already in flight), fold the CR fixes into that work commit instead of pushing them alone — each solo push burns a review run against the adaptive rate limit. Only push CR fixes standalone when the PR is merge-blocked waiting on the clean review.
    - If a finding is wrong or a bad-taste suggestion: leave a reply on the comment explaining why, don't dismiss silently. CR's next pass will see the reply.
    - If a finding is a genuine architectural disagreement you can't resolve: surface to Kyle.
-4. **After the push, resolve stale threads.** Post `@coderabbitai resolve` on the PR. This clears old thread state so the next auto-review starts clean. This is the ONLY manual `@coderabbitai` command you normally need.
+4. **Do NOT post `@coderabbitai resolve` routinely.** CR marks its own comments addressed on the next review pass (you'll see `(edited)` inline-comment events) — the command is redundant chatter that costs quota and triggers a reply. Only post it when stale threads genuinely linger after a clean review AND the PR is about to merge. (Per Kyle 2026-07-11, plan #581: "learn to not be so chatty with CR".)
 5. **Wait for the auto-triggered next review from the push.** Do NOT also post `@coderabbitai full review` — duplicate review against the same HEAD. Just watch for the event.
 6. **Loop back to step 1.** Every iteration should reduce the finding count. If it doesn't (fighting in circles), stop and ask Kyle.
 7. **Exit condition: clean review** (see the signal table below). At that point, merge the PR.
@@ -53,6 +54,8 @@ When a channel event arrives carrying a CR message, classify it by matching the 
 **Note:** The webhook handler filters out the `Currently processing new changes` pattern before dispatch, so you won't see those events in your channel. Everything else reaches you.
 
 ## Rate-limit retry sub-procedure
+
+**First check whether a retry is needed at all.** If the PR is not merge-blocked on the clean review (long-lived ticket branch, more slices coming), skip the retry entirely — the next work push auto-triggers a cumulative review that covers the rate-limited diff for free. Only retry when the PR is actually waiting to merge.
 
 When the Rate limit signal arrives, the message will contain text like:
 
