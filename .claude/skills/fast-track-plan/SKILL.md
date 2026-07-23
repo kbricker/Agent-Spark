@@ -40,6 +40,16 @@ Use `hive_plan_create` with `fastTrack: true` by default. Full description, conc
 2. **Async in-flight** — for each async flow: what if the world changed mid-flight, and what if it runs twice/overlaps? See `feedback_plan_async_inflight`.
 3. **Touched-surface audit** — when generalizing/modifying an existing surface: the enumerated (greppable) list of consumers and sibling/mirrored implementations, each marked in-scope or out. See `feedback_solve_the_actual_problem` item 7.
 
+**Record as you shape (plan #629 — see `feedback_record_as_you_shape`):** the shaping trajectory is mineable data for the task-ripeness initiative. Capture into the plan's shaping log via `hive_plan_log_add` **at the moment of the exchange**, not as an after-the-fact summary:
+
+- A question raised during planning → log `{type: "question"}` when it's asked, not when it's resolved.
+- Kyle's answer → log `{type: "answer", questionId}` linked to the question entry it resolves.
+- Every scope decision → log `{type: "decision"}` with what was chosen and why, at the moment it's made.
+- Every scope split → log `{type: "deferral", disposition: PREREQUISITE | FOLLOW_UP | PRECLUDED}` at decision time, with `linkedPlanId` if the target plan already exists. If it doesn't yet, log the deferral without the link, then append a **second** deferral entry carrying `linkedPlanId` after the fork creates the plan — the link arrives as a new entry, never as an edit to the original.
+- Entries are append-only and immutable — corrections are NEW entries, never edits.
+
+**Ticket splits go through `hive_plan_fork`, never hand-rolled `hive_plan_create`.** Fork stamps lineage on both ends (the parent's fork revision and the child's fork-origin pointer); a hand-rolled create silently loses that lineage. Pair each fork with a deferral entry naming the disposition.
+
 ### 2. Assign yourself as both agents
 
 Required before the status can move past Planning:
