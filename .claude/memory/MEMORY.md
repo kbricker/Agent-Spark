@@ -49,6 +49,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_infra_agent_security_rules.md](feedback_infra_agent_security_rules.md)
 - Four non-negotiable rules for any cloud infra agent operating with a GCP service account — never read SA key files, never commit or display secrets, all secrets flow through Secret Manager at runtime
 
+### See [feedback_log_review_findings.md](feedback_log_review_findings.md)
+- Every settled review (internal adversarial, ephemeral review agent, CodeRabbit-worth-keeping) logs its surviving findings — including skipped ones — to the Hive review-findings store via hive_review_finding_add. Procedure in the log-review-findings skill.
+
 ### See [feedback_move_tickets_with_work.md](feedback_move_tickets_with_work.md)
 - Always update plan status when spawning agents or starting work — don't leave tickets in Planning while agents are in Development
 

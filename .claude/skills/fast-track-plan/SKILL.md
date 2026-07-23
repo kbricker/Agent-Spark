@@ -97,11 +97,15 @@ hive_plan_update({id, status: "Completed"})
 
 For config-repo plans with no PR, use a descriptive `prUrl` (e.g. direct commit SHA link) or leave null and note it in the commit message.
 
-### 9. Check off every checklist item
+### 9. Log review findings to the platform store
+
+If the plan ran any review that produced findings — internal adversarial subagents, your own self-review, or CodeRabbit catches worth keeping — **invoke `/log-review-findings`** before completing the plan (plan #632; supersedes the old file-based `reports/internal-review-log/` convention). That skill is the canonical procedure: one `hive_review_finding_add` entry per finding that survived verification, including skipped ones, generalized `pattern`, honest `reviewer`, `criterion` when it's clear. The always-loaded rule is `feedback_log_review_findings`: a review is not finished until its findings are in the store. A review pass with zero surviving findings logs nothing.
+
+### 10. Check off every checklist item
 
 Use `hive_plan_checklist` with `checkedBy: "overwatch"` on every fix + task + validation item. Leave nothing unchecked on a Completed plan. The checklist is the audit trail.
 
-### 10. Report back to Kyle
+### 11. Report back to Kyle
 
 One or two sentences. What shipped, where to look, follow-ups. Mention any side findings and offer to file separate tickets.
 
