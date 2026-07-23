@@ -45,7 +45,7 @@ Use `hive_plan_create` with `fastTrack: true` by default. Full description, conc
 - A question raised during planning → log `{type: "question"}` when it's asked, not when it's resolved.
 - Kyle's answer → log `{type: "answer", questionId}` linked to the question entry it resolves.
 - Every scope decision → log `{type: "decision"}` with what was chosen and why, at the moment it's made.
-- Every scope split → log `{type: "deferral", disposition: PREREQUISITE | FOLLOW_UP | PRECLUDED}` at decision time, with `linkedPlanId` if the target plan already exists. If it doesn't yet, log the deferral without the link, then append a **second** deferral entry carrying `linkedPlanId` after the fork creates the plan — the link arrives as a new entry, never as an edit to the original.
+- Every scope split → log `{type: "deferral", disposition: PREREQUISITE | FOLLOW_UP | PRECLUDED}` at decision time, with `linkedPlanId` if the target plan already exists. If it doesn't yet, log the deferral without the link — and note that `hive_plan_fork` then **auto-appends a linked deferral on the parent from its reason field**, which IS the link entry (verified live, plan #629 validation): don't add a manual duplicate. Only append a linking deferral yourself when the target plan came into existence outside fork — always as a new entry, never as an edit to the original.
 - Entries are append-only and immutable — corrections are NEW entries, never edits.
 
 **Ticket splits go through `hive_plan_fork`, never hand-rolled `hive_plan_create`.** Fork stamps lineage on both ends (the parent's fork revision and the child's fork-origin pointer); a hand-rolled create silently loses that lineage. Pair each fork with a deferral entry naming the disposition.
