@@ -35,6 +35,11 @@ Use `hive_plan_create` with `fastTrack: true` by default. Full description, conc
 
 **Module selection:** valid modules are `Dashboard, Remote, Plans, Sessions, Bugs, Activity, Infra`. Orchestration plans → `Sessions`. There is no "Hive" module.
 
+**Planning pre-conditions (from #624 review-catch mining, Kyle-approved 2026-07-22):** before moving past Planning, the plan description or checklist must answer three things — explicitly stating "none touched" counts as the answer:
+1. **State lifecycle** — for each stateful surface touched (pooled object, cache, mode controller, serialized/numeric input): init / every reset path (incl. pool reuse, mode handoff) / teardown / value-domain constraints. See `feedback_plan_state_lifecycle`.
+2. **Async in-flight** — for each async flow: what if the world changed mid-flight, and what if it runs twice/overlaps? See `feedback_plan_async_inflight`.
+3. **Touched-surface audit** — when generalizing/modifying an existing surface: the enumerated (greppable) list of consumers and sibling/mirrored implementations, each marked in-scope or out. See `feedback_solve_the_actual_problem` item 7.
+
 ### 2. Assign yourself as both agents
 
 Required before the status can move past Planning:

@@ -82,6 +82,12 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_orchestrate_proactively.md](feedback_orchestrate_proactively.md)
 - After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
 
+### See [feedback_plan_async_inflight.md](feedback_plan_async_inflight.md)
+- Every async flow in a plan must answer "what if the world changed while this was in flight?" and "what if this runs twice / overlaps itself?" — single-flight, sequencing, and cancellation named before dev starts
+
+### See [feedback_plan_state_lifecycle.md](feedback_plan_state_lifecycle.md)
+- Any plan touching stateful surfaces (pooled objects, caches, mode controllers, serialized/numeric inputs) must enumerate init → reset → teardown → reuse paths plus value-domain constraints before dev starts
+
 ### See [feedback_plans_default_planning.md](feedback_plans_default_planning.md)
 - Never file new Hive plans in Backlog by default — Planning is the default status; Backlog is Kyle's manual "get this out of my face" bucket
 
