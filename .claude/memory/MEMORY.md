@@ -152,6 +152,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_personal_repo_git_identity.md](feedback_personal_repo_git_identity.md)
 - Spark's projects are Kyle's PERSONAL repos — commit as Kyle Bricker <kyle.bricker@gmail.com>, never the WonderForge identity (each repo carries a local git config override; don't reset it)
 
+### See [user_printing_tree_supports.md](user_printing_tree_supports.md)
+- Kyle always 3D-prints with tree supports (PLA+ default) — prefers wasted material over failed prints; design CAD for correctness, not support-free printability
+
 ### See [reference_gh_cli_is_wonderforge_account.md](reference_gh_cli_is_wonderforge_account.md)
 - gh CLI is authenticated as kyle-wf (WonderForge) — pushes to personal repos work (SSH), but gh PR create/merge fails until Kyle adds the kbricker account or adds kyle-wf as collaborator
 
