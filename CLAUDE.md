@@ -8,6 +8,14 @@ Spark exists so small personal projects get a real orchestrator (plans, fast-tra
 
 **Before doing anything else, read `.claude/memory/MEMORY.md` in this project directory.** It carries the managed global rules (shared across orchestrators), Spark-local shared conventions, and per-project context. These memories encode lessons and rules that MUST be followed.
 
+## Restart handoff (fresh process launch only)
+
+This rule applies ONLY to the interactive orchestrator main session, at a fresh process launch. Subagents, headless runs, and scheduled routines must NEVER touch `.claude/restart-handoff.md`. A context-compaction resume is NOT a startup — do not consume the handoff after compaction.
+
+At session start, right after reading MEMORY.md: if `.claude/restart-handoff.md` exists, read it, then consume it BEFORE acting on its contents, in exactly this sequence: `mkdir -p .claude/restart-journal && mv .claude/restart-handoff.md .claude/restart-journal/<yyyy-MM-dd-HHmmss>.md` (timestamp = time of consumption, local, 24h; if the target name exists, suffix `-2`), then verify `.claude/restart-handoff.md` no longer exists. If the move fails for any reason, DELETE `.claude/restart-handoff.md` instead — deletion beats replay. If deletion also fails, stop and tell Kyle before acting on the handoff. Only after the file is confirmed gone: run the handoff's verification checks, re-establish its watch list (then poll each watched agent's current state once — events during the restart were lost), and resume its work.
+
+If the file doesn't exist, start normally. Never read `.claude/restart-journal/` at startup — it is an archive, not an input. Handoffs are written by the `prepare-restart` skill when Kyle says "get ready for a restart".
+
 ## Memories vs. skills
 
 - **Memories** (`.claude/memory/`): lightweight, always-loaded facts and rules. One rule or fact per file. The global block is synced from `wfa2/orchestrator-shared/` (don't hand-edit it); Spark-local memories (shared conventions + `project_*`) live in their own sections.

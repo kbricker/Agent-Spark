@@ -8,3 +8,7 @@ Desktop.ini
 
 # Node
 node_modules/
+
+# Restart handoff flow (plan #652) — transient, never commit
+.claude/restart-handoff.md
+.claude/restart-journal/
