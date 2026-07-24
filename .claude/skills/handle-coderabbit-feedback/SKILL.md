@@ -46,12 +46,12 @@ When a channel event arrives carrying a CR message, classify it by matching the 
 | **Findings review** | `Actionable comments posted: N` with N≥1 | CR posted N actionable items | Read findings via `gh pr view <n> --comments --repo <owner>/<repo>`, fix, push |
 | **Inline-only review** | Literal text `(Empty review body — findings are inline. Run 'gh pr view ...' to fetch them.)` | CR review body is empty; findings are inline comments only | Fetch with the suggested `gh` command, treat as findings review |
 | **Inline comment** | Message starts with `CodeRabbit inline comment` (may include `(edited)` suffix before `on **<repo>#<pr>**`) | Single inline code finding (new or updated — edits often mean "addressed" markers) | Part of an inline-only review; already covered by the parent review event, but useful as a per-finding prompt |
-| **Terminal ack** | Body ends with `Resolving.` / `Resolving all open comments now.` / `[resolve]` / `<!-- <review_comment_addressed> -->` | CR is acknowledging a resolve command; no new review coming for this HEAD | Treat as end-of-loop for this iteration; if no clean-review signal yet, verify via `gh pr view --comments` before merging |
-| **Rate limit** | Contains `<!-- This is an auto-generated comment: rate limited by coderabbit.ai -->` AND `## Rate limit exceeded` | CR is rate-limited; has specified a wait duration | Trigger the rate-limit retry sub-procedure below |
+| **Terminal ack** | Body ends with `Resolving.` / `Resolving all open comments now.` / `[resolve]` | CR is acknowledging a resolve command; no new review coming for this HEAD | Treat as end-of-loop for this iteration; if no clean-review signal yet, verify via `gh pr view --comments` before merging |
+| **Rate limit** | Contains `Rate limit exceeded` (relay emits it with the verbatim `Please wait **N minutes and M seconds**` line when CR provided one) | CR is rate-limited; has specified a wait duration | Trigger the rate-limit retry sub-procedure below |
 | **In-progress** | `Currently processing new changes` | CR is actively reviewing | Wait for the next event — this is a progress ping, not terminal |
-| **Paused** | `Reviews paused` or `[!NOTE] Reviews paused` | CR has stopped reviewing this PR | Escalate to Kyle — the auto-loop can't continue without CR |
+| **Paused** | `Reviews paused` | CR has stopped reviewing this PR | Escalate to Kyle — the auto-loop can't continue without CR |
 
-**Note:** The webhook handler filters out the `Currently processing new changes` pattern before dispatch, so you won't see those events in your channel. Everything else reaches you.
+**Note (relay contract, plan #646):** the webhook handler sanitizes and classifies before dispatch — you receive clean signal-only messages, never raw CodeRabbit markup. Specifically: `Currently processing new changes` is filtered outright; review events relay only on `action=submitted` (no more submitted+edited double posts); a CR review body collapses to its `Actionable comments posted: N` line; walkthrough/banner comments with no signal content are suppressed entirely; rate-limit and paused comments arrive as the clean one-liners in the table above. HTML comments and `<details>` blocks never reach you — patterns that referenced them are retired.
 
 ## Rate-limit retry sub-procedure
 
