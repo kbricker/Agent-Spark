@@ -50,6 +50,8 @@ Use `hive_plan_create` with `fastTrack: true` by default. Full description, conc
 
 **Ticket splits go through `hive_plan_fork`, never hand-rolled `hive_plan_create`.** Fork stamps lineage on both ends (the parent's fork revision and the child's fork-origin pointer); a hand-rolled create silently loses that lineage. Pair each fork with a deferral entry naming the disposition.
 
+**Capture doesn't stop when dev starts.** A scope deferral discovered during review (e.g. a skipped finding pushing work to another plan) gets a linked deferral entry just like one discovered during shaping. And when a review-driven change alters what the plan text promises — a contract change — the review finding records the catch AND a decision entry records the contract change; in-scope implementation fixes stay findings-only. Traceability wins: plan text that no longer matches shipped behavior must have its "why" on the shaping log.
+
 ### 2. Assign yourself as both agents
 
 Required before the status can move past Planning:
