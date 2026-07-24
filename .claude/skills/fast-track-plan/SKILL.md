@@ -83,6 +83,15 @@ hive_plan_update({id, assignedAgent: "overwatch", reviewAgent: "overwatch"})
 
 Before every commit, run `git status` and `git diff` to see what's dirty. Pre-existing uncommitted state is common across orchestrator workspaces — do NOT sweep it into your commit. Use explicit `git add <path>` on only the files you touched. If the plan includes a version bump and the csproj is already dirty-ahead-of-main, fold the existing bump into your commit so git main stays monotonically ahead of what's deployed. See the gotcha on 2026-04-13, plan #178.
 
+### 5.5 Internal adversarial review — mandatory before the first CR push
+
+Before the first push of any fast-track PR branch — the push that opens it to CodeRabbit, and regardless of whether you'll wait for CR — run an internal adversarial review on the complete outgoing diff (plan #650, Kyle 2026-07-24). Stage everything you intend to ship first (explicit `git add <path>` per step 5), then give the subagent `git diff <default>...HEAD` plus `git diff --cached`, and confirm via `git status` that no unstaged or untracked file you meant to include is missing from what it reviewed. No size exemption — trivial diffs still get the pass. Inline self-review alone does not hit the "rigor of a review ephemeral" bar — wfa2 PR #104 shipped a Major to CR (dedup filter silently dropping human review events, finding #112) that this pass is specifically built to catch.
+
+- Brief the subagent to REFUTE the diff: hunt scope-exceeding behavior changes (does any condition apply more broadly than the stated intent?), edge cases, contract breaks with consumers of the touched surface, and state/async gaps. Give it the plan's Fix design as the stated intent and the full diff.
+- Fix its valid findings before pushing; consciously skip invalid ones. Then **re-stage the fixed paths** (`git add` — fixes land in the working tree, and an unstaged fix would leave the rerun reviewing the pre-fix index) and re-run the pass on the post-fix diff (continuing the same subagent via SendMessage is fine — it has context); loop restage → rerun until it reports no new valid findings. Fixed code that no reviewer saw is exactly the gap this step closes. Log survivors (fixed AND skipped) to the findings store at review settle — batching with the CR findings in one `/log-review-findings` call is fine.
+- Why this pays: the subagent shares your prompt cache (cheap, fast), its catches cost zero CR review-run quota, and every pre-push catch saves a full CR round-trip (push → review → fix → push → re-review).
+- Config-repo direct commits (no PR flow) don't require this step, but use judgment — a workspace skill/hook change that alters orchestrator behavior deserves the same pass.
+
 ### 6. Commit, push, (PR if applicable), merge
 
 - Commit message: `Plan #{id}: {short summary}` followed by a short rationale. Reference fix item IDs when helpful.
@@ -168,7 +177,7 @@ Brief each subagent as if it's a colleague who just walked in:
 - **fastTrack skips dashboard-only gates, not agent-required gates.** You still need `assignedAgent` + `reviewAgent` set.
 - **Module must be valid.** `Sessions` for orchestration; "Hive" is not a module.
 - **Don't pre-bump a version with a dirty working tree.** Check `git diff` on the csproj first.
-- **You are still the reviewer.** Self-review your diff with the same rigor a review ephemeral would — edge cases, regressions, things you'd flag if someone else wrote it.
+- **You are still the reviewer.** Self-review your diff with the same rigor a review ephemeral would — edge cases, regressions, things you'd flag if someone else wrote it. Self-review does NOT replace step 5.5 — the adversarial subagent pass before the first CR push is mandatory.
 - **CodeRabbit may run late.** If you merge before CR finishes, the review is harmless against a closed PR — but if it surfaces real findings, open a small follow-up PR rather than ignoring.
 - **Pre-existing drift in workspace repos is common.** Always commit by explicit path — never `git add -A`.
 
