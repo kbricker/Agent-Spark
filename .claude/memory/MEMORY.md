@@ -145,6 +145,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [reference_virtual_orchestrators.md](reference_virtual_orchestrators.md)
 - Active interactive Claude orchestrators are overwatch, vaexdev, spark, and 3dproppipeline (verletDev retired 2026-07-09; codexhive parked R&D) — use this list whenever a change must propagate to "the other orchestrators"
 
+### See [reference_coderabbit_rate_limits.md](reference_coderabbit_rate_limits.md)
+- CodeRabbit Pro rate limits are adaptive (fair-usage tiers), pooled per developer identity — the whole agent fleet counts as kyle-wf; how to check status without burning a review
+
 <!-- END GLOBAL SECTION -->
 
 ## Shared conventions (Spark-local — apply to every small project)

@@ -47,7 +47,7 @@ When a channel event arrives carrying a CR message, classify it by matching the 
 | **Inline-only review** | Literal text `(Empty review body — findings are inline. Run 'gh pr view ...' to fetch them.)` | CR review body is empty; findings are inline comments only | Fetch with the suggested `gh` command, treat as findings review |
 | **Inline comment** | Message starts with `CodeRabbit inline comment` (may include `(edited)` suffix before `on **<repo>#<pr>**`) | Single inline code finding (new or updated — edits often mean "addressed" markers) | Part of an inline-only review; already covered by the parent review event, but useful as a per-finding prompt |
 | **Terminal ack** | Body ends with `Resolving.` / `Resolving all open comments now.` / `[resolve]` | CR is acknowledging a resolve command; no new review coming for this HEAD | Treat as end-of-loop for this iteration; if no clean-review signal yet, verify via `gh pr view --comments` before merging |
-| **Rate limit** | Contains `Rate limit exceeded` (relay emits it with the verbatim `Please wait **N minutes and M seconds**` line when CR provided one) | CR is rate-limited; has specified a wait duration | Trigger the rate-limit retry sub-procedure below |
+| **Rate limit** | Contains `Rate limit exceeded` (relay emits it with the verbatim wait line when CR provided one — either `Please wait **N minutes and M seconds**` or the newer `Next review available in:** **N minutes**`) | CR is rate-limited; has specified a wait duration | Trigger the rate-limit retry sub-procedure below |
 | **In-progress** | `Currently processing new changes` | CR is actively reviewing | Wait for the next event — this is a progress ping, not terminal |
 | **Paused** | `Reviews paused` | CR has stopped reviewing this PR | Escalate to Kyle — the auto-loop can't continue without CR |
 
@@ -57,22 +57,23 @@ When a channel event arrives carrying a CR message, classify it by matching the 
 
 **First check whether a retry is needed at all.** If the PR is not merge-blocked on the clean review (long-lived ticket branch, more slices coming), skip the retry entirely — the next work push auto-triggers a cumulative review that covers the rate-limited diff for free. Only retry when the PR is actually waiting to merge.
 
-When the Rate limit signal arrives, the message will contain text like:
+When the Rate limit signal arrives, the message will contain a wait line in one of two phrasings (CR changed format ~2026-07; the relay passes either through verbatim):
 
 ```text
 Please wait **N minutes and M seconds** before requesting another review.
+**Next review available in:** **N minutes**
 ```
 
 Steps:
 
-1. **Parse the duration.** Regex: `Please wait \*\*(\d+) minutes? and (\d+) seconds?\*\* before requesting another review`. Convert to total seconds: `N*60 + M`.
+1. **Parse the duration.** Try legacy regex `Please wait \*\*(\d+) minutes? and (\d+) seconds?\*\*` → `N*60 + M` seconds; else `Next review available in:\*\*\s*\*\*(\d+) minutes?` → `N*60` seconds. If neither matches, default to 15 minutes and note it.
 2. **Track retry count.** Keep a mental counter for this PR's rate-limit hits (from TaskCreate metadata, a skill-local variable, or just conversation state). Cap at **3 attempts**. On the 4th rate-limit for the same PR, escalate to Kyle — something is structurally wrong (too many commits, quota exhausted for the hour, org config).
 3. **Schedule a wake-up.** `ScheduleWakeup delaySeconds=<total_seconds + 30>, reason="CR rate-limited on PR #<n>, retry after wait"`. The +30s is slack to avoid racing the rate-limit window.
-4. **On wake-up:** post `@coderabbitai full review` on the PR (this one IS a manual trigger — there's no new commit, so CR won't auto-review). Wait for the next event.
+4. **On wake-up:** post `@coderabbitai review` on the PR (this one IS a manual trigger — there's no new commit, so CR won't auto-review; plain `review` is incremental and cheaper than `full review`, and it's the command CR's own limit message names). Wait for the next event.
 5. **If the retry also rate-limits:** increment the counter and repeat from step 1.
 6. **If the retry succeeds:** reset the counter and resume the normal loop.
 
-**Why the +30s:** CR's rate-limit window is hourly (confirmed: per-user commit cap per hour). The message says "wait N minutes and M seconds" — that's the time until the hour-rollover for the oldest commit in the window. A few seconds of slack avoids the edge case where we retrigger 1 second before the window expires and get rate-limited again.
+**Why the +30s:** CR's limits are adaptive fair-usage (rolling window; reviews free up as earlier ones age out — see `reference_coderabbit_rate_limits`). The wait line states time until the next review becomes available. A few seconds of slack avoids the edge case where we retrigger just before the window frees and get rate-limited again.
 
 ## When to spawn a fix agent vs patch inline
 
