@@ -1,6 +1,6 @@
 ---
 name: commit-config
-description: Commit and push changes to the current orchestrator's own config repo after edits — memory files, skills, hooks, MEMORY.md, settings, CLAUDE.md, .mcp.json. Use when Kyle says "commit your config" or after a batch of config edits. The skill auto-adapts to whichever orchestrator is running it (overwatch, verletDev, vaexdev).
+description: Commit and push changes to the current orchestrator's own config repo after edits — memory files, skills, hooks, MEMORY.md, settings, CLAUDE.md, .mcp.json. Use when Kyle says "commit your config" or after a batch of config edits. The skill auto-adapts to whichever orchestrator is running it (overwatch, vaexdev, spark, 3dproppipeline).
 scope: global
 ---
 
@@ -15,8 +15,11 @@ This skill runs in the **current orchestrator's** workspace. Which orchestrator 
 | Orchestrator | Repo path | Default branch | Remote URL |
 |---|---|---|---|
 | overwatch | `C:\Projects\overwatch` | `master` | `git@github-second.com:WonderForge/overwatch.git` |
-| verletDev | `C:\Projects\verletDev` | `main` | `git@github-third.com:kyle-gnl/verletdev.git` |
 | vaexdev | `C:\Projects\vaexdev` | `master` | `git@github-second.com:WonderForge/vaexdev.git` |
+| spark | `C:\Projects\spark` | `master` | `git@github.com:kbricker/Agent-Spark.git` |
+| 3dproppipeline | `C:\Projects\3dproppipeline` | `master` | `git@github-second.com:WonderForge/3dPropPipeline.git` |
+
+(verletDev retired 2026-07-09 — its workspace at `C:\Projects\verletDev` is frozen, never commit there. Roster per `reference_virtual_orchestrators`.)
 
 When you run this skill, identify which orchestrator you are (from session context / agent key / the working directory you're in), then use the matching row's values everywhere the procedure references `<repo-path>`, `<branch>`, etc.
 
@@ -43,6 +46,8 @@ The orchestrator repo's tracked files are:
 - `.gitignore`
 
 Anything outside these paths is out of scope. If `git status` shows untracked files in unexpected locations (stray `.log`, editor backups, test artifacts, loose Playwright scripts), **stop and ask Kyle before committing** — do not blanket-add the whole working tree.
+
+**Known gitignored transient state (never commit, never flag as unexpected):** `.claude/restart-handoff.md` and `.claude/restart-journal/` (the prepare-restart flow, plan #652), plus lock files like `.claude/scheduled_tasks.lock`. These are process-local by design — a committed handoff would replay on a fresh clone.
 
 ## Workflow
 
@@ -100,7 +105,7 @@ EOF
 git -C <repo-path> push origin <branch>
 ```
 
-Use the branch name from the dispatch table (overwatch: `master`, verletDev: `main`, vaexdev: `master`).
+Use the branch name from the dispatch table (all four current orchestrators: `master`).
 
 **Never** force-push. If the push is rejected because the remote is ahead, pull with `git pull --rebase origin <branch>`, resolve any conflicts, and push again. Do not `--force` or `--force-with-lease` unless Kyle explicitly says so.
 
@@ -111,10 +116,10 @@ One or two sentences: what committed, what the SHA is, and that it's pushed.
 ## Gotchas
 
 - **Pre-commit hooks:** the global commit rules say never skip hooks. If a hook fails, fix the underlying issue and create a **new** commit — do not `--amend` the failing one.
-- **Unrelated local changes:** if `git status` shows changes in files you didn't touch in this session (stale edits from a prior session, auto-generated files), don't silently include them. Ask Kyle whether to include them, stash them, or leave them unstaged. **Especially relevant for verletDev** — it tends to accumulate uncommitted session drift.
+- **Unrelated local changes:** if `git status` shows changes in files you didn't touch in this session (stale edits from a prior session, auto-generated files), don't silently include them. Ask Kyle whether to include them, stash them, or leave them unstaged.
 - **MEMORY.md drift:** whenever you add or rename a memory file, MEMORY.md needs to be updated in the same commit so the index stays accurate. Never commit a new memory file without also updating the index.
-- **Wrong branch:** overwatch and vaexdev use `master`; verletDev uses `main`. The three-orchestrator dispatch table is canonical — if in doubt, run `git -C <repo-path> branch --show-current` to verify before pushing.
-- **Wrong SSH alias:** WonderForge repos use `github-second.com`; kyle-gnl repos (verletDev) use `github-third.com`. Plain `github.com` is a different GitHub account. Check `git -C <repo-path> remote -v` if auth errors surface.
+- **Wrong branch:** all four current orchestrators use `master`. The dispatch table is canonical — if in doubt, run `git -C <repo-path> branch --show-current` to verify before pushing.
+- **Wrong SSH alias:** WonderForge repos use `github-second.com`; spark uses plain `github.com` (kbricker account). Check `git -C <repo-path> remote -v` if auth errors surface.
 - **Secrets:** the `.gitignore` excludes secret files. If you ever see `secrets.json` or `appsettings.Development.json` staged, unstage immediately — something is broken.
 
 ## Do not
