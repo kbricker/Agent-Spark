@@ -158,6 +158,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [user_printing_tree_supports.md](user_printing_tree_supports.md)
 - Kyle always 3D-prints with tree supports (PLA+ default) — prefers wasted material over failed prints; design CAD for correctness, not support-free printability
 
+### See [feedback_dependency_messy_test.md](feedback_dependency_messy_test.md)
+- Kyle's bar for new deps: it must do something messy we don't want to get distracted on (e.g. reverse-engineered protocols); wrappers around clean problems get hand-rolled instead
+
 ### See [reference_gh_cli_is_wonderforge_account.md](reference_gh_cli_is_wonderforge_account.md)
 - gh CLI is authenticated as kyle-wf (WonderForge) — pushes to personal repos work (SSH), but gh PR create/merge fails until Kyle adds the kbricker account or adds kyle-wf as collaborator
 
