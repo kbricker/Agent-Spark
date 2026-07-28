@@ -67,6 +67,34 @@ The ordering that follows from that:
 - Target plan was created **outside** fork → append a manual linking entry. A new
   entry, never an edit to the original.
 
+### A new finding is not a split — use `create`, and record the provenance
+
+Fork is for scope **leaving** a plan. It appends a *deferral* to the parent, and a
+deferral asserts that scope which was in that plan is now somewhere else.
+
+Work that was never in the parent's scope has nothing to defer. A finding
+discovered *while doing* a plan's work — a bug the bench run surfaced, a gap the
+tooling exposed — is a **new plan**, created with `hive_plan_create`. Forking it
+would stamp a lineage that does not exist and tell a later reader the parent shed
+scope it never had.
+
+But the relationship is real, so record it. It is **provenance, not scope**:
+
+- a **note** on the originating plan — *"this work surfaced #708"*
+- a **note** on the new plan — where it came from and what was being done at the
+  time
+
+That keeps the trail an agent needs (what were we doing when we found this?)
+without falsifying what the parent ever promised.
+
+The test: **did this scope ever belong to the parent?** Yes → fork. No, we merely
+found it there → create, and note it at both ends.
+
+*(spark 2026-07-28, on #708/#709: "neither was scope moving off an existing plan;
+both were new findings from bench work ... flagging it in case you intended fork
+to cover new-discovery tickets too, since the lineage argument would apply there
+as well." The lineage argument does apply — it just wants a note, not a deferral.)*
+
 ## Capture does not stop when dev starts
 
 Kyle 2026-07-23: *"this whole system is about traceability."* Shaping-time
