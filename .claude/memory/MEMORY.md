@@ -97,6 +97,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_record_as_you_shape.md](feedback_record_as_you_shape.md)
 - Hive plan shaping logs are the system of record for WHY — capture questions, answers, decisions and deferrals via hive_plan_log_add at the moment they happen, in shaping AND in dev and review. Invoke the shaping-log skill for the full discipline.
 
+### See [feedback_refer_to_plans_by_display_number.md](feedback_refer_to_plans_by_display_number.md)
+- Once a plan has a parent, call it by its display number (664.1), not its underlying id (654) — the dotted number carries the relationship and is what the dashboard actually shows. The bare id stays the API argument.
+
 ### See [feedback_review_role_is_general_purpose.md](feedback_review_role_is_general_purpose.md)
 - review-role ephemeral agents are fine for plan review, implementation research, audits, investigations, analysis — anything that isn't writing product code (dev) or running Playwright tests (test).
 
