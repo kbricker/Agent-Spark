@@ -25,6 +25,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_check_local_memory.md](feedback_check_local_memory.md)
 - Memory lives in .claude/memory/ inside the project, not the default central ~/.claude/ path — always check there first
 
+### See [feedback_check_what_overrides_the_file.md](feedback_check_what_overrides_the_file.md)
+- Before editing a config or index file, check whether something downstream overwrites or overrides it — a generated block, a fence comment, or a .d/ drop-in directory. The file you are about to edit is often not the authority, and the edit fails silently.
+
 ### See [feedback_coderabbit_webhook.md](feedback_coderabbit_webhook.md)
 - GitHub webhook pushes CodeRabbit PR review events into hive-channel as chat_message events — never poll, never ScheduleWakeup to check, just wait
 
@@ -100,6 +103,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_refer_to_plans_by_display_number.md](feedback_refer_to_plans_by_display_number.md)
 - Once a plan has a parent, call it by its display number (664.1), not its underlying id (654) — the dotted number carries the relationship and is what the dashboard actually shows. The bare id stays the API argument.
 
+### See [feedback_research_before_asking.md](feedback_research_before_asking.md)
+- Exhaust the research you can do alone before asking Kyle to gather information — never use him as a sensor for something that is publicly documented
+
 ### See [feedback_review_role_is_general_purpose.md](feedback_review_role_is_general_purpose.md)
 - review-role ephemeral agents are fine for plan review, implementation research, audits, investigations, analysis — anything that isn't writing product code (dev) or running Playwright tests (test).
 
@@ -133,6 +139,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [reference_coderabbit_auto_triggers.md](reference_coderabbit_auto_triggers.md)
 - CR automatically runs a full review on PR creation and on every commit pushed to an open PR. Manually posting `@coderabbitai full review` after a dev push is redundant and wasteful. Only use the manual trigger for no-new-commit re-evaluations.
 
+### See [reference_coderabbit_rate_limits.md](reference_coderabbit_rate_limits.md)
+- CodeRabbit Pro rate limits are adaptive (fair-usage tiers), pooled per developer identity — the whole agent fleet counts as kyle-wf; how to check status without burning a review
+
 ### See [reference_ephemeral_agent_roles.md](reference_ephemeral_agent_roles.md)
 - Canonical reference for the three ephemeral-agent roles orchestrators spawn per plan. Explains what each role is, when to use it, and — critically for test — when NOT to use it. Use when picking the role for a spawn.
 
@@ -147,9 +156,6 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 
 ### See [reference_virtual_orchestrators.md](reference_virtual_orchestrators.md)
 - Active interactive Claude orchestrators are overwatch, vaexdev, spark, and 3dproppipeline (verletDev retired 2026-07-09; codexhive parked R&D) — use this list whenever a change must propagate to "the other orchestrators"
-
-### See [reference_coderabbit_rate_limits.md](reference_coderabbit_rate_limits.md)
-- CodeRabbit Pro rate limits are adaptive (fair-usage tiers), pooled per developer identity — the whole agent fleet counts as kyle-wf; how to check status without burning a review
 
 <!-- END GLOBAL SECTION -->
 
