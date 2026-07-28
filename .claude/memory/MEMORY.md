@@ -95,7 +95,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Never file new Hive plans in Backlog by default — Planning is the default status; Backlog is Kyle's manual "get this out of my face" bucket
 
 ### See [feedback_record_as_you_shape.md](feedback_record_as_you_shape.md)
-- Capture plan-shaping exchanges — questions, answers, decisions, deferrals — into the plan's shaping log via hive_plan_log_add at the moment they happen; ticket splits go through hive_plan_fork
+- Hive plan shaping logs are the system of record for WHY — capture questions, answers, decisions and deferrals via hive_plan_log_add at the moment they happen, in shaping AND in dev and review. Invoke the shaping-log skill for the full discipline.
 
 ### See [feedback_review_role_is_general_purpose.md](feedback_review_role_is_general_purpose.md)
 - review-role ephemeral agents are fine for plan review, implementation research, audits, investigations, analysis — anything that isn't writing product code (dev) or running Playwright tests (test).
