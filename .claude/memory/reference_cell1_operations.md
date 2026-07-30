@@ -22,7 +22,8 @@ cell1 is the TendWright hardware runtime: the box the arm and cameras are wired 
 - **Long-lived services must be launched `nohup setsid <cmd> > log 2>&1 < /dev/null &`.** Wrapping it in a subshell — `(setsid ... &)` — did NOT survive the ssh session teardown, twice. The working form makes the ssh channel hang, which is fine: run that Bash call in the background and verify on a fresh connection.
 - **Verify on a SEPARATE connection.** A launch and its verification in one ssh command can both report success while the process dies with the channel.
 - **Do not restart or kill services on cell1 without asking Kyle first** (standing rule). Reading state is always fine.
-- `sudo` needs a password over ssh — `sudo -n` fails with "interactive authentication is required". Anything root has to be handed to Kyle as a command to paste. `systemctl poweroff` also fails: a local Wayland session is permanently open on seat0, so polkit routes it to `power-off-multiple-sessions`. Remote shutdown needs a narrow sudoers.d rule (#698).
+- **I CAN shut cell1 down.** Kyle added a scoped sudoers rule: `(root) NOPASSWD: /usr/sbin/poweroff, /usr/sbin/shutdown, /usr/bin/systemctl poweroff`. Everything else root still needs him.
+- **`sudo -n true` is the WRONG test and I got this wrong on 2026-07-29** — it probes the general `(ALL:ALL) ALL` entry, which needs a password, so it fails even when a scoped NOPASSWD grant exists. I told Kyle I could not shut the box down while a rule to do exactly that was sitting in sudoers. **Always `sudo -n -l`** to see what is actually permitted.
 - `v4l2-ctl` is **not installed**. Query cameras through OpenCV instead.
 
 ## MuJoCo offscreen rendering
@@ -31,6 +32,12 @@ cell1 is the TendWright hardware runtime: the box the arm and cameras are wired 
 
 ## camserve
 
-Runs nohup'd on :8081, no auth, LAN only — **never port-forward it**. Cameras open only while watched, so `/status` reports `fps 0.0` and `profile: null` with no viewer attached; that is not a fault. Two live defects as of 2026-07-27: a memory leak (#704, reached 3.7 GB of 5.2 GB) and AprilTag detection costing 35 ms/frame at 1920×1080, capping the stream at ~18 fps (#705).
+Runs nohup'd on :8081, no auth, LAN only — **never port-forward it**. It is NOT a service and does not survive a reboot (#744). Cameras open only while watched, so `/status` reports `fps 0.0` and `profile: null` with no viewer attached; that is not a fault. The #704 memory leak is **FIXED** (2026-07-29, 5.09 → ~0 MB/min); detection still costs ~35 ms/frame at 1080p, capping the stream near 18 fps (#705).
 
-Related: [[project_tendwright]], [[feedback_can_kill_processes]].
+`/debug/memory` answers live on the running server — free-vs-live bytes, free CHUNK COUNT, and a coverage gate. Use it before inventing a new instrument. `?trim=<pid>` can kill the process; read-only first.
+
+## The lab beyond cell1
+
+The full inventory — every device, address, MAC, what it powers or sees, and the command that actuates it — is versioned in the repo at **`docs/lab-inventory.md`**, not here. Detail belongs in git where it survives; this memory only points at it. What to carry in your head: mains power is three TP-Link Kasa devices on the LAN reachable with `hardware/bench/kasa.py` **from the desk as well as cell1**, and `192.168.86.44` is the bench light. See [[reference_lab_control_authority]].
+
+Related: [[project_tendwright]], [[feedback_can_kill_processes]], [[reference_lab_control_authority]].

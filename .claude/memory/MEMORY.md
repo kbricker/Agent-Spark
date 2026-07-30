@@ -186,5 +186,8 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [project_tendwright.md](project_tendwright.md)
 - TendWright — robotic CNC machine-tending cell (Hive app 8, epic #612, rungs #604–#610 in order); MuJoCo+mink+uv stack; the TARGET is vision-guided pick-and-place (#606), not canned playback; twin verified against the printed STLs (#670), IK + sim camera + collision-gated bench tools shipped 2026-07-27; deep guide is the repo's own CLAUDE.md
 
+### See [reference_lab_control_authority.md](reference_lab_control_authority.md)
+- What spark is AUTHORIZED to physically actuate — cell1 shutdown, mains power, the bench light — and the gate on each. Check this before asking Kyle to go flip something; full topology is versioned at TendWright/docs/lab-inventory.md
+
 ### See [reference_cell1_operations.md](reference_cell1_operations.md)
 - cell1 (TendWright hardware runtime, Minisforum UM350) — hardware identity, no BIOS update exists, MUJOCO_GL=egl required for offscreen render, and the ssh gotchas that have already cost time (pkill -f kills your own session; services need `nohup setsid ... &` and a separate connection to verify)
