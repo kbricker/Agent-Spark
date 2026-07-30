@@ -22,6 +22,8 @@ Every orchestrator — overwatch, vaexdev, spark, 3dproppipeline — is standing
 - Fix valid findings, **re-stage**, and re-run until it reports nothing new. Log survivors — fixed and skipped — per [[feedback_log_review_findings]].
 - Do not delegate synthesis or design judgment. Subagents do lookup and adversarial reading; you do the thinking.
 
+**Known limit of this memory — the gate lives in the skill, not here.** Prose saying "ignore the config line" only helps if it is recalled at the decision point, and the decision point is `gh pr create`, which has nothing attached to it. Two orchestrators have skipped the pass without ever consciously weighing config against memory: the config line was in working context at PR time and this file was not. So `fast-track-plan` **step 6** now opens with a hard STOP that re-states the gate where it will actually be read. If you are assembling a PR, that gate is the operative check — do not rely on remembering this memory.
+
 **One caution when Kyle mentions agents:** background Bash tasks and Monitor watches render similarly to subagents in his window, so "I saw an agent" may refer to those. Check before contradicting him — and never contradict him on whether he authorized something.
 
 Related: [[feedback_fast_track_is_default]], [[feedback_never_skip_review]], [[feedback_log_review_findings]], [[feedback_review_role_is_general_purpose]], [[reference_ephemeral_agent_roles]].
