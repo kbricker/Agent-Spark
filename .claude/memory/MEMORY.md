@@ -190,7 +190,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Bench task lists are DATED files — `docs/bench-tasks-YYYY-MM-DD.md`, one per session, never one rolling document that quietly rewrites its own history
 
 ### See [reference_lab_control_authority.md](reference_lab_control_authority.md)
-- What spark is AUTHORIZED to physically actuate — cell1 shutdown, mains power, the bench light — and the gate on each. Check this before asking Kyle to go flip something; full topology is versioned at TendWright/docs/lab-inventory.md
+- What spark is AUTHORIZED to physically actuate — cell1 shutdown, mains power, the bench light, and THE ARM'S POWER (default OFF, on per task; ON from anywhere, OFF only from cell1) — and the gate on each. Check this before asking Kyle to go flip something; full topology is versioned at TendWright/docs/lab-inventory.md
 
 ### See [reference_cell1_operations.md](reference_cell1_operations.md)
 - cell1 (TendWright hardware runtime, Minisforum UM350) — hardware identity, no BIOS update exists, MUJOCO_GL=egl required for offscreen render, and the ssh gotchas that have already cost time (pkill -f kills your own session; services need `nohup setsid ... &` and a separate connection to verify)

@@ -24,12 +24,33 @@ failure mode is not forgetting an IP — it is forgetting that I am allowed.
   **`192.168.86.44`, the bench light**. Works from the desk too, so power is
   reachable with cell1 off.
 
-## Gated, but still mine to do
+## The arm's power is mine, and it defaults to OFF
 
-- Guarded outlet ON (`Arm`, `psu`, `12v`, …) → `--confirm <alias>`.
-- Guarded outlet OFF → the arm must read within `REST_TOL_TICKS` of rest,
-  checked from the encoders. These servos have **no brakes**: an unfolded
-  arm falls when de-energised. `--force` overrides for a genuine e-stop.
+Kyle 2026-07-31: *"you have control of the arms power now, the arm should
+be powered up when we are doing things, and powered down when we are
+not."* Energised **per task**, not per machine uptime — powering up is a
+deliberate first step of arm work, powering down is part of finishing.
+Proven wired that day: outlet on → `scan` → six servos at 11.9–12.0 V.
+Powering on does **not** move the arm; torque is off at power-up.
+
+**Arm ON from anywhere, arm OFF from cell1.** This asymmetry is not a
+quirk to work around — it falls out of the two gates being different in
+kind:
+
+- **ON** → `--confirm Arm`. A speed bump needing only the operator, so it
+  runs fine from the desk:
+  `uv run python -m hardware.bench.kasa on 192.168.86.90 Arm --confirm Arm`
+- **OFF** → a **measurement**: every calibrated joint read within
+  `REST_TOL_TICKS` of rest, off the encoders. The desk has no servo bus,
+  so the check cannot answer and correctly refuses (exit 2) — unknown
+  state is not permission to cut power. Run it over ssh on cell1.
+  These servos have **no brakes**: an unfolded arm falls when
+  de-energised. `--force` overrides for a genuine e-stop.
+
+Note `kasa` short-circuits when the outlet is already in the requested
+state, so an `off` against an already-off outlet returns 0 without ever
+reaching the guard. That is correct, and it means such a run proves
+nothing about whether the guard works.
 
 ## Kyle's, not mine
 
