@@ -186,6 +186,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [project_tendwright.md](project_tendwright.md)
 - TendWright — robotic CNC machine-tending cell (Hive app 8, epic #612, rungs #604–#610 in order); MuJoCo+mink+uv stack; the TARGET is vision-guided pick-and-place (#606), not canned playback; twin verified against the printed STLs (#670), IK + sim camera + collision-gated bench tools shipped 2026-07-27; deep guide is the repo's own CLAUDE.md
 
+### See [feedback_bench_task_lists_are_dated.md](feedback_bench_task_lists_are_dated.md)
+- Bench task lists are DATED files — `docs/bench-tasks-YYYY-MM-DD.md`, one per session, never one rolling document that quietly rewrites its own history
+
 ### See [reference_lab_control_authority.md](reference_lab_control_authority.md)
 - What spark is AUTHORIZED to physically actuate — cell1 shutdown, mains power, the bench light — and the gate on each. Check this before asking Kyle to go flip something; full topology is versioned at TendWright/docs/lab-inventory.md
 
