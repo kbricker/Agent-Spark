@@ -70,6 +70,17 @@ hive_plan_update({id, assignedAgent: "overwatch", reviewAgent: "overwatch"})
 
 ### 4. Do the work
 
+> **STATUS GATE — move the ticket to Development BEFORE the first edit.** Not after, not at the end. The full walk is `Planning → Review → Ready → Development`; run all three transitions now, in one batch:
+> ```
+> hive_plan_update({id, fastTrack: true, assignedAgent: "<you>", reviewAgent: "<you>", gitBranch, baseBranch})
+> hive_plan_update({id, status: "Review"})
+> hive_plan_update({id, status: "Ready"})
+> hive_plan_update({id, status: "Development"})
+> ```
+> Assignments must land first — `fastTrack` skips dashboard-approval gates but **not** the agent-required gate, and `Planning → Development` in one hop is rejected as "not an allowed transition". Four calls total; do them as a block and get on with the work.
+>
+> This gate is here, not in step 8, on purpose. Step 8 lists the whole state machine including "before starting work" — but by the time you read step 8 you have already done the work, so that line arrives too late to act on. Measured 2026-07-30: 16 plans sat in Planning with checklist items already checked, 2 of them fully checked; 5 more had a branch or PR while still pre-Development.
+
 - Start from fresh default branch: `git checkout <default> && git pull origin <default>`
 - For single-target-repo plans, create a feature branch: `git checkout -b plan{id}/short-slug`
 - For config-repo plans, commit to default branch directly
@@ -107,13 +118,23 @@ Before the first push of any fast-track PR branch — the push that opens it to 
 - For single-target PR flow: push the branch, `gh pr create` with detailed body + test plan, wait for CodeRabbit (default is to wait — only skip when Kyle says "don't wait for rabbit"), merge with `gh pr merge {n} --merge --delete-branch`. Never `--squash`.
 - For config-repo direct flow: commit directly to default branch, `git push`, done.
 
+> **STATUS GATE — the moment the PR exists, move the ticket:** `hive_plan_update({id, status: "CodeReview", prUrl, gitBranch})`. Do it in the same breath as `gh pr create`, not after CR replies. A plan sitting in Development with a live PR is the second most common stall we measured.
+
 ### 7. Deploy (if applicable)
 
 - If the plan touches `AgentStudio2/` / `McpBridge/src/` / `RemoteAgent/`: invoke `/deploy-hive` as a sub-step.
 - If the plan only touches orchestrator workspace config (`.claude/`): no deploy. The local `git pull` in each workspace (or you're already in it) picks up the change.
 - If it touches wfa2 hooks/scripts used by orchestrators: message affected orchestrators to `git pull` in `C:/Projects/wfa2`.
 
-### 8. Walk plan status through the gated machine
+### 8. Close the ticket — and reference for the whole state machine
+
+> **STATUS GATE — after the merge and any deploy, move it to Completed.** `hive_plan_update({id, status: "Completed"})`. A merged, deployed plan left in CodeReview reads as in-flight on Kyle's dashboard and is indistinguishable from work that stalled.
+>
+> **If it cannot close, say so out loud — do not just leave it.** The usual reason is a validation item only Kyle can perform (a UI check, a device test, a round-trip he has to trigger). That is legitimate, but a silently-parked plan is invisible: nothing chases it and it looks identical to an abandoned one. Name the specific item and what you need from him in your report, every time you hand back. Live example at time of writing: #738 and #739 were both merged and deployed yet sat in CodeReview on one unchecked Kyle-only item.
+>
+> **Never close on a partially-checked list.** Every fix/task/validation item gets checked, or the plan is not Completed — see step 10. If an item turns out not to apply, correct its text or delete it deliberately; do not leave it dangling and close anyway.
+
+**This section is the reference for the full machine. The operative gates are inline at steps 4, 6 and here** — do not rely on reaching this section to remember them.
 
 **Sequential, one step at a time, no skipping:** `Planning → Review → Ready → Development → CodeReview → Completed`.
 

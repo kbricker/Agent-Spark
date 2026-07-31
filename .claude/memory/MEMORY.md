@@ -56,7 +56,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Every settled review (internal adversarial, ephemeral review agent, CodeRabbit-worth-keeping) logs its surviving findings — including skipped ones — to the Hive review-findings store via hive_review_finding_add. Procedure in the log-review-findings skill.
 
 ### See [feedback_move_tickets_with_work.md](feedback_move_tickets_with_work.md)
-- Always update plan status when spawning agents or starting work — don't leave tickets in Planning while agents are in Development
+- The ticket status must track reality at three moments — first edit (Development), PR opened (CodeReview), merged+deployed (Completed). Applies to inline fast-track work, not just agent spawns.
 
 ### See [feedback_never_defer_scope.md](feedback_never_defer_scope.md)
 - Verlet tickets are always about user-facing features. Do not invent "polish follow-up" buckets on your own to get a PR shipped. If the user can't do the thing, the plan isn't done.
