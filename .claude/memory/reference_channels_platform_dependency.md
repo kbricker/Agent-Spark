@@ -1,6 +1,6 @@
 ---
 name: Channels is a platform dependency — pin the version, test delivery after every upgrade
-description: The whole fleet's inbound event pipeline rides on a preview Claude Code feature; how to pin the version, how to test delivery before rolling an upgrade, and how to recognise a silent inbound drop in minutes instead of hours
+description: The whole fleet's inbound event pipeline rides on a preview Claude Code feature; how to pin the version, how to test delivery before rolling an upgrade, how to recognise a silent inbound drop in minutes, and the remote Anthropic feature flag (tengu_harbor) that pinning does not protect against
 type: reference
 scope: global
 ---
@@ -63,7 +63,29 @@ A Claude Code "marketplace" is not a storefront: it is a directory or git URL ho
 
 So migrating to supported `--channels` is: a manifest file, the existing McpBridge channel wrapped as a plugin, one registry value, and a launch-flag swap. The allowlist check is skipped entirely for dev-loaded channels, so building the supported path cannot disturb the dev-flag path still in use.
 
-**Not yet exercised end-to-end**, and `tengu_harbor` — a remote feature flag feeding the `/channels` status view's `disabled` field — is unexamined and outside our control.
+**Not yet exercised end-to-end.**
+
+## The risk pinning does NOT cover: `tengu_harbor`
+
+Channels can be switched off remotely by Anthropic, and nothing on our side prevents it. This is the largest exposure here — larger than a bad release — and it was initially mis-recorded as a cosmetic detail, so do not re-file it as one.
+
+`tengu_harbor` is a **GrowthBook feature flag**, read as `Ke("tengu_harbor", false)` — server-supplied value, **default false**. It is checked inside `gateChannelServer`, third in the sequence:
+
+1. does the server declare the `claude/channel` capability
+2. is this a first-party provider (channels are unavailable on third-party providers)
+3. **`if (!tengu_harbor) → skip: "channels feature is not currently available"`**
+4. org policy (`channelsEnabled`)
+5. the plugin allowlist
+
+**Step 3 is upstream of both the policy check and the allowlist.** `--dangerously-load-development-channels` only skips step 5, so the dev flag does not protect us — and neither would migrating to the supported `--channels` path. The code also *deletes* the `claude/channel` capability from a connected server's advertised set when the flag is false, so the feature disappears silently rather than erroring.
+
+If Anthropic flips it off — for one account, a rollout cohort, or globally — **every orchestrator goes deaf at once**, with no upgrade, no version change, and no config change on our side. The symptom is identical to the v2.1.195 silent drop above: outbound fine, inbound silent, nothing logged. During a preview, flag flips are the normal rollout and rollback mechanism, so this is more likely than a bad release and takes effect faster, since no upgrade is required.
+
+**Diagnostic value:** if inbound dies fleet-wide and simultaneously across sessions on *different* Claude Code versions, suspect the flag rather than a release. A bad release only affects sessions that took it.
+
+Currently **on**, known empirically rather than by inspection — inbound events are arriving, which cannot happen while it is false.
+
+**Open lead, not a fact:** the async flag resolvers consult two local sources before falling back to the cached GrowthBook values, which hints a local override may exist. The synchronous path `Ke` uses has not been traced to confirm it honours the same precedence. If an override exists and is honoured, it is a real mitigation. Untraced — do not assume either way.
 
 ## Related
 
