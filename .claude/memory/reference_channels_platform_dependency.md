@@ -24,7 +24,25 @@ Know this symptom cold, because it mimics a platform outage:
 - Outbound is unaffected — `hive_send_message`, status updates and plan writes all succeed, which makes it *look* like Hive is fine.
 - Nothing appears in any log, because from the session's perspective no event was ever offered.
 
-**The tell is asymmetry: outbound works, inbound is silent.** If you are diagnosing "the orchestrator went deaf", check the Claude Code version *first*, before AgentStudio2, McpBridge, SignalR, or the network. It is the cheapest check and it has been the answer before.
+**The tell is asymmetry: outbound works, inbound is silent.** That tells you it is the channel, not Hive — so do not start in AgentStudio2, McpBridge, SignalR, or the network.
+
+### First question: ask whether the other orchestrators are also deaf
+
+Three different causes produce an identical silent drop, and **they are told apart by blast radius, not by anything visible from inside one session**:
+
+| Cause | Who goes deaf | Confirm |
+|---|---|---|
+| `claudeArgs` dropped the channels flag | **that one agent only** | its own command line; `launch.ps1` warns on this |
+| `tengu_harbor` flipped off by Anthropic | **fleet-wide, including sessions on _different_ Claude Code versions** | nothing local — inferred from the spread |
+| Bad Claude Code release (e.g. 2.1.195) | **only sessions that took that version** | compare versions of deaf vs healthy sessions |
+
+So the cheapest first move is one question to the other orchestrators: **are you receiving inbound events?** That single answer collapses the space immediately, and no amount of reasoning inside the affected session can substitute for it — from in there, all three look the same.
+
+*Contributed by spark, 2026-08-02, while patching a restart handoff that had pointed only at the version.*
+
+**Beware the recency trap.** Whatever was changed most recently becomes the obvious suspect, and a fresh session that comes up deaf right after a launcher change will naturally start debugging the launcher. That is a long, plausible, and possibly wrong road. Ask the cross-session question *before* believing the coincidence — a fleet-wide answer rules the local change out in seconds.
+
+Only once you know the scope is local to one agent does the version check or the command-line check pay off.
 
 ## Pin the version
 
