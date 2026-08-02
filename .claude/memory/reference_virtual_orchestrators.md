@@ -23,4 +23,4 @@ Each active orchestrator has its own workspace, its own `.claude/settings.json`,
 
 **How to apply:** Any time the task scope is "roll this out to the other orchestrators" or "tell my agents X", enumerate ALL active orchestrators from this list. A full propagation beyond overwatch currently has THREE destinations: vaexdev, spark, 3dproppipeline. Charter caveat: spark builds Kyle's personal projects only (not wfa2/VaEx/Verlet) — some platform-specific globals still propagate to it for the shared baseline, but it won't act on Hive-platform work.
 
-Also see `reference_channel_launch.md` for launcher details (virtual-launcher wrapper, desktop .lnk files, credential manager key storage) — this file is the "who exists" file; that file is the "how they start up" file.
+Also see `reference_channel_launch.md` for launcher details (`virtual-launcher/launch.ps1`, desktop .lnk files, credential manager key storage) — this file is the "who exists" file; that file is the "how they start up" file. The word "wrapper" was correct until plan #752 (2026-08-02) retired the resident Node process; the launcher is now a launch-time PowerShell script and nothing stays running.
