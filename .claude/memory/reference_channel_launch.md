@@ -61,6 +61,7 @@ That precedence is the important part: on the Kyle box the store wins, so a stal
 - VM agents (ephemerals, NightWatch) don't set `HIVE_AGENT_KEY` and stay dormant on the channel.
 - For unattended operation, add `--dangerously-skip-permissions` to the agent's `claudeArgs` in its config JSON.
 - `claudeArgs` is **all-or-nothing** — a config that sets it must restate every flag it wants, including `--dangerously-load-development-channels server:hive`. Dropping that flag detaches the agent from the entire inbound event pipeline. `launch.ps1` warns when the resolved arguments omit it.
+- That flag is a **preview-contract dependency on Claude Code itself**. Before upgrading Claude Code, and whenever an orchestrator has gone deaf while outbound still works, read [[reference_channels_platform_dependency]] — it covers version pinning, the post-upgrade delivery test, the silent-inbound-drop symptom, and the (non-admin-gated) route off the dev flag.
 
 ## Historical notes
 

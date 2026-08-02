@@ -139,6 +139,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [reference_channel_launch.md](reference_channel_launch.md)
 - Launch via the desktop .lnk shortcuts (virtual-launcher/launch.ps1) with identity keys in Windows Credential Manager; direct claude invocation is a debug-only fallback
 
+### See [reference_channels_platform_dependency.md](reference_channels_platform_dependency.md)
+- The whole fleet's inbound event pipeline rides on a preview Claude Code feature; how to pin the version, how to test delivery before rolling an upgrade, and how to recognise a silent inbound drop in minutes instead of hours
+
 ### See [reference_coderabbit_auto_triggers.md](reference_coderabbit_auto_triggers.md)
 - CR automatically runs a full review on PR creation and on every commit pushed to an open PR. Manually posting `@coderabbitai full review` after a dev push is redundant and wasteful. Only use the manual trigger for no-new-commit re-evaluations.
 
