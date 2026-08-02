@@ -27,13 +27,32 @@ Repeat until CodeRabbit comes back clean, then merge.
 2. **Distinguish actionable from informational.** Focus on actionable findings and nits you decide to absorb. Apply `manage-scope-creep` sift to anything adjacent-but-outside the diff.
 3. **Fix or push back.**
    - If findings are correct: dispatch the dev agent (already alive from `run-plan-workflow`) with a concrete briefing. Dev fixes, runs tests, commits, **pushes — that push automatically triggers CR pass N+1**. For fast-track plans, the orchestrator fixes directly.
-   - **Piggyback the fix-push when possible.** If more work is about to land on the same PR anyway (long-lived ticket branch, next slice already in flight), fold the CR fixes into that work commit instead of pushing them alone — each solo push burns a review run against the adaptive rate limit. Only push CR fixes standalone when the PR is merge-blocked waiting on the clean review.
-   - If a finding is wrong or a bad-taste suggestion: leave a reply on the comment explaining why, don't dismiss silently. CR's next pass will see the reply.
+   - **ONE PUSH PER REVIEW CYCLE. This is a hard rule, not a preference.** When a review arrives, fix EVERY finding in it, run the internal pass (step 3.5), fix what that finds too — then push ONCE. Never push per finding, per finding-cluster, or "while you think about the rest". Findings that arrive mid-triage join the same push.
+     - Why it is stated this hard: the previous wording said "piggyback the fix-push *when possible*, only push standalone when the PR is merge-blocked" — which never fires on the common case (a PR whose only remaining work IS the CR fixes) and whose escape clause explicitly licensed a standalone push exactly when the loop is hottest. On wfa2#119 that guidance permitted three pushes in twenty minutes, consumed the entire fleet-wide hourly allowance on ONE PR, and stalled the merge behind a 30-minute cooldown. The cost is per-cycle; guidance that reasons per-push cannot see it.
+     - The push cadence sets the review cadence. Every push is a review run, so pushing three times means asking for three reviews whether or not you wanted them.
+   - If a finding is wrong or a bad-taste suggestion: explain why rather than dismissing silently — but **batch the pushbacks into ONE PR comment covering every declined finding**, not one reply per thread. Reply comments appear to consume runs too (wfa2#119 measured five runs against four pushes), and a reply-per-finding turns one disagreement into several.
    - If a finding is a genuine architectural disagreement you can't resolve: surface to Kyle.
-4. **Do NOT post `@coderabbitai resolve` routinely.** CR marks its own comments addressed on the next review pass (you'll see `(edited)` inline-comment events) — the command is redundant chatter that costs quota and triggers a reply. Only post it when stale threads genuinely linger after a clean review AND the PR is about to merge. (Per Kyle 2026-07-11, plan #581: "learn to not be so chatty with CR".)
-5. **Wait for the auto-triggered next review from the push.** Do NOT also post `@coderabbitai full review` — duplicate review against the same HEAD. Just watch for the event.
-6. **Loop back to step 1.** Every iteration should reduce the finding count. If it doesn't (fighting in circles), stop and ask Kyle.
-7. **Exit condition: clean review** (see the signal table below). At that point, merge the PR.
+4. **Run the internal adversarial pass on the FIX BATCH before pushing it** — not only on the original diff. `fast-track-plan` step 5.5 mandates this before the first push; it applies to every subsequent fix batch too, and this is the highest-leverage rule in this skill.
+   - Fix commits are where review attention is lowest and stakes are often highest (they touch error paths, rollback, ordering). On wfa2#119, three fix batches were pushed without an internal pass and CR found defects in two of them, each costing a full round-trip; the one batch that DID get an internal pass first had two findings caught before they ever reached CR.
+   - Internal passes cost **zero** CR quota, share the prompt cache, and return in minutes. A finding caught internally is a CR cycle you never spend.
+   - Watch specifically for **the sibling you didn't fix**: wfa2#119 twice had a fix applied at the reported site while the identical defect sat untouched in a parallel code path a few lines away. When you fix a finding, grep for its shape elsewhere before pushing.
+5. **Do NOT post `@coderabbitai resolve` routinely.** CR marks its own comments addressed on the next review pass (you'll see `(edited)` inline-comment events) — the command is redundant chatter that costs quota and triggers a reply. Only post it when stale threads genuinely linger after a clean review AND the PR is about to merge. (Per Kyle 2026-07-11, plan #581: "learn to not be so chatty with CR".)
+6. **Wait for the auto-triggered next review from the push.** Do NOT also post `@coderabbitai full review` — duplicate review against the same HEAD. Just watch for the event.
+7. **Loop back to step 1.** Every iteration should reduce the finding count. If it doesn't (fighting in circles), stop and ask Kyle.
+8. **Exit condition: clean review** (see the signal table below). At that point, merge the PR.
+
+## The review budget — count runs, not just findings
+
+**Target: 3 CR runs per PR.** One on open, plus at most two fix cycles. That is the whole budget, because the nominal Pro allowance is 5 reviews/hour **pooled across the entire fleet** (every agent authors as `kyle-wf`), and adaptive fair-usage cuts it further — CodeRabbit told us on 2026-08-02 that our activity sits in the *95th percentile or higher* of all its users. One PR spending five runs is one PR spending everyone's hour.
+
+- **Before any push to a PR that has already had 2+ reviews**, post `@coderabbitai rate limit` — it returns current status and **does not consume a run**. Check the budget before spending it.
+- **Reaching run 4 is a signal, not a milestone.** It means the diff was not ready when it was first pushed. Stop, run the internal pass to convergence, and ship the remainder as one batch — do not keep trading pushes for reviews.
+- **A green CodeRabbit check is not necessarily a review.** A rate-limited PR shows the check as `pass` with the description `Review rate limited`. Read the description, not the tick — merging on that is merging on a check that never ran.
+- **What the check state actually means** matters at merge time: `mergeStateStatus: CLEAN` reflects branch protection, not whether CR reviewed the latest commit. Verify the newest commit was actually covered.
+
+## Guard against auto-pause as well as rate limits
+
+These are different mechanisms and they need different responses — see `reference_coderabbit_rate_limits`. A **rate limit** names a wait and clears itself. An **auto-pause** names no time, never clears on its own, and silently stops reviewing pushes altogether so a branch accumulates unreviewed commits. Batching fixes into fewer pushes is the single defence that works against both.
 
 ## CR event signal table
 
@@ -101,6 +120,8 @@ Merge the PR. Move the plan back to the appropriate deploy/validate step (or str
 
 ## Do not
 
+- **Do not push more than once per review cycle.** The single most expensive habit available to you. See step 3.
+- **Do not push a fix batch that no reviewer has seen.** Internal pass first, every time — it is free.
 - Do not nag Kyle between iterations. Own the loop.
 - Do not merge on a partially-reviewed PR hoping the remaining findings "don't matter".
 - Do not argue with CodeRabbit in comment threads beyond a single clarifying reply. If it's still wrong on the next pass, surface to Kyle.
