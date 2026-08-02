@@ -137,7 +137,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Virtual Hive agent `3dproppipeline` can drive Blender to produce/modify 3D asset files (fbx, obj, likely glb). Use for Blender-reexport validations and any test that needs real DCC output instead of fabricated binaries.
 
 ### See [reference_channel_launch.md](reference_channel_launch.md)
-- Preferred launch is the virtual-launcher wrapper with keys in Windows Credential Manager (plan #239); direct claude invocation is a debug-only fallback
+- Launch via the desktop .lnk shortcuts (virtual-launcher/launch.ps1) with identity keys in Windows Credential Manager; direct claude invocation is a debug-only fallback
 
 ### See [reference_coderabbit_auto_triggers.md](reference_coderabbit_auto_triggers.md)
 - CR automatically runs a full review on PR creation and on every commit pushed to an open PR. Manually posting `@coderabbitai full review` after a dev push is redundant and wasteful. Only use the manual trigger for no-new-commit re-evaluations.
