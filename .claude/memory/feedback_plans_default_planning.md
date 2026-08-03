@@ -1,9 +1,29 @@
 ---
 name: Plans default to Planning, not Backlog
-description: Never file new Hive plans in Backlog by default — Planning is the default status; Backlog is Kyle's manual "get this out of my face" bucket
+description: Two checks before every hive_plan_create — should this be a fork of an existing plan instead, and is the status Planning (never Backlog, which is Kyle's manual "get this out of my face" bucket)
 type: feedback
 scope: global
 ---
+
+## Before you create: should this be a fork, or not a new plan at all?
+
+`hive_plan_create` is a tool you can reach for at any moment, so this check has to live somewhere always loaded rather than in a skill you might not invoke.
+
+**The test — did this scope ever belong to an existing plan?**
+
+- **Yes → `hive_plan_fork`.** Fork stamps lineage on both ends and auto-appends a linked deferral on the parent. A hand-rolled create gives you two plans with no relationship, and the connection then lives only in prose someone remembered to write.
+- **No, we merely found it while working there → `hive_plan_create`**, plus a provenance note on both plans.
+- **It's just the next phase of work already in an existing plan's scope → neither. Keep working that plan.**
+
+That third branch is the one that gets missed. Kyle, 2026-08-03: *"no agent should make a new ticket so blithly... its super annoying how you bloat tickets with scope that makes little sense, and create new tickets when they are not needed."*
+
+**Worked example of getting it wrong (2026-08-03).** Plan #754 said in its own scope: *"if it works, packaging the Hive channel as a plugin gets us onto supported `--channels`."* When Kyle authorised that build, a new plan #773 was created for it. But the scope was already #754's — the answer was fork, or simply carry on. Kyle had to notice the two plans were the same work and ask *"so these are the same ticket?"* before it was caught. It was reparented to 754.1.
+
+The tell that produced the error: the split was drawn on **research vs build**, and on *"this needed Kyle's go-ahead, so it should be its own ticket."* Neither is a scope boundary. Needing authorization to proceed is not the same as the work being separate work — get the go-ahead and keep working the plan you have.
+
+Fuller reasoning, and the fork-vs-create ordering rules, live in the `shaping-log` skill (§ Scope splits) and `fast-track-plan` step 1. This memory exists because those are on-demand skills and this decision happens at tool-call time.
+
+## Status: Planning, never Backlog
 
 When filing a new Hive plan (including parking-lot platform-improvement tickets that won't be worked on immediately), the default status is **Planning**, not Backlog.
 

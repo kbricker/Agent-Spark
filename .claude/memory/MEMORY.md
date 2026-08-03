@@ -95,7 +95,10 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Any plan touching stateful surfaces (pooled objects, caches, mode controllers, serialized/numeric inputs) must enumerate init → reset → teardown → reuse paths plus value-domain constraints before dev starts
 
 ### See [feedback_plans_default_planning.md](feedback_plans_default_planning.md)
-- Never file new Hive plans in Backlog by default — Planning is the default status; Backlog is Kyle's manual "get this out of my face" bucket
+- Two checks before every hive_plan_create — should this be a fork of an existing plan instead, and is the status Planning (never Backlog, which is Kyle's manual "get this out of my face" bucket)
+
+### See [feedback_fix_workflow_problems_when_found.md](feedback_fix_workflow_problems_when_found.md)
+- When a process or workflow defect surfaces mid-task, fix it then and there or file a ticket so it gets circled back to; breaking context is worth it
 
 ### See [feedback_record_as_you_shape.md](feedback_record_as_you_shape.md)
 - Hive plan shaping logs are the system of record for WHY — capture questions, answers, decisions and deferrals via hive_plan_log_add at the moment they happen, in shaping AND in dev and review. Invoke the shaping-log skill for the full discipline.
