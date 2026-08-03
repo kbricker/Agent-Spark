@@ -70,14 +70,18 @@ hive_plan_update({id, assignedAgent: "overwatch", reviewAgent: "overwatch"})
 
 ### 4. Do the work
 
-> **STATUS GATE — move the ticket to Development BEFORE the first edit.** Not after, not at the end. The full walk is `Planning → Review → Ready → Development`; run all three transitions now, in one batch:
+> **STATUS GATE — move the ticket to Development BEFORE the first edit.** Not after, not at the end. The walk is `Planning → Review → Ready → Development`:
 > ```
 > hive_plan_update({id, fastTrack: true, assignedAgent: "<you>", reviewAgent: "<you>", gitBranch, baseBranch})
 > hive_plan_update({id, status: "Review"})
-> hive_plan_update({id, status: "Ready"})
-> hive_plan_update({id, status: "Development"})
+> hive_plan_update({id, status: "Ready"})       // shaping is done — see below
+> hive_plan_update({id, status: "Development"}) // first edit is imminent
 > ```
-> Assignments must land first — `fastTrack` skips dashboard-approval gates but **not** the agent-required gate, and `Planning → Development` in one hop is rejected as "not an allowed transition". Four calls total; do them as a block and get on with the work.
+> Assignments must land first — `fastTrack` skips dashboard-approval gates but **not** the agent-required gate, and `Planning → Development` in one hop is rejected as "not an allowed transition".
+>
+> **`Ready` is a real state, not a transition to pass through.** It means *research and planning are complete and this is now a workable plan.* Kyle, 2026-08-03: *"ready state means the research and planning has been completed, but we rarely use it properly."* Almost every plan starts as a rough goal that needs shaping (see `feedback_plans_default_planning`), so the Planning→Ready boundary is the single most informative transition on the board: it is what separates "still being figured out" from "understood, could be built."
+>
+> So **set Ready when shaping actually finishes**, which is usually earlier than this step and often in a different session. Firing it in the same batch as Development — which this gate previously instructed — means no plan ever rests in Ready, the dashboard can never show what is shaped-but-unbuilt, and the state carries no information. Batch all four calls together **only** when the plan arrived already shaped and you are starting work immediately; that is the rare case, not the default.
 >
 > This gate is here, not in step 8, on purpose. Step 8 lists the whole state machine including "before starting work" — but by the time you read step 8 you have already done the work, so that line arrives too late to act on. Measured 2026-07-30: 16 plans sat in Planning with checklist items already checked, 2 of them fully checked; 5 more had a branch or PR while still pre-Development.
 
@@ -138,9 +142,20 @@ Before the first push of any fast-track PR branch — the push that opens it to 
 
 **Sequential, one step at a time, no skipping:** `Planning → Review → Ready → Development → CodeReview → Completed`.
 
+What each state asserts, since two of them are routinely burned as syntax:
+
+| State | Means |
+|---|---|
+| `Planning` | Being shaped. The default, and where most plans legitimately spend their early life. |
+| `Review` | The shaped plan is being checked before work starts. |
+| `Ready` | **Research and planning are complete — this is a workable plan.** Set it when shaping finishes, not when you start building. |
+| `Development` | Someone is editing code right now. |
+| `CodeReview` | PR is open. |
+| `Completed` | Merged, deployed, every item checked. |
+
 ```
 hive_plan_update({id, status: "Review"})       // after assignments set
-hive_plan_update({id, status: "Ready"})
+hive_plan_update({id, status: "Ready"})        // when shaping is done — often its own moment
 hive_plan_update({id, status: "Development"})  // before starting work
 hive_plan_update({id, status: "CodeReview", prUrl, gitBranch})   // after commit
 hive_plan_update({id, status: "Completed"})
