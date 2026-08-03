@@ -21,6 +21,12 @@ That third branch is the one that gets missed. Kyle, 2026-08-03: *"no agent shou
 
 The tell that produced the error: the split was drawn on **research vs build**, and on *"this needed Kyle's go-ahead, so it should be its own ticket."* Neither is a scope boundary. Needing authorization to proceed is not the same as the work being separate work — get the go-ahead and keep working the plan you have.
 
+**Why research-vs-build is the trap specifically.** Kyle, 2026-08-03: *"almost all our tickets start as research / rouch shaped goals that need refined into concise workable plans. its exceedingly rare for me to just blurt out a sentance of perfectly formed scope that can just be done."*
+
+So the normal life of a ticket is **rough goal → research → shaped scope → build**, all in one plan. Refinement is the ticket's early phase, not a precursor to it. Treating the end of research as the end of the ticket splits at the point nearly every plan passes through, which is how you get two plans for one piece of work.
+
+Practical consequence: when research on a plan concludes and the way forward is clear, the default is to **rewrite that plan's description and checklist in place** and carry on. A plan whose scope changed as it was shaped is working exactly as intended — it does not need a successor.
+
 Fuller reasoning, and the fork-vs-create ordering rules, live in the `shaping-log` skill (§ Scope splits) and `fast-track-plan` step 1. This memory exists because those are on-demand skills and this decision happens at tool-call time.
 
 ## Status: Planning, never Backlog
