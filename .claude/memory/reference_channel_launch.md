@@ -61,7 +61,24 @@ That precedence is the important part: on the Kyle box the store wins, so a stal
 - VM agents (ephemerals, NightWatch) don't set `HIVE_AGENT_KEY` and stay dormant on the channel.
 - For unattended operation, add `--dangerously-skip-permissions` to the agent's `claudeArgs` in its config JSON.
 - `claudeArgs` is **all-or-nothing** — a config that sets it must restate every flag it wants, including `--dangerously-load-development-channels server:hive`. Dropping that flag detaches the agent from the entire inbound event pipeline. `launch.ps1` warns when the resolved arguments omit it.
-- That flag is a **preview-contract dependency on Claude Code itself**. Before upgrading Claude Code, and whenever an orchestrator has gone deaf while outbound still works, read [[reference_channels_platform_dependency]] — it covers version pinning, the post-upgrade delivery test, the silent-inbound-drop symptom, and the (non-admin-gated) route off the dev flag.
+- That flag is a **preview-contract dependency on Claude Code itself**. Before upgrading Claude Code, and whenever an orchestrator has gone deaf while outbound still works, read [[reference_channels_platform_dependency]] — it covers version pinning, the post-upgrade delivery test, the silent-inbound-drop symptom, and the route off the dev flag.
+
+## The fleet is split: one agent on supported `--channels`, the rest on the dev flag
+
+As of 2026-08-03 (plan 754.1), **`3dproppipeline` launches on the supported path** — `--channels plugin:hive-channel@wonderforge`, with no dev flag. Every other agent still uses `--dangerously-load-development-channels server:hive`, deliberately, until the pilot has run for a while. **`launch.ps1`'s guard accepts either form and warns only if a config has neither** (or confusingly, both) — the dev flag is *not* deprecated and must keep working for the unmigrated majority.
+
+Migrating an agent takes three changes together. Doing only the first is the failure that cost an iteration:
+
+1. `claudeArgs` in its `configs/<key>.json` → `["--channels", "plugin:hive-channel@wonderforge"]`
+2. **Remove the `hive` server from its workspace `.mcp.json`.** The plugin must be the *sole* definition. Two servers both named `hive` collide, the plugin's copy loses, and you get the worst failure shape available: tools keep working, so the agent looks healthy, while the channel never arms and no event ever arrives.
+3. Add `mcp__plugin_hive-channel_hive__*` to its `.claude/settings.json` allow list. Plugin-provided tools are namespaced, so the existing `mcp__hive__*` rule cannot match them and **every** Hive call prompts.
+
+Two consequences that surprise people:
+
+- **Channel blocks arrive as `source="plugin:hive-channel:hive"`, not `source="hive"`.** Anything matching on the literal string — docs, hooks, parsing, the MCP server's own instructions — is wrong for a migrated agent.
+- **`/mcp` output is not evidence either way.** The capability report reads a different, non-override-aware allowlist than the one that actually gates delivery, so it can claim the channel capability is absent while events flow perfectly. The only proof is a real inbound block arriving.
+
+One-time machine setup, already done: the marketplace lives at `C:\Projects\wfa2\claude-plugins` (added by local path — nothing is published anywhere), and `allowedChannelPlugins` is in the managed-settings policy key. **That policy write requires elevation** — `HKCU\SOFTWARE\Policies` is ACL'd, so it is a UAC prompt, not a user-writable key. `claude-plugins/setup-channel-policy.ps1` performs it and takes `-Remove` to undo.
 
 ## Historical notes
 
