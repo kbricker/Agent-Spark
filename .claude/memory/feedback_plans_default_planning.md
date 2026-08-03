@@ -5,6 +5,8 @@ type: feedback
 scope: global
 ---
 
+**The name is the rule.** Kyle, 2026-08-03: *"it is why they are called plans and the starting state is planning."* They are **plans**, and they open in **Planning** — the artifact is named for the activity, and the default status is the phase where shaping happens. Both halves of this memory follow from that: file it as Planning, and refine it in place rather than filing a successor once it is shaped.
+
 ## Before you create: should this be a fork, or not a new plan at all?
 
 `hive_plan_create` is a tool you can reach for at any moment, so this check has to live somewhere always loaded rather than in a skill you might not invoke.
