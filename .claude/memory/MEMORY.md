@@ -94,6 +94,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_plan_state_lifecycle.md](feedback_plan_state_lifecycle.md)
 - Any plan touching stateful surfaces (pooled objects, caches, mode controllers, serialized/numeric inputs) must enumerate init → reset → teardown → reuse paths plus value-domain constraints before dev starts
 
+### See [reference_plan_state_design_intent.md](reference_plan_state_design_intent.md)
+- The plan states encode a multi-agent pipeline (planner shapes, air-gapped adversarial reviewer flags Ready, dev picks it up, review validates); Ready is the handoff point, and only the code-review half was ever built
+
 ### See [feedback_plans_default_planning.md](feedback_plans_default_planning.md)
 - Two checks before every hive_plan_create — should this be a fork of an existing plan instead, and is the status Planning (never Backlog, which is Kyle's manual "get this out of my face" bucket)
 
