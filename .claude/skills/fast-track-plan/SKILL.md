@@ -79,9 +79,13 @@ hive_plan_update({id, assignedAgent: "overwatch", reviewAgent: "overwatch"})
 > ```
 > Assignments must land first — `fastTrack` skips dashboard-approval gates but **not** the agent-required gate, and `Planning → Development` in one hop is rejected as "not an allowed transition".
 >
-> **`Ready` is a real state, not a transition to pass through.** It means *research and planning are complete and this is now a workable plan.* Kyle, 2026-08-03: *"ready state means the research and planning has been completed, but we rarely use it properly."* Almost every plan starts as a rough goal that needs shaping (see `feedback_plans_default_planning`), so the Planning→Ready boundary is the single most informative transition on the board: it is what separates "still being figured out" from "understood, could be built."
+> **`Review` and `Ready` are real states, not transitions to pass through** — see the table at step 8 for what each asserts. `Review` is **planning review**: the plan is baked, and you smell-check it for gaps before any work starts. `Ready` means it passed and is **ready for development — a stopping point in the ticket's lifecycle**, where plans legitimately rest.
 >
-> So **set Ready when shaping actually finishes**, which is usually earlier than this step and often in a different session. Firing it in the same batch as Development — which this gate previously instructed — means no plan ever rests in Ready, the dashboard can never show what is shaped-but-unbuilt, and the state carries no information. Batch all four calls together **only** when the plan arrived already shaped and you are starting work immediately; that is the rare case, not the default.
+> Kyle, 2026-08-03: *"ready state means the research and planning has been completed, but we rarely use it properly... its a stopping point in the lifecycle of a ticket. we dont use the workflow well at all today."*
+>
+> So the intended rhythm is **shape → planning-review → Ready → stop**, with starting the build as a separate later act. Almost every plan begins as a rough goal that needs shaping (see `feedback_plans_default_planning`), which makes Planning→Review→Ready the most informative stretch of the board: it separates "still being figured out" from "gap-checked and buildable." Set each when it is true, not when you happen to reach this step.
+>
+> Batch all four calls together **only** when the plan arrived already shaped, has genuinely been gap-checked, and you are starting work immediately. That is the rare case, not the default — and this gate previously instructed the batch unconditionally, which is why no plan ever rests in Ready today.
 >
 > This gate is here, not in step 8, on purpose. Step 8 lists the whole state machine including "before starting work" — but by the time you read step 8 you have already done the work, so that line arrives too late to act on. Measured 2026-07-30: 16 plans sat in Planning with checklist items already checked, 2 of them fully checked; 5 more had a branch or PR while still pre-Development.
 
@@ -147,11 +151,15 @@ What each state asserts, since two of them are routinely burned as syntax:
 | State | Means |
 |---|---|
 | `Planning` | Being shaped. The default, and where most plans legitimately spend their early life. |
-| `Review` | The shaped plan is being checked before work starts. |
-| `Ready` | **Research and planning are complete — this is a workable plan.** Set it when shaping finishes, not when you start building. |
+| `Review` | **Planning review.** The plan is baked; smell-check it for gaps before any work starts. This is a review of the *plan*, not of code — `CodeReview` is the code one. |
+| `Ready` | **Passed review; ready for development.** A deliberate stopping point in the lifecycle — plans rest here. |
 | `Development` | Someone is editing code right now. |
 | `CodeReview` | PR is open. |
 | `Completed` | Merged, deployed, every item checked. |
+
+Kyle, 2026-08-03: *"review is PLANNING REVIEW, the intent there is to smell check a baked plan to ensure there are no gaps, then its 'ready' meaning ready for development, its a stopping point in the lifecycle of a ticket. we dont use the workflow well at all today."*
+
+**`Ready` being a stopping point is the part the workflow currently loses.** The intended rhythm is shape → planning-review → Ready → **stop**; picking the work up and starting to build is a separate, later act. That gives the board a queue of shaped, gap-checked plans that anyone can pull from. Running all four transitions in one batch collapses that queue to nothing — every plan is either unshaped or already being built, and the two states that carry the most planning information never hold a plan long enough to be read.
 
 ```
 hive_plan_update({id, status: "Review"})       // after assignments set
