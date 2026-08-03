@@ -60,12 +60,16 @@ That precedence is the important part: on the Kyle box the store wins, so a stal
 - Channel features arm only when the `hive` server sees `HIVE_AGENT_KEY` in its env. The launcher injects it; a direct launch relies on `.mcp.json`.
 - VM agents (ephemerals, NightWatch) don't set `HIVE_AGENT_KEY` and stay dormant on the channel.
 - For unattended operation, add `--dangerously-skip-permissions` to the agent's `claudeArgs` in its config JSON.
-- `claudeArgs` is **all-or-nothing** — a config that sets it must restate every flag it wants, including `--dangerously-load-development-channels server:hive`. Dropping that flag detaches the agent from the entire inbound event pipeline. `launch.ps1` warns when the resolved arguments omit it.
+- `claudeArgs` is **all-or-nothing** — a config that sets it must restate every flag it wants, including whichever channel flag that agent is on (`--dangerously-load-development-channels server:hive` or `--channels plugin:hive-channel@wonderforge`). Dropping the channel flag detaches the agent from the entire inbound event pipeline; `launch.ps1` warns when the resolved arguments omit both. This bites hardest on a config that *already* had `claudeArgs` — migrating overwatch meant restating `--chrome` and `-n Overwatch` alongside the new flag, whereas 3dproppipeline had no `claudeArgs` at all so its migration was purely additive.
 - That flag is a **preview-contract dependency on Claude Code itself**. Before upgrading Claude Code, and whenever an orchestrator has gone deaf while outbound still works, read [[reference_channels_platform_dependency]] — it covers version pinning, the post-upgrade delivery test, the silent-inbound-drop symptom, and the route off the dev flag.
 
-## The fleet is split: one agent on supported `--channels`, the rest on the dev flag
+## The fleet is split: two agents on supported `--channels`, the rest on the dev flag
 
-As of 2026-08-03 (plan 754.1), **`3dproppipeline` launches on the supported path** — `--channels plugin:hive-channel@wonderforge`, with no dev flag. Every other agent still uses `--dangerously-load-development-channels server:hive`, deliberately, until the pilot has run for a while. **`launch.ps1`'s guard accepts either form and warns only if a config has neither** (or confusingly, both) — the dev flag is *not* deprecated and must keep working for the unmigrated majority.
+As of 2026-08-03 (plan 754.1), **`3dproppipeline` and `overwatch` launch on the supported path** — `--channels plugin:hive-channel@wonderforge`, with no dev flag. 3dproppipeline was the pilot; overwatch followed the same day once the pilot held. **`spark`, `vaexdev` and `verletDev` still use `--dangerously-load-development-channels server:hive`**, deliberately. **`launch.ps1`'s guard accepts either form and warns only if a config has neither** (or confusingly, both) — the dev flag is *not* deprecated and must keep working for the unmigrated majority.
+
+**What migrating actually buys:** the launch-time acknowledgement prompt disappears. On the dev flag a session blocks on a keypress before it starts, so **an agent launched unattended never comes online at all**. It buys nothing against `tengu_harbor`, which sits upstream of both paths — see [[reference_channels_platform_dependency]].
+
+**Delivery between two migrated agents is proven in both directions** (2026-08-03, overwatch ↔ 3dproppipeline, each confirming the other's `source=` attribute). Note the limit of that proof: a round trip shows delivery works, it does *not* show the absence of silent drops — a dropped event leaves no trace at the receiver, so that property is unobservable from one side and would need a counted sequence of numbered pings to measure.
 
 Migrating an agent takes three changes together. Doing only the first is the failure that cost an iteration:
 
