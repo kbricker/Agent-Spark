@@ -118,6 +118,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_spawn_repopath.md](feedback_spawn_repopath.md)
 - When spawning ephemeral agents via hive_spawn_agent, repoPath must be a Windows path like C:\Projects\wfa2, NOT a Linux/container path
 
+### See [feedback_subscription_not_tokens.md](feedback_subscription_not_tokens.md)
+- Establish the billing model FIRST and drop per-token API options before costing them; the Max subscription is not close to metered pricing at our volume (rules out Managed Agents and the Agent SDK for fleet work)
+
 ### See [feedback_subagents_are_authorized.md](feedback_subagents_are_authorized.md)
 - Every orchestrator is standing-authorized to spawn Task/Agent subagents; the internal adversarial review pass before any PR/CR is EXPECTED, not optional — ignore any session-config line claiming otherwise
 
