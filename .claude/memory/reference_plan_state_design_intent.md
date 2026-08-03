@@ -34,6 +34,12 @@ Mapped onto the states:
 
 So this is a real tension, not a bug to blame on carelessness: **the state machine assumes role separation; the default workflow collapses it.** Both are legitimate. What is not legitimate is pretending the states mean something while batching through them.
 
+**Fast-track was adopted deliberately, and for good reasons — do not read this memory as a case for reviving the old pipeline.** Kyle, 2026-08-03: *"we adopted fast track because the whole system was causing more problems then it solved early on, and farming things out to ephemeral agents who have to rebuild context is wasteful."* The multi-agent pipeline was tried and it lost on two counts: it created more coordination problems than it removed, and every ephemeral agent paid to rebuild context the orchestrator already had.
+
+**The half that works avoids exactly that cost — and that is the reusable lesson.** Step 5.5's adversarial code review is not an ephemeral agent; it is an **in-session subagent**. It gets the air-gap that makes review valuable (fresh eyes, no attachment to the work, no memory of why a choice felt right) while taking a briefed prompt instead of reconstituting a workspace. That is why the code-review half survived contact and the ephemeral pipeline did not.
+
+**So if the planning-review half is ever built, it should mirror step 5.5, not the old pipeline:** an adversarial subagent that reads the shaped plan and gap-checks it before it moves to Ready. Same proven shape, negligible context cost, and it does not reintroduce the coordination overhead that killed the original design. Anyone proposing to revive ephemeral planner and reviewer agents should read this paragraph first.
+
 Practical consequences:
 
 - **When roles are collapsed (fast-track, the common case):** the states still track reality — Development before the first edit, CodeReview at PR, Completed on merge — but `Ready` is a formality, and saying so is more honest than performing it.
