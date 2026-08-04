@@ -22,6 +22,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_channel_rewatch_after_spawn.md](feedback_channel_rewatch_after_spawn.md)
 - hive_kill_agent silently removes the agent key from the hive-channel watch list. After any respawn — especially same-key respawn — call hive_channel_watch again or events go silent.
 
+### See [feedback_check_docs_on_harness_friction.md](feedback_check_docs_on_harness_friction.md)
+- Permission prompts, hook misfires, settings that don't take effect — read the current docs before theorising. The harness is a moving target and yesterday's mental model is stale.
+
 ### See [feedback_check_local_memory.md](feedback_check_local_memory.md)
 - Memory lives in .claude/memory/ inside the project, not the default central ~/.claude/ path — always check there first
 
@@ -144,6 +147,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 
 ### See [reference_3dproppipeline_agent.md](reference_3dproppipeline_agent.md)
 - Virtual Hive agent `3dproppipeline` can drive Blender to produce/modify 3D asset files (fbx, obj, likely glb). Use for Blender-reexport validations and any test that needs real DCC output instead of fabricated binaries.
+
+### See [reference_bash_permission_matching.md](reference_bash_permission_matching.md)
+- A bare Bash allow rule does NOT match past a shell variable assignment — write literal commands, not VAR=... ones. Plus the other documented carve-outs that defeat allow rules.
 
 ### See [reference_channel_launch.md](reference_channel_launch.md)
 - Launch via the desktop .lnk shortcuts (virtual-launcher/launch.ps1) with identity keys in Windows Credential Manager; direct claude invocation is a debug-only fallback
