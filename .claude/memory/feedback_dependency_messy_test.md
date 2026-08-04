@@ -3,6 +3,7 @@ name: feedback_dependency_messy-test
 description: Kyle's bar for approving a new dependency — it must do something messy we don't want to get distracted on; convenience wrappers around clean problems don't pass
 metadata:
   type: feedback
+scope: global
 ---
 
 When Kyle approved `bambulabs_api` for TendWright plan #655 (2026-07-25) he named his criterion: "this is the 'it does something messy that we don't want to get distracted on' test."

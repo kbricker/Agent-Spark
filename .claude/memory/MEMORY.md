@@ -16,6 +16,9 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [feedback_always_plan.md](feedback_always_plan.md)
 - Kyle requires a researched plan in the Hive plan system before writing any code
 
+### See [feedback_blanket_shell_allows.md](feedback_blanket_shell_allows.md)
+- Kyle wants blanket Bash + PowerShell allows in orchestrator settings — endless per-command permission prompts are unacceptable
+
 ### See [feedback_build_straight_through.md](feedback_build_straight_through.md)
 - When the design is locked and Kyle says build/proceed, execute the whole plan end-to-end — don't stop to checkpoint after the foundation
 
@@ -31,6 +34,9 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [feedback_check_docs_on_harness_friction.md](feedback_check_docs_on_harness_friction.md)
 - Permission prompts, hook misfires, settings that don't take effect — read the current docs before theorising. The harness is a moving target and yesterday's mental model is stale.
 
+### See [feedback_check_for_an_existing_ticket_before_growing_scope.md](feedback_check_for_an_existing_ticket_before_growing_scope.md)
+- Before adding a section of scope to a plan you're writing, search for an existing ticket that already owns that problem — and if Kyle has no context for a question you're about to ask him, the scope is yours, not his
+
 ### See [feedback_check_local_memory.md](feedback_check_local_memory.md)
 - Memory lives in .claude/memory/ inside the project, not the default central ~/.claude/ path — always check there first
 
@@ -39,6 +45,9 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 
 ### See [feedback_define_done_by_user_visible_behavior.md](feedback_define_done_by_user_visible_behavior.md)
 - A plan's definition of done is "the user can do the thing the plan promised." If the on-disk shape is correct but the user can't mint / edit / assign from the editor, the plan is not done — no matter how clean the tests are.
+
+### See [feedback_dependency_messy_test.md](feedback_dependency_messy_test.md)
+- Kyle's bar for approving a new dependency — it must do something messy we don't want to get distracted on; convenience wrappers around clean problems don't pass
 
 ### See [feedback_dont_assume_staged_scope.md](feedback_dont_assume_staged_scope.md)
 - Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle
@@ -61,6 +70,12 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [feedback_infra_agent_security_rules.md](feedback_infra_agent_security_rules.md)
 - Four non-negotiable rules for any cloud infra agent operating with a GCP service account — never read SA key files, never commit or display secrets, all secrets flow through Secret Manager at runtime
 
+### See [feedback_kyle_does_not_edit_tickets.md](feedback_kyle_does_not_edit_tickets.md)
+- Plan/ticket surfaces are agent-facing. Kyle reads plans and directs changes verbally; never scope dashboard UI for human plan editing.
+
+### See [feedback_kyle_does_not_review_prs.md](feedback_kyle_does_not_review_prs.md)
+- Never ask Kyle to review a PR line-by-line; that's CodeRabbit's job. Kyle's role is merge approval, not code review.
+
 ### See [feedback_log_review_findings.md](feedback_log_review_findings.md)
 - Every settled review (internal adversarial, ephemeral review agent, CodeRabbit-worth-keeping) logs its surviving findings — including skipped ones — to the Hive review-findings store via hive_review_finding_add. Procedure in the log-review-findings skill.
 
@@ -73,6 +88,9 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [feedback_never_force_push_agent.md](feedback_never_force_push_agent.md)
 - Before pushing a branch from any agent-owned clone that a human or another agent also commits to — cherry-pick or rebase, never force
 
+### See [feedback_never_kill_chrome.md](feedback_never_kill_chrome.md)
+- NEVER kill Chrome by any means — Kyle works on this machine and blanket kills destroy his open work
+
 ### See [feedback_never_suggest_stopping.md](feedback_never_suggest_stopping.md)
 - Never suggest ending the session, calling it a day, or wrapping up — Kyle decides when to stop
 
@@ -81,6 +99,12 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 
 ### See [feedback_no_chairman.md](feedback_no_chairman.md)
 - Call Kyle "Kyle" — never "Chairman"
+
+### See [feedback_no_claude_artifacts_local_docs_only.md](feedback_no_claude_artifacts_local_docs_only.md)
+- Never publish documents/reports/charts as claude.ai Artifacts — all deliverable documents land on local disk in the project folder
+
+### See [feedback_no_commits_in_agents_working_tree.md](feedback_no_commits_in_agents_working_tree.md)
+- Never commit in a repo checkout an agent is actively working in — check current branch first
 
 ### See [feedback_no_new_abstractions_over_canonical_primitives.md](feedback_no_new_abstractions_over_canonical_primitives.md)
 - When the codebase already has a canonical primitive for a concept, use it directly — do not invent a new named compound property just to hide a short inline composition.
@@ -175,6 +199,9 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [reference_gcp_infra_agent_setup.md](reference_gcp_infra_agent_setup.md)
 - Forge's recipe for setting up a new GCP project with a claude-infra service account, SA-scoped IAM roles, OS Login SSH, Secret Manager, and local gcloud activation — use when Kyle asks to bootstrap a new cloud infra agent
 
+### See [reference_gh_cli_is_wonderforge_account.md](reference_gh_cli_is_wonderforge_account.md)
+- gh CLI is authenticated as kyle-wf (WonderForge) — it cannot create PRs on kbricker personal repos (Spark projects)
+
 ### See [reference_github_ssh.md](reference_github_ssh.md)
 - WonderForge GitHub repos use custom SSH host github-second.com (kyle@wonderforge.io key)
 
@@ -202,12 +229,6 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 
 ### See [user_printing_tree_supports.md](user_printing_tree_supports.md)
 - Kyle always 3D-prints with tree supports (PLA+ default) — prefers wasted material over failed prints; design CAD for correctness, not support-free printability
-
-### See [feedback_dependency_messy_test.md](feedback_dependency_messy_test.md)
-- Kyle's bar for new deps: it must do something messy we don't want to get distracted on (e.g. reverse-engineered protocols); wrappers around clean problems get hand-rolled instead
-
-### See [reference_gh_cli_is_wonderforge_account.md](reference_gh_cli_is_wonderforge_account.md)
-- gh CLI is authenticated as kyle-wf (WonderForge) — pushes to personal repos work (SSH), but gh PR create/merge fails until Kyle adds the kbricker account or adds kyle-wf as collaborator
 
 ## Orbital
 

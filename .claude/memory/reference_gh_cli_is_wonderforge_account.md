@@ -5,6 +5,7 @@ metadata:
   node_type: memory
   type: reference
   originSessionId: 08c4549d-0dcb-4d3f-b861-a56f84597918
+scope: global
 ---
 
 The `gh` CLI on this machine is logged in as **kyle-wf** (the WonderForge account) only. Git pushes to Spark's personal repos work fine (SSH uses Kyle's personal key), but **gh API operations — PR create/merge — fail with "must be a collaborator"** on kbricker personal repos (TendWright, Orbital).
