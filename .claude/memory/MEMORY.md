@@ -44,7 +44,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - When user specifies a technology stack, agents MUST follow it exactly — don't let agents substitute frameworks
 
 ### See [feedback_ephemerals_speak_in_own_channel.md](feedback_ephemerals_speak_in_own_channel.md)
-- The correct orchestration model is that ephemerals speak in their own dedicated hive-channel and the orchestrator (verletDev) is automatically watching those channels. Reports and heartbeats must be normal assistant output, NOT hive_send_message calls targeting the orchestrator's inbox. Per Kyle 2026-04-15.
+- Ephemerals speak in their own dedicated hive-channel and the spawning orchestrator is already watching it. Reports and heartbeats must be normal assistant output, NOT hive_send_message calls targeting the orchestrator's inbox. Per Kyle 2026-04-15.
 
 ### See [feedback_fast_track_is_default.md](feedback_fast_track_is_default.md)
 - Fast-track is the main orchestrator path now; ephemeral run-plan-workflow is the escape hatch, not the entry point. Applies to overwatch, verletDev, vaexdev.
@@ -71,7 +71,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Never suggest ending the session, calling it a day, or wrapping up — Kyle decides when to stop
 
 ### See [feedback_no_chairman.md](feedback_no_chairman.md)
-- Kyle hates being called Chairman — always use Kyle instead
+- Call Kyle "Kyle" — never "Chairman"
 
 ### See [feedback_no_new_dependencies_without_auth.md](feedback_no_new_dependencies_without_auth.md)
 - Never add a new runtime/dev/build/test/transitive dependency to any project without Kyle's explicit yes. Applies to npm/pnpm, NuGet, pip, cargo, gem, go mod, Unity Package Manager — every package ecosystem.

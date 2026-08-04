@@ -65,7 +65,7 @@ That precedence is the important part: on the Kyle box the store wins, so a stal
 
 ## The fleet is split: two agents on supported `--channels`, the rest on the dev flag
 
-As of 2026-08-03 (plan 754.1), **`3dproppipeline` and `overwatch` launch on the supported path** — `--channels plugin:hive-channel@wonderforge`, with no dev flag. 3dproppipeline was the pilot; overwatch followed the same day once the pilot held. **`spark`, `vaexdev` and `verletDev` still use `--dangerously-load-development-channels server:hive`**, deliberately. **`launch.ps1`'s guard accepts either form and warns only if a config has neither** (or confusingly, both) — the dev flag is *not* deprecated and must keep working for the unmigrated majority.
+As of 2026-08-03 (plan 754.1), **`3dproppipeline` and `overwatch` launch on the supported path** — `--channels plugin:hive-channel@wonderforge`, with no dev flag. 3dproppipeline was the pilot; overwatch followed the same day once the pilot held. **`spark` and `vaexdev` still use `--dangerously-load-development-channels server:hive`**, deliberately. (verletDev is retired as of 2026-07-09 and codexhive is parked — neither launches, so neither is on either path.) **`launch.ps1`'s guard accepts either form and warns only if a config has neither** (or confusingly, both) — the dev flag is *not* deprecated and must keep working for the unmigrated majority.
 
 **What migrating actually buys:** the launch-time acknowledgement prompt disappears. On the dev flag a session blocks on a keypress before it starts, so **an agent launched unattended never comes online at all**. It buys nothing against `tengu_harbor`, which sits upstream of both paths — see [[reference_channels_platform_dependency]].
 
