@@ -37,12 +37,6 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [feedback_check_what_overrides_the_file.md](feedback_check_what_overrides_the_file.md)
 - Before editing a config or index file, check whether something downstream overwrites or overrides it — a generated block, a fence comment, or a .d/ drop-in directory. The file you are about to edit is often not the authority, and the edit fails silently.
 
-### See [feedback_coderabbit_ratelimit_batch_pushes.md](feedback_coderabbit_ratelimit_batch_pushes.md)
-- CodeRabbit's adaptive rate limit counts every push's incremental review — batch commits during fast iteration loops, and skip @coderabbitai commands (resolve/full review) unless genuinely needed
-
-### See [feedback_coderabbit_webhook.md](feedback_coderabbit_webhook.md)
-- GitHub webhook pushes CodeRabbit PR review events into hive-channel as chat_message events — never poll, never ScheduleWakeup to check, just wait
-
 ### See [feedback_define_done_by_user_visible_behavior.md](feedback_define_done_by_user_visible_behavior.md)
 - A plan's definition of done is "the user can do the thing the plan promised." If the on-disk shape is correct but the user can't mint / edit / assign from the editor, the plan is not done — no matter how clean the tests are.
 
@@ -79,9 +73,6 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [feedback_never_force_push_agent.md](feedback_never_force_push_agent.md)
 - Before pushing a branch from any agent-owned clone that a human or another agent also commits to — cherry-pick or rebase, never force
 
-### See [feedback_never_skip_review.md](feedback_never_skip_review.md)
-- Kyle requires CodeRabbit review AND all findings addressed before merging any PR
-
 ### See [feedback_never_suggest_stopping.md](feedback_never_suggest_stopping.md)
 - Never suggest ending the session, calling it a day, or wrapping up — Kyle decides when to stop
 
@@ -103,14 +94,8 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [feedback_no_shortcuts.md](feedback_no_shortcuts.md)
 - Kyle's direct feedback that Hive platform quality is poor because of shortcuts and sloppy architecture, creating endless maintenance that steals time from game development
 
-### See [feedback_no_squash_merge.md](feedback_no_squash_merge.md)
-- Always use a merge commit (not squash) when merging PRs in WonderForge/VaEx and related repos
-
 ### See [feedback_no_unrequested_ux.md](feedback_no_unrequested_ux.md)
 - When drafting plan descriptions / fleshing out checklists, stick to the behaviors Kyle actually named. Don't extrapolate a UX affordance and ship it as if it were authorized.
-
-### See [feedback_one_ticket_one_branch_pr.md](feedback_one_ticket_one_branch_pr.md)
-- One ticket = one branch + one PR. Don't fragment a single plan into per-sub-fix branches/PRs.
 
 ### See [feedback_orchestrate_proactively.md](feedback_orchestrate_proactively.md)
 - After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
@@ -123,9 +108,6 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 
 ### See [feedback_plans_default_planning.md](feedback_plans_default_planning.md)
 - Two checks before every hive_plan_create — should this be a fork of an existing plan instead, and is the status Planning (never Backlog, which is Kyle's manual "get this out of my face" bucket)
-
-### See [feedback_pr_ownership_route_dont_fix.md](feedback_pr_ownership_route_dont_fix.md)
-- When a CodeRabbit webhook fires for a PR vaexdev didn't author, route it to the owning agent instead of opening the PR inline
 
 ### See [feedback_record_as_you_shape.md](feedback_record_as_you_shape.md)
 - Hive plan shaping logs are the system of record for WHY — capture questions, answers, decisions and deferrals via hive_plan_log_add at the moment they happen, in shaping AND in dev and review. Invoke the shaping-log skill for the full discipline.
@@ -183,12 +165,6 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 
 ### See [reference_channels_platform_dependency.md](reference_channels_platform_dependency.md)
 - The whole fleet's inbound event pipeline rides on a preview Claude Code feature; how to pin the version, how to test delivery before rolling an upgrade, how to recognise a silent inbound drop in minutes, and the remote Anthropic feature flag (tengu_harbor) that pinning does not protect against
-
-### See [reference_coderabbit_auto_triggers.md](reference_coderabbit_auto_triggers.md)
-- CR automatically runs a full review on PR creation and on every commit pushed to an open PR. Manually posting `@coderabbitai full review` after a dev push is redundant and wasteful. Only use the manual trigger for no-new-commit re-evaluations.
-
-### See [reference_coderabbit_rate_limits.md](reference_coderabbit_rate_limits.md)
-- CodeRabbit Pro rate limits are adaptive (fair-usage tiers), pooled per developer identity — the whole agent fleet counts as kyle-wf; how to check status without burning a review
 
 ### See [reference_ephemeral_agent_roles.md](reference_ephemeral_agent_roles.md)
 - Canonical reference for the three ephemeral-agent roles orchestrators spawn per plan. Explains what each role is, when to use it, and — critically for test — when NOT to use it. Use when picking the role for a spawn.
