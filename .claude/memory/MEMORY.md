@@ -208,9 +208,6 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 ### See [reference_how_to_reach_another_agent.md](reference_how_to_reach_another_agent.md)
 - Before replying to an orchestrator, reporting a result, or wondering why your last message went unanswered — check whether your output reaches Hive at all, because for interactive agents it does not
 
-### See [reference_multi_agent_research.md](reference_multi_agent_research.md)
-- Research findings on multi-agent patterns, failure modes, and scaling limits for software development tasks
-
 ### See [reference_plan_completion_path.md](reference_plan_completion_path.md)
 - State-machine transition path required to move an interactive plan from Planning to Completed in Hive
 
