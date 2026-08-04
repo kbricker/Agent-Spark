@@ -12,3 +12,10 @@ node_modules/
 # Restart handoff flow (plan #652) — transient, never commit
 .claude/restart-handoff.md
 .claude/restart-journal/
+
+# Machine-managed permission grants - Claude Code writes narrow Bash(...)/
+# PowerShell(...) rules here whenever you answer "yes, don't ask again".
+# Tracking it means every mint dirties the tree and invites a cleanse that the
+# next launch silently undoes. The rules are a symptom; fix the command shape
+# instead (see reference_bash_permission_matching).
+.claude/settings.local.json
