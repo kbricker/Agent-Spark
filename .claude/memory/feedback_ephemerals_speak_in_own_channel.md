@@ -7,6 +7,21 @@ scope: global
 
 **Scope note:** this governs the **ephemeral** dev/review/test path, which is a legacy route — see [[project_named_agents_over_ephemerals]] and [[feedback_fast_track_is_default]]. It still applies whenever ephemerals are spawned (the `run-plan-workflow` escape hatch), but it is not the default orchestration model.
 
+## ⚠️ VIRTUAL agents: "just speak in your output" does NOT work
+
+**If you are a virtual agent — an interactive session Kyle launches from a desktop shortcut (overwatch, vaexdev, vaexdev2, spark, 3dproppipeline) — your terminal output reaches Kyle's screen and nothing else. It does not reach Hive, and no orchestrator watching your channel will ever see it.**
+
+The advice below works for ephemerals because the **server spawns** them and captures their stdout. Nobody captures a virtual agent's stdout; it is a terminal in front of a human.
+
+So for a virtual agent, replying to another agent requires an explicit tool call:
+
+- `hive_send_message` — directed message to a specific agent key
+- `hive_respond` — reply on your own channel
+
+**This cost a real exchange on 2026-08-04.** vaexdev2's first session was asked five questions, answered all five carefully in its terminal, and overwatch saw silence. The agent had read this memory and followed it correctly — the memory was simply written for a class of agent it does not belong to. vaexdev2 flagged the gap itself: the wording read as universal when it is not.
+
+**Rule of thumb: if the server launched you, speaking is enough. If Kyle launched you, you must call a tool.**
+
 **The rule:** Ephemeral dev/review/test agents communicate via their own dedicated hive-channel. The spawning orchestrator is already subscribed to each ephemeral's channel via `hive_channel_watch` after spawning, so every `chat_message` on that agent's channel surfaces to the orchestrator automatically as a `<channel>` event.
 
 **What that means for briefings:**
