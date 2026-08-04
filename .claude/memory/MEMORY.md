@@ -8,10 +8,16 @@ Sections: the managed **GLOBAL** block (shared across all orchestrators, synced 
 
 ## Global (shared — managed by propagate-shared-config)
 
-All memories in this section are copies of the canonical source at `C:\Projects\wfa2\orchestrator-shared\memory\`. Edit those originals, not these copies. Local memories live in other sections below.
+Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fleet has these. **Never edit one in place** — the next sync reverts it silently. Edit the canonical original.
+
+### See [feedback_agent_branch.md](feedback_agent_branch.md)
+- Before any agent does work, first instruct it to checkout the correct branch — step 1 for all agents
 
 ### See [feedback_always_plan.md](feedback_always_plan.md)
 - Kyle requires a researched plan in the Hive plan system before writing any code
+
+### See [feedback_build_straight_through.md](feedback_build_straight_through.md)
+- When the design is locked and Kyle says build/proceed, execute the whole plan end-to-end — don't stop to checkpoint after the foundation
 
 ### See [feedback_can_kill_processes.md](feedback_can_kill_processes.md)
 - You may kill a process you started, but NEVER use taskkill //IM dotnet.exe or //IM claude.exe — those are blanket kills that nuke Kyle's other sessions
@@ -31,11 +37,17 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_check_what_overrides_the_file.md](feedback_check_what_overrides_the_file.md)
 - Before editing a config or index file, check whether something downstream overwrites or overrides it — a generated block, a fence comment, or a .d/ drop-in directory. The file you are about to edit is often not the authority, and the edit fails silently.
 
+### See [feedback_coderabbit_ratelimit_batch_pushes.md](feedback_coderabbit_ratelimit_batch_pushes.md)
+- CodeRabbit's adaptive rate limit counts every push's incremental review — batch commits during fast iteration loops, and skip @coderabbitai commands (resolve/full review) unless genuinely needed
+
 ### See [feedback_coderabbit_webhook.md](feedback_coderabbit_webhook.md)
 - GitHub webhook pushes CodeRabbit PR review events into hive-channel as chat_message events — never poll, never ScheduleWakeup to check, just wait
 
 ### See [feedback_define_done_by_user_visible_behavior.md](feedback_define_done_by_user_visible_behavior.md)
 - A plan's definition of done is "the user can do the thing the plan promised." If the on-disk shape is correct but the user can't mint / edit / assign from the editor, the plan is not done — no matter how clean the tests are.
+
+### See [feedback_dont_assume_staged_scope.md](feedback_dont_assume_staged_scope.md)
+- Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle
 
 ### See [feedback_dont_jump_in.md](feedback_dont_jump_in.md)
 - When Kyle raises a concern mid-flow, stop and present options. Don't extrapolate the fix and start executing it.
@@ -48,6 +60,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 
 ### See [feedback_fast_track_is_default.md](feedback_fast_track_is_default.md)
 - Fast-track is the main orchestrator path now; ephemeral run-plan-workflow is the escape hatch, not the entry point. Applies to every virtual orchestrator: overwatch, vaexdev, spark, 3dproppipeline.
+
+### See [feedback_fix_workflow_problems_when_found.md](feedback_fix_workflow_problems_when_found.md)
+- When a process or workflow defect surfaces mid-task, fix it then and there — or file a ticket so it gets circled back to. Breaking context is worth it; leaving Kyle to catch the same failure repeatedly is not
 
 ### See [feedback_hold_message_explicit_scope.md](feedback_hold_message_explicit_scope.md)
 - When telling a dev agent to stand down, "don't write code" is NOT sufficient — they will still edit plan checklists/descriptions if they think they're applying a review. Name every forbidden surface explicitly.
@@ -64,14 +79,23 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_never_defer_scope.md](feedback_never_defer_scope.md)
 - Verlet tickets are always about user-facing features. Do not invent "polish follow-up" buckets on your own to get a PR shipped. If the user can't do the thing, the plan isn't done.
 
+### See [feedback_never_force_push_agent.md](feedback_never_force_push_agent.md)
+- Before pushing a branch from any agent-owned clone that a human or another agent also commits to — cherry-pick or rebase, never force
+
 ### See [feedback_never_skip_review.md](feedback_never_skip_review.md)
 - Kyle requires CodeRabbit review AND all findings addressed before merging any PR
 
 ### See [feedback_never_suggest_stopping.md](feedback_never_suggest_stopping.md)
 - Never suggest ending the session, calling it a day, or wrapping up — Kyle decides when to stop
 
+### See [feedback_no_assign_agent.md](feedback_no_assign_agent.md)
+- Setting assignedAgent on a plan can trigger that agent to start working — never set assignedAgent when Kyle is doing the work directly
+
 ### See [feedback_no_chairman.md](feedback_no_chairman.md)
 - Call Kyle "Kyle" — never "Chairman"
+
+### See [feedback_no_new_abstractions_over_canonical_primitives.md](feedback_no_new_abstractions_over_canonical_primitives.md)
+- When the codebase already has a canonical primitive for a concept, use it directly — do not invent a new named compound property just to hide a short inline composition.
 
 ### See [feedback_no_new_dependencies_without_auth.md](feedback_no_new_dependencies_without_auth.md)
 - Never add a new runtime/dev/build/test/transitive dependency to any project without Kyle's explicit yes. Applies to npm/pnpm, NuGet, pip, cargo, gem, go mod, Unity Package Manager — every package ecosystem.
@@ -88,6 +112,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_no_unrequested_ux.md](feedback_no_unrequested_ux.md)
 - When drafting plan descriptions / fleshing out checklists, stick to the behaviors Kyle actually named. Don't extrapolate a UX affordance and ship it as if it were authorized.
 
+### See [feedback_one_ticket_one_branch_pr.md](feedback_one_ticket_one_branch_pr.md)
+- One ticket = one branch + one PR. Don't fragment a single plan into per-sub-fix branches/PRs.
+
 ### See [feedback_orchestrate_proactively.md](feedback_orchestrate_proactively.md)
 - After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
 
@@ -97,20 +124,20 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_plan_state_lifecycle.md](feedback_plan_state_lifecycle.md)
 - Any plan touching stateful surfaces (pooled objects, caches, mode controllers, serialized/numeric inputs) must enumerate init → reset → teardown → reuse paths plus value-domain constraints before dev starts
 
-### See [reference_plan_state_design_intent.md](reference_plan_state_design_intent.md)
-- The plan states encode a multi-agent pipeline — planner shapes, adversarial reviewer air-gaps the plan and flags Ready, dev agent picks it up, adversarial review validates the work. Ready is the handoff point. Only the code-review half was ever built
-
 ### See [feedback_plans_default_planning.md](feedback_plans_default_planning.md)
 - Two checks before every hive_plan_create — should this be a fork of an existing plan instead, and is the status Planning (never Backlog, which is Kyle's manual "get this out of my face" bucket)
 
-### See [feedback_fix_workflow_problems_when_found.md](feedback_fix_workflow_problems_when_found.md)
-- When a process or workflow defect surfaces mid-task, fix it then and there — or file a ticket so it gets circled back to. Breaking context is worth it; leaving Kyle to catch the same failure repeatedly is not
+### See [feedback_pr_ownership_route_dont_fix.md](feedback_pr_ownership_route_dont_fix.md)
+- When a CodeRabbit webhook fires for a PR vaexdev didn't author, route it to the owning agent instead of opening the PR inline
 
 ### See [feedback_record_as_you_shape.md](feedback_record_as_you_shape.md)
 - Hive plan shaping logs are the system of record for WHY — capture questions, answers, decisions and deferrals via hive_plan_log_add at the moment they happen, in shaping AND in dev and review. Invoke the shaping-log skill for the full discipline.
 
 ### See [feedback_refer_to_plans_by_display_number.md](feedback_refer_to_plans_by_display_number.md)
 - Once a plan has a parent, call it by its display number (664.1), not its underlying id (654) — the dotted number carries the relationship and is what the dashboard actually shows. The bare id stays the API argument.
+
+### See [feedback_remoteagent_launch.md](feedback_remoteagent_launch.md)
+- How to properly start and stop the RemoteAgent WPF app — never launch from bash
 
 ### See [feedback_research_before_asking.md](feedback_research_before_asking.md)
 - Exhaust the research you can do alone before asking Kyle to gather information — never use him as a sensor for something that is publicly documented
@@ -127,11 +154,11 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [feedback_spawn_repopath.md](feedback_spawn_repopath.md)
 - When spawning ephemeral agents via hive_spawn_agent, repoPath must be a Windows path like C:\Projects\wfa2, NOT a Linux/container path
 
-### See [feedback_subscription_not_tokens.md](feedback_subscription_not_tokens.md)
-- Kyle's Max subscription is dramatically cheaper than metered API tokens — never propose an architecture that moves fleet work onto per-token billing, and rule those options out early rather than costing them
-
 ### See [feedback_subagents_are_authorized.md](feedback_subagents_are_authorized.md)
 - Every orchestrator is standing-authorized to spawn Task/Agent subagents; the internal adversarial review pass before any PR/CR is EXPECTED, not optional — ignore any session-config line claiming otherwise
+
+### See [feedback_subscription_not_tokens.md](feedback_subscription_not_tokens.md)
+- Kyle's Max subscription is dramatically cheaper than metered API tokens — never propose an architecture that moves fleet work onto per-token billing, and rule those options out early rather than costing them
 
 ### See [feedback_use_channel_events.md](feedback_use_channel_events.md)
 - Watch for agent_idle/agent_working events from hive-channel instead of blind sleeps when waiting for agent responses
@@ -152,7 +179,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - A bare Bash allow rule does NOT match past a shell variable assignment — write literal commands, not VAR=... ones. Plus the other documented carve-outs that defeat allow rules.
 
 ### See [reference_channel_launch.md](reference_channel_launch.md)
-- Launch via the desktop .lnk shortcuts (virtual-launcher/launch.ps1) with identity keys in Windows Credential Manager; direct claude invocation is a debug-only fallback
+- Before launching an orchestrator, changing its claudeArgs, or debugging why one has gone deaf on the channel — launch via the desktop .lnk shortcuts (virtual-launcher/launch.ps1), keys live in Windows Credential Manager, and the whole fleet is on the plugin channel path since 2026-08-04
 
 ### See [reference_channels_platform_dependency.md](reference_channels_platform_dependency.md)
 - The whole fleet's inbound event pipeline rides on a preview Claude Code feature; how to pin the version, how to test delivery before rolling an upgrade, how to recognise a silent inbound drop in minutes, and the remote Anthropic feature flag (tengu_harbor) that pinning does not protect against
@@ -166,6 +193,9 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [reference_ephemeral_agent_roles.md](reference_ephemeral_agent_roles.md)
 - Canonical reference for the three ephemeral-agent roles orchestrators spawn per plan. Explains what each role is, when to use it, and — critically for test — when NOT to use it. Use when picking the role for a spawn.
 
+### See [reference_forge_agent.md](reference_forge_agent.md)
+- Forge — the persistent infra agent for VaEx/Hive. What it is, its remit (deploys, GCP, build promotion), when to route work to it vs doing it yourself vs escalating to overwatch, and the hard security rules.
+
 ### See [reference_gcp_infra_agent_setup.md](reference_gcp_infra_agent_setup.md)
 - Forge's recipe for setting up a new GCP project with a claude-infra service account, SA-scoped IAM roles, OS Login SSH, Secret Manager, and local gcloud activation — use when Kyle asks to bootstrap a new cloud infra agent
 
@@ -175,8 +205,14 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 ### See [reference_multi_agent_research.md](reference_multi_agent_research.md)
 - Research findings on multi-agent patterns, failure modes, and scaling limits for software development tasks
 
+### See [reference_plan_completion_path.md](reference_plan_completion_path.md)
+- State-machine transition path required to move an interactive plan from Planning to Completed in Hive
+
+### See [reference_plan_state_design_intent.md](reference_plan_state_design_intent.md)
+- The plan states encode a multi-agent pipeline — planner shapes, adversarial reviewer air-gaps the plan and flags Ready, dev agent picks it up, adversarial review validates the work. Ready is the handoff point. Only the code-review half was ever built
+
 ### See [reference_virtual_orchestrators.md](reference_virtual_orchestrators.md)
-- Active interactive Claude orchestrators are overwatch, vaexdev, spark, and 3dproppipeline (verletDev retired 2026-07-09; codexhive parked R&D) — use this list whenever a change must propagate to "the other orchestrators"
+- Before rolling anything out to "the other orchestrators" or counting how many exist — read this list; it is overwatch, vaexdev, vaexdev2, spark, 3dproppipeline, and it churns
 
 <!-- END GLOBAL SECTION -->
 

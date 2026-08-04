@@ -1,6 +1,6 @@
 ---
 name: How to launch orchestrator agents with Hive channel events
-description: Launch via the desktop .lnk shortcuts (virtual-launcher/launch.ps1) with identity keys in Windows Credential Manager; direct claude invocation is a debug-only fallback
+description: Before launching an orchestrator, changing its claudeArgs, or debugging why one has gone deaf on the channel — launch via the desktop .lnk shortcuts (virtual-launcher/launch.ps1), keys live in Windows Credential Manager, and the whole fleet is on the plugin channel path since 2026-08-04
 type: reference
 scope: global
 ---
@@ -63,9 +63,11 @@ That precedence is the important part: on the Kyle box the store wins, so a stal
 - `claudeArgs` is **all-or-nothing** — a config that sets it must restate every flag it wants, including whichever channel flag that agent is on (`--dangerously-load-development-channels server:hive` or `--channels plugin:hive-channel@wonderforge`). Dropping the channel flag detaches the agent from the entire inbound event pipeline; `launch.ps1` warns when the resolved arguments omit both. This bites hardest on a config that *already* had `claudeArgs` — migrating overwatch meant restating `--chrome` and `-n Overwatch` alongside the new flag, whereas 3dproppipeline had no `claudeArgs` at all so its migration was purely additive.
 - That flag is a **preview-contract dependency on Claude Code itself**. Before upgrading Claude Code, and whenever an orchestrator has gone deaf while outbound still works, read [[reference_channels_platform_dependency]] — it covers version pinning, the post-upgrade delivery test, the silent-inbound-drop symptom, and the route off the dev flag.
 
-## The fleet is split: two agents on supported `--channels`, the rest on the dev flag
+## The whole fleet is on the supported `--channels` path
 
-As of 2026-08-03 (plan 754.1), **`3dproppipeline` and `overwatch` launch on the supported path** — `--channels plugin:hive-channel@wonderforge`, with no dev flag. 3dproppipeline was the pilot; overwatch followed the same day once the pilot held. **`spark` and `vaexdev` still use `--dangerously-load-development-channels server:hive`**, deliberately. (verletDev is retired as of 2026-07-09 and codexhive is parked — neither launches, so neither is on either path.) **`launch.ps1`'s guard accepts either form and warns only if a config has neither** (or confusingly, both) — the dev flag is *not* deprecated and must keep working for the unmigrated majority.
+**As of 2026-08-04 (plan 754.2) every active virtual agent launches with `--channels plugin:hive-channel@wonderforge` and no dev flag:** `overwatch`, `vaexdev`, `vaexdev2`, `spark`, `3dproppipeline`. 3dproppipeline was the pilot on 2026-08-03 (754.1), overwatch followed the same day, vaexdev and spark migrated on 2026-08-04, and vaexdev2 was born on it. (verletDev is retired as of 2026-07-09 and codexhive is parked — neither launches, so neither is on either path.)
+
+**The dev flag still works and is NOT deprecated.** `launch.ps1`'s guard accepts either form and warns only if a config has neither (or confusingly, both). Keep the rollback path in mind: every migrated workspace's `.mcp.json` carries its original `hive` server definition in a `_rollback` key, and reverting means restoring that block into `mcpServers` **and** reverting `claudeArgs` in the launcher config. Both halves, or you get an agent with no channel at all.
 
 **What migrating actually buys:** the launch-time acknowledgement prompt disappears. On the dev flag a session blocks on a keypress before it starts, so **an agent launched unattended never comes online at all**. It buys nothing against `tengu_harbor`, which sits upstream of both paths — see [[reference_channels_platform_dependency]].
 
