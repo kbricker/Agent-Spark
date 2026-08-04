@@ -10,7 +10,6 @@
       "WebFetch",
       "WebSearch",
       "Write",
-      "mcp__hive__*",
       "mcp__plugin_hive-channel_hive__*",
       "Skill(fast-track-plan)"
     ],
@@ -39,18 +38,6 @@
             "type": "command",
             "command": "bash -c \"export HIVE_AGENT_KEY=spark && bash C:/Projects/wfa2/hooks/hive-status-idle.sh\"",
             "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "grep -q 'gh pr create' && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PostToolUse\",\"additionalContext\":\"REMINDER: CodeRabbit reviews arrive via GitHub webhook into the hive-channel as chat_message events. Do NOT poll gh pr view. Do NOT ScheduleWakeup to check CR status. Wait for the channel event.\"}}' || true",
-            "timeout": 5
           }
         ]
       }
