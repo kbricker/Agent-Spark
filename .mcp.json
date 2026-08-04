@@ -1,5 +1,6 @@
 {
-  "mcpServers": {
+  "_comment": "Plan 754.2 (2026-08-04). The `hive` server is deliberately ABSENT: it now comes from the installed plugin hive-channel@wonderforge instead. Two servers both named `hive` collide, the plugin's copy loses, and you get the worst failure shape available — tools keep working so the agent looks healthy, while the channel never arms and no event ever arrives. The plugin must be the sole definition. ROLLBACK: restore the block below into mcpServers and revert claudeArgs in virtual-launcher/configs/spark.json to [\"--dangerously-load-development-channels\", \"server:hive\", \"-n\", \"Spark\"].",
+  "_rollback": {
     "hive": {
       "command": "node",
       "args": ["C:/Projects/wfa2/McpBridge/dist/index.js"],
@@ -9,5 +10,6 @@
         "HIVE_AGENT_KEY": "spark"
       }
     }
-  }
+  },
+  "mcpServers": {}
 }

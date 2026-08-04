@@ -11,6 +11,7 @@
       "WebSearch",
       "Write",
       "mcp__hive__*",
+      "mcp__plugin_hive-channel_hive__*",
       "Skill(fast-track-plan)"
     ],
     "additionalDirectories": [
