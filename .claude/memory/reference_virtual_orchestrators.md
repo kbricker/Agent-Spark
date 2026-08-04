@@ -9,7 +9,7 @@ The ACTIVE set of virtual (interactive-Claude-session) orchestrators:
 
 1. **overwatch** — Hive platform, `C:\Projects\overwatch\`
 2. **vaexdev** — game design / VaEx world content, `C:\Projects\vaexdev\`. Clone `C:\Projects\Unity\VaEx`.
-3. **vaexdev2** — **second instance of the same role as vaexdev**, `C:\Projects\vaexdev2\`. Clone `C:\Projects\Unity\VaEx2`. Added 2026-08-04, plan 782.2.
+3. **vaexdev2** — **second instance of the same role as vaexdev**, `C:\Projects\vaexdev2\`. Clone `C:\Projects\Unity\VaEx2`. Added 2026-08-04, plan 782.2. ⚠️ **PENDING: its roster record still reads `remote` / `offline`.** The workspace, memory bundle, launcher config and shortcut all exist; only the class flip is outstanding (782.10 shipped the ability to do it). **Until that flip lands, do not message, watch, or propagate to `vaexdev2` on the strength of this entry** — `hive_agent_list` reports it as an offline remote dev agent, indistinguishable in shape from `vaexdev3` / `vaexserverdev` / `forge`, and the platform is right that it is not yet live. Delete this warning once the record reads `virtual`. (Caught by spark 2026-08-04, which nearly filed a correction against this file before finding the entry was aspirational rather than wrong.)
 4. **spark** — Kyle's small **personal** projects studio, `C:\Projects\spark\` (Orbital first; added 2026-06-15, plan #501)
 5. **3dproppipeline** — 3D asset / prop pipeline orchestrator, `C:\Projects\3dproppipeline\`
 
