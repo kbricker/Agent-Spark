@@ -15,6 +15,12 @@ Observed on Claude Code **v2.1.220**, 2026-08-03. Permission semantics move betw
 
 This is why blanket-allowing `Bash` does not eliminate prompts, and why deleting the accumulated narrow rules never sticks: the rules are a *symptom*. A command that prompts once prompts every time it runs, so anything in a startup path re-mints its rule on every session. Overwatch's restart-handoff claim did exactly this — `TS=$(date ...)` inside the claim sequence — regenerating the same two rules each launch and reading as unexplained "permission drift".
 
+**The asymmetry is deliberate, and only allow rules are affected.** The very next line of the same doc paragraph:
+
+> "A deny or ask rule matches past any leading assignment, so `Bash(rm *)` in deny still matches `FOO=bar rm -rf tmp/`."
+
+So a deny rule **cannot** be evaded by prefixing an assignment — this is a safety design, not a matching bug. Do not generalise it to "assignments defeat rule matching"; that reads as a hole in deny rules, which would be exactly backwards. Allow loses the match, deny and ask keep it.
+
 **So: write literal commands.** Need a computed value? Get it in a *separate* read-only call (`date`, `ls`, `git rev-parse`) and paste the literal into the next command. Two clean calls beat one convenient call plus a prompt.
 
 ## Other documented ways an allow rule fails to match
