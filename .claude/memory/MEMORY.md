@@ -68,7 +68,7 @@ Copies of the canonical source. Every agent in the fleet has these. **Never edit
 - The ticket status must track reality at three moments — first edit (Development), PR opened (CodeReview), merged+deployed (Completed). Applies to inline fast-track work, not just agent spawns.
 
 ### See [feedback_never_defer_scope.md](feedback_never_defer_scope.md)
-- Verlet tickets are always about user-facing features. Do not invent "polish follow-up" buckets on your own to get a PR shipped. If the user can't do the thing, the plan isn't done.
+- A ticket's user-facing goal IS its scope — never carve it into a "polish follow-up" of your own invention to get a PR shipped. If the user still can't do the thing, the plan isn't done.
 
 ### See [feedback_never_force_push_agent.md](feedback_never_force_push_agent.md)
 - Before pushing a branch from any agent-owned clone that a human or another agent also commits to — cherry-pick or rebase, never force
