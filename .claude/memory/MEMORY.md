@@ -8,7 +8,7 @@ Sections: the managed **GLOBAL** block (shared across all orchestrators, synced 
 
 ## Global (shared — managed by propagate-shared-config)
 
-Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fleet has these. **Never edit one in place** — the next sync reverts it silently. Edit the canonical original.
+Copies of the canonical source. Every agent in the fleet has these. **Never edit one in place** — the next sync reverts it silently.
 
 ### See [feedback_agent_branch.md](feedback_agent_branch.md)
 - Before any agent does work, first instruct it to checkout the correct branch — step 1 for all agents
@@ -17,7 +17,7 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 - Kyle requires a researched plan in the Hive plan system before writing any code
 
 ### See [feedback_build_straight_through.md](feedback_build_straight_through.md)
-- "When the design is locked and Kyle says build/proceed, execute the whole plan end-to-end — don't stop to checkpoint after the foundation"
+- When the design is locked and Kyle says build/proceed, execute the whole plan end-to-end — don't stop to checkpoint after the foundation
 
 ### See [feedback_can_kill_processes.md](feedback_can_kill_processes.md)
 - You may kill a process you started, but NEVER use taskkill //IM dotnet.exe or //IM claude.exe — those are blanket kills that nuke Kyle's other sessions
@@ -38,7 +38,7 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 - Before editing a config or index file, check whether something downstream overwrites or overrides it — a generated block, a fence comment, or a .d/ drop-in directory. The file you are about to edit is often not the authority, and the edit fails silently.
 
 ### See [feedback_coderabbit_ratelimit_batch_pushes.md](feedback_coderabbit_ratelimit_batch_pushes.md)
-- "CodeRabbit's adaptive rate limit counts every push's incremental review — batch commits during fast iteration loops, and skip @coderabbitai commands (resolve/full review) unless genuinely needed"
+- CodeRabbit's adaptive rate limit counts every push's incremental review — batch commits during fast iteration loops, and skip @coderabbitai commands (resolve/full review) unless genuinely needed
 
 ### See [feedback_coderabbit_webhook.md](feedback_coderabbit_webhook.md)
 - GitHub webhook pushes CodeRabbit PR review events into hive-channel as chat_message events — never poll, never ScheduleWakeup to check, just wait
@@ -47,7 +47,7 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 - A plan's definition of done is "the user can do the thing the plan promised." If the on-disk shape is correct but the user can't mint / edit / assign from the editor, the plan is not done — no matter how clean the tests are.
 
 ### See [feedback_dont_assume_staged_scope.md](feedback_dont_assume_staged_scope.md)
-- "Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle"
+- Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle
 
 ### See [feedback_dont_jump_in.md](feedback_dont_jump_in.md)
 - When Kyle raises a concern mid-flow, stop and present options. Don't extrapolate the fix and start executing it.
@@ -110,7 +110,7 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 - When drafting plan descriptions / fleshing out checklists, stick to the behaviors Kyle actually named. Don't extrapolate a UX affordance and ship it as if it were authorized.
 
 ### See [feedback_one_ticket_one_branch_pr.md](feedback_one_ticket_one_branch_pr.md)
-- "One ticket = one branch + one PR. Don't fragment a single plan into per-sub-fix branches/PRs."
+- One ticket = one branch + one PR. Don't fragment a single plan into per-sub-fix branches/PRs.
 
 ### See [feedback_orchestrate_proactively.md](feedback_orchestrate_proactively.md)
 - After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
@@ -171,6 +171,9 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 
 ### See [reference_3dproppipeline_agent.md](reference_3dproppipeline_agent.md)
 - Virtual Hive agent `3dproppipeline` can drive Blender to produce/modify 3D asset files (fbx, obj, likely glb). Use for Blender-reexport validations and any test that needs real DCC output instead of fabricated binaries.
+
+### See [reference_agent_key_reuse.md](reference_agent_key_reuse.md)
+- Before treating an agent key as fresh, dormant, or safe to repurpose — read its chat history, because the turn and token counters are per-session and reset, so a key with a real past reports zeros
 
 ### See [reference_bash_permission_matching.md](reference_bash_permission_matching.md)
 - A bare Bash allow rule does NOT match past a shell variable assignment — write literal commands, not VAR=... ones. Plus the other documented carve-outs that defeat allow rules.
