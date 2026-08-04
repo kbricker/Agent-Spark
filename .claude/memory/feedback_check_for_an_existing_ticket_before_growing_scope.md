@@ -21,4 +21,4 @@ Kyle, 2026-08-02, on plan #754: *"stop asking about this shit, geez. we have oth
 - Re-homing is cheap and non-destructive: land real checklist items on the owning ticket first, then remove them from the wrong one, then record the disposition in both shaping logs so citations stay resolvable. Never just delete.
 - A "not in scope" section naming where the work went, with item ids, stops the next session pulling it back in.
 
-Related: [[feedback_no_unrequested_ux]], [[feedback_read_architectural_asks_literally]], [[feedback_dont_jump_in]], [[feedback_never_defer_scope]], and the `manage-scope-creep` skill (which covers dev/review-time creep; this one is about creep at *shaping* time, which the skill does not catch).
+Related: [[feedback_no_unrequested_ux]], [[feedback_dont_jump_in]], [[feedback_never_defer_scope]], and the `manage-scope-creep` skill (which covers dev/review-time creep; this one is about creep at *shaping* time, which the skill does not catch).

@@ -23,4 +23,4 @@ A plan's status must match what is actually happening to it, at three moments:
 
 The operative gates live inline in the `fast-track-plan` skill at steps 4, 6 and 8. Do not rely on recalling this memory at the moment of action — see [[feedback_subagents_are_authorized]] for the same lesson learned the hard way about review.
 
-Related: [[feedback_plans_default_planning]], [[feedback_review_vs_done]], [[feedback_checklist_items_phase_with_gates]].
+Related: [[feedback_plans_default_planning]], [[feedback_review_vs_done]].

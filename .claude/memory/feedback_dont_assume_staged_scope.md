@@ -16,6 +16,6 @@ ambiguous whether they belong in the current commit/PR, **ask** — don't guess 
 assumed they were for a later "terrain texture" change. Kyle had specifically staged them for that PR and was
 annoyed I assumed instead of asking ("ask questions don't make assumptions… I specifically included those").
 
-**How to apply:** Still verify staged files before committing (see [[feedback_verify_staged_before_commit]]) —
-but the goal is correct scope, not blanket exclusion. Default to asking which staged changes belong when unsure,
+**How to apply:** Still verify staged files before committing (`git diff --cached --name-only` before every
+commit in a shared checkout) — but the goal is correct scope, not blanket exclusion. Default to asking which staged changes belong when unsure,
 rather than either sweeping them in OR leaving them out on a hunch.

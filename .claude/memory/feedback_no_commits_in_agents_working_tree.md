@@ -10,4 +10,4 @@ While spark was mid-plan on TendWright, I committed a CLAUDE.md edit in `C:\Proj
 
 **Why:** Repos like TendWright are a single checkout shared with the working agent. When the agent is mid-plan, the tree sits on their feature branch; any commit I make lands there, tangling my change into their work and risking state confusion.
 
-**How to apply:** Before committing in any repo an agent works in, run `git branch --show-current`. If it's a plan/feature branch (or the agent is working per Hive status), don't commit — either message the agent to include the change, or wait for the branch to merge. Related: [[fast-track-is-default]]
+**How to apply:** Before committing in any repo an agent works in, run `git branch --show-current`. If it's a plan/feature branch (or the agent is working per Hive status), don't commit — either message the agent to include the change, or wait for the branch to merge. Related: [[feedback_fast_track_is_default]]
