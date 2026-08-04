@@ -8,7 +8,7 @@ scope: global
 
 This is the default orchestration workflow. Overwatch plays dev + review inline and fans out to Agent/Task subagents as-needed. Ephemeral dev/review/test agents via `run-plan-workflow` are the **escape hatch** for work this skill can't handle cleanly — not the default entry point.
 
-Per Kyle 2026-04-19: fast-track is the main track for all three virtual orchestrators (overwatch, verletDev, vaexdev). The old pattern — spawning three ephemerals on every plan — was overkill for the common case, broke cache sharing, and burned startup cost on most plans that didn't need it. See `feedback_fast_track_is_default` for the rule.
+Per Kyle 2026-04-19: fast-track is the main track for all four virtual orchestrators (overwatch, vaexdev, spark, 3dproppipeline). The old pattern — spawning three ephemerals on every plan — was overkill for the common case, broke cache sharing, and burned startup cost on most plans that didn't need it. See `feedback_fast_track_is_default` for the rule.
 
 ## When to use this skill
 
@@ -65,7 +65,7 @@ hive_plan_update({id, assignedAgent: "overwatch", reviewAgent: "overwatch"})
 ### 3. Decide: single-repo or multi-repo?
 
 - **Single target repo** (wfa2 is the common case): standard branch + PR + merge flow, covered below.
-- **Workspace-config-only** (editing `.claude/` in overwatch and/or verletDev and/or vaexdev): direct-commit to each workspace's default branch (`master` for overwatch + vaexdev, `main` for verletDev). No PR flow, no CodeRabbit — these repos are local config stores, not code. Reference the plan number in each commit message.
+- **Workspace-config-only** (editing `.claude/` in any orchestrator workspace): direct-commit to each workspace's default branch (`master` for all four). No PR flow, no CodeRabbit — these repos are local config stores, not code. Reference the plan number in each commit message.
 - **Mixed** (e.g. wfa2 + workspace changes): wfa2 gets the PR flow; workspace repos get direct commits. Reference the same plan number across all.
 
 ### 4. Do the work

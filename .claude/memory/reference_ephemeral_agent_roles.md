@@ -5,7 +5,7 @@ type: reference
 scope: global
 ---
 
-There are **exactly three ephemeral roles** in the WonderForge Hive platform: `dev`, `review`, and `test`. Orchestrators (overwatch, verletdev, vaexdev, any future app orchestrator) spawn some combination of these per plan. The templates live in `C:/Projects/wfa2/agent-templates/<role>/CLAUDE.md` and are copied into each spawned ephemeral's clone at spawn time.
+There are **exactly three ephemeral roles** in the WonderForge Hive platform: `dev`, `review`, and `test`. Orchestrators (overwatch, vaexdev, spark, 3dproppipeline, any future app orchestrator) spawn some combination of these per plan. The templates live in `C:/Projects/wfa2/agent-templates/<role>/CLAUDE.md` and are copied into each spawned ephemeral's clone at spawn time.
 
 Other folders under `agent-templates/` (`planning/`, `action/`, `persistent/`) are not roles orchestrators normally spawn — they're for other spawn paths or are legacy. Stick to `dev`, `review`, `test` unless you have a specific reason not to.
 

@@ -7,9 +7,9 @@ scope: global
 
 Virtual orchestrator agents launch through **`virtual-launcher/launch.ps1`**, which resolves the agent's identity key from Windows Credential Manager, assembles the `claude` arguments, and runs `claude` in the agent's working directory. It is launch-time only — nothing stays resident once the session is up.
 
-Wired up today: **overwatch, vaexdev, verletDev, 3dproppipeline, spark** — each has a `configs/<key>.json` and a desktop shortcut. **codexhive is NOT wired up**: a `Hive/codexhive` credential exists in the store, but there is no config and no shortcut, so `-Agent codexhive` exits 2. That is deliberate — codexhive is completed R&D and currently unused. To revive it, add `configs/codexhive.json` and an entry in `shortcuts/setup.ps1`.
+Wired up today: **overwatch, vaexdev, spark, 3dproppipeline** — each has a `configs/<key>.json` and a desktop shortcut. **codexhive is NOT wired up**: a `Hive/codexhive` credential exists in the store, but there is no config and no shortcut, so `-Agent codexhive` exits 2. That is deliberate — codexhive is completed R&D and currently unused; to revive it, add `configs/codexhive.json` and an entry in `shortcuts/setup.ps1`. **verletDev** is retired (2026-07-09) — its config and shortcut are still on disk but it is never launched.
 
-**Preferred (desktop icons):** double-click `Overwatch.lnk`, `VaExDev.lnk`, `VerletDev.lnk`, `3DPropPipeline.lnk`, or `Spark.lnk`. They invoke `C:\Projects\wfa2\virtual-launcher\shortcuts\virtual-launcher.cmd <agent-key>`, which calls `launch.ps1`.
+**Preferred (desktop icons):** double-click `Overwatch.lnk`, `VaExDev.lnk`, `Spark.lnk`, or `3DPropPipeline.lnk`. They invoke `C:\Projects\wfa2\virtual-launcher\shortcuts\virtual-launcher.cmd <agent-key>`, which calls `launch.ps1`.
 
 **Preferred (terminal):**
 

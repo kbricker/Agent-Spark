@@ -1,11 +1,11 @@
 ---
 name: Fast-track is the default workflow
-description: Fast-track is the main orchestrator path now; ephemeral run-plan-workflow is the escape hatch, not the entry point. Applies to overwatch, verletDev, vaexdev.
+description: Fast-track is the main orchestrator path now; ephemeral run-plan-workflow is the escape hatch, not the entry point. Applies to every virtual orchestrator: overwatch, vaexdev, spark, 3dproppipeline.
 type: feedback
 scope: global
 ---
 
-Fast-track is the default orchestration path for all plans across overwatch, verletDev, and vaexdev. The orchestrator plays dev + review inline and is free to spawn Agent/Task subagents at its discretion for fan-out (parallel dev on independent sub-areas), leveraging the shared prompt cache. Ephemeral dev/review/test via `run-plan-workflow` is the **escape hatch** for large, risky, architecturally-unknown, or multi-agent-coordination work — not the default.
+Fast-track is the default orchestration path for all plans across overwatch, vaexdev, spark and 3dproppipeline. The orchestrator plays dev + review inline and is free to spawn Agent/Task subagents at its discretion for fan-out (parallel dev on independent sub-areas), leveraging the shared prompt cache. Ephemeral dev/review/test via `run-plan-workflow` is the **escape hatch** for large, risky, architecturally-unknown, or multi-agent-coordination work — not the default.
 
 **Why:** Kyle set this rule on 2026-04-19 during an orchestrator-comparison discussion. Reasoning: spawning ephemerals has real startup cost, breaks cache sharing, and for the size of most plans is overkill. Fast-track + fan-out via subagents keeps cache warm, parallelizes where useful, and shaves the spawn/clone/kill cycle entirely. This reverses the prior default where run-plan-workflow was the expected path and fast-track required explicit authorization.
 

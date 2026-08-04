@@ -5,7 +5,7 @@ type: reference
 scope: global
 ---
 
-`3dproppipeline` is a virtual agent on Hive (parallel to overwatch / verletDev / vaexdev) that wraps Blender. Kyle confirmed 2026-04-15: *"he is another virtual called 3dproppipeline. if you send him requests he can make fbx and obj and make changes to them, tell him where to put them so your test agent can use."*
+`3dproppipeline` is a virtual agent on Hive (parallel to overwatch / vaexdev / spark) that wraps Blender. Kyle confirmed 2026-04-15: *"he is another virtual called 3dproppipeline. if you send him requests he can make fbx and obj and make changes to them, tell him where to put them so your test agent can use."*
 
 ## What it can do
 
@@ -35,4 +35,4 @@ scope: global
 
 ## Charter note
 
-`3dproppipeline` is a separate charter like overwatch or vaexdev. verletDev does not edit its internals — just sends requests and consumes output. If the agent is missing a capability Verlet needs, file a plan on its side via a message, same coordination pattern as the overwatch/verletDev split.
+`3dproppipeline` is a separate charter like overwatch or vaexdev. Other orchestrators do not edit its internals — they send requests and consume output. If it is missing a capability another agent needs, file a plan on its side via a message, the same coordination pattern used between any two orchestrators.

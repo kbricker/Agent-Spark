@@ -47,7 +47,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Ephemerals speak in their own dedicated hive-channel and the spawning orchestrator is already watching it. Reports and heartbeats must be normal assistant output, NOT hive_send_message calls targeting the orchestrator's inbox. Per Kyle 2026-04-15.
 
 ### See [feedback_fast_track_is_default.md](feedback_fast_track_is_default.md)
-- Fast-track is the main orchestrator path now; ephemeral run-plan-workflow is the escape hatch, not the entry point. Applies to overwatch, verletDev, vaexdev.
+- Fast-track is the main orchestrator path now; ephemeral run-plan-workflow is the escape hatch, not the entry point. Applies to every virtual orchestrator: overwatch, vaexdev, spark, 3dproppipeline.
 
 ### See [feedback_hold_message_explicit_scope.md](feedback_hold_message_explicit_scope.md)
 - When telling a dev agent to stand down, "don't write code" is NOT sufficient — they will still edit plan checklists/descriptions if they think they're applying a review. Name every forbidden surface explicitly.
@@ -98,13 +98,13 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - Any plan touching stateful surfaces (pooled objects, caches, mode controllers, serialized/numeric inputs) must enumerate init → reset → teardown → reuse paths plus value-domain constraints before dev starts
 
 ### See [reference_plan_state_design_intent.md](reference_plan_state_design_intent.md)
-- The plan states encode a multi-agent pipeline (planner shapes, air-gapped adversarial reviewer flags Ready, dev picks it up, review validates); Ready is the handoff point, and only the code-review half was ever built
+- The plan states encode a multi-agent pipeline — planner shapes, adversarial reviewer air-gaps the plan and flags Ready, dev agent picks it up, adversarial review validates the work. Ready is the handoff point. Only the code-review half was ever built
 
 ### See [feedback_plans_default_planning.md](feedback_plans_default_planning.md)
 - Two checks before every hive_plan_create — should this be a fork of an existing plan instead, and is the status Planning (never Backlog, which is Kyle's manual "get this out of my face" bucket)
 
 ### See [feedback_fix_workflow_problems_when_found.md](feedback_fix_workflow_problems_when_found.md)
-- When a process or workflow defect surfaces mid-task, fix it then and there or file a ticket so it gets circled back to; breaking context is worth it
+- When a process or workflow defect surfaces mid-task, fix it then and there — or file a ticket so it gets circled back to. Breaking context is worth it; leaving Kyle to catch the same failure repeatedly is not
 
 ### See [feedback_record_as_you_shape.md](feedback_record_as_you_shape.md)
 - Hive plan shaping logs are the system of record for WHY — capture questions, answers, decisions and deferrals via hive_plan_log_add at the moment they happen, in shaping AND in dev and review. Invoke the shaping-log skill for the full discipline.
@@ -128,7 +128,7 @@ All memories in this section are copies of the canonical source at `C:\Projects\
 - When spawning ephemeral agents via hive_spawn_agent, repoPath must be a Windows path like C:\Projects\wfa2, NOT a Linux/container path
 
 ### See [feedback_subscription_not_tokens.md](feedback_subscription_not_tokens.md)
-- Establish the billing model FIRST and drop per-token API options before costing them; the Max subscription is not close to metered pricing at our volume (rules out Managed Agents and the Agent SDK for fleet work)
+- Kyle's Max subscription is dramatically cheaper than metered API tokens — never propose an architecture that moves fleet work onto per-token billing, and rule those options out early rather than costing them
 
 ### See [feedback_subagents_are_authorized.md](feedback_subagents_are_authorized.md)
 - Every orchestrator is standing-authorized to spawn Task/Agent subagents; the internal adversarial review pass before any PR/CR is EXPECTED, not optional — ignore any session-config line claiming otherwise

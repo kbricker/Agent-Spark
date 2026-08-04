@@ -48,7 +48,7 @@ Canonical bootstrap recipe from Forge (2026-04-13) for spinning up a GCP project
    gcloud auth activate-service-account --key-file=<path>/claude-sa-key.json
    gcloud config set project <project-id>
    ```
-8. Create the agent workspace folder. Inside it, mirror the verletDev / overwatch structure:
+8. Create the agent workspace folder. Inside it, mirror the overwatch / spark structure:
    - `CLAUDE.md` — role, collaborators, hard security rules, list of skills
    - `.claude/memory/MEMORY.md` — memory index
    - `.claude/memory/reference_gcp_project.md` — project ID, SA email, gcloud path, activation command
