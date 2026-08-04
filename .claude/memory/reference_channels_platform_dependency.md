@@ -5,7 +5,9 @@ type: reference
 scope: global
 ---
 
-Every orchestrator launches with `--dangerously-load-development-channels server:hive`. That flag is the fleet's **entire inbound event pipeline** — `agent_idle`, `agent_working`, `chat_message`, CodeRabbit webhook relays, connection sentinels. There is no fallback: hooks fire only on local events, Remote Control drives a session but pushes nothing into it, and standard MCP is pull-only. Channels is the only mechanism that delivers unsolicited external events into a running session.
+Every orchestrator's inbound events arrive over a Claude Code **channel** — as of 2026-08-04 (plan 754.2) via the supported plugin path, `--channels plugin:hive-channel@wonderforge`. The `--dangerously-load-development-channels server:hive` flag it replaced was never the mechanism; it was only one way of loading a channel, differing solely in that it skipped the plugin allowlist.
+
+Channels is the fleet's **entire inbound event pipeline** — `agent_idle`, `agent_working`, `chat_message`, CodeRabbit webhook relays, connection sentinels. There is no fallback: hooks fire only on local events, Remote Control drives a session but pushes nothing into it, and standard MCP is pull-only. Channels is the only mechanism that delivers unsolicited external events into a running session.
 
 It is a **documented, official feature** (`https://code.claude.com/docs/en/channels`, `/channels-reference`), but the contract is explicitly unstable:
 
@@ -58,10 +60,12 @@ Rollback is local and cheap: previous versions stay on disk at `~/.local/share/c
 
 ## Test delivery after every upgrade, before rolling to the fleet
 
-Claude Code auto-updates. The fleet is five orchestrators plus every ephemeral, so an upgrade that breaks inbound delivery goes wide before anyone notices. Sequence:
+Claude Code auto-updates. The fleet is five active orchestrators — overwatch, vaexdev, vaexdev2, spark, 3dproppipeline — plus every ephemeral, so an upgrade that breaks inbound delivery goes wide before anyone notices. (Read the count from [[reference_virtual_orchestrators]] rather than trusting the number here; it has been wrong in both directions. It said five while counting retired verletDev against a real four, and is five again today only because vaexdev2 was added.) Sequence:
 
 1. Upgrade **one** session. Do not let the fleet follow yet.
-2. Launch it and confirm a **real inbound event arrives** — not that the flag is on the command line, and not that MCP tools work. Those pass while inbound is dead. Watch for an actual `<channel source="hive">` block: trigger one by having an agent go idle, or send a chat message to that agent's key from the dashboard.
+2. Launch it and confirm a **real inbound event arrives** — not that the flag is on the command line, and not that MCP tools work. Those pass while inbound is dead. Watch for an actual `<channel>` block: trigger one by having an agent go idle, or send a chat message to that agent's key from the dashboard.
+
+   **Do not look for a specific `source=` value.** This step used to say "watch for a `<channel source="hive">` block", which since 2026-08-04 is wrong for **every** agent in the fleet — all five are on the plugin path and emit `source="plugin:hive-channel:hive"`. An agent following that literally sees no matching block, concludes delivery is broken, and rolls back a working upgrade. **It built a guaranteed false negative into the one step whose entire job is proving delivery.** Match on the block arriving at all, and on its `event_type` / `agent_key` — never on `source=`. (Caught by spark 2026-08-04, immediately after its own migration made it the affected case.)
 3. Only then let the rest of the fleet take the version.
 4. If inbound is silent, pin back to the last known-good version and record the bad version here.
 
@@ -80,9 +84,9 @@ Corrected 2026-08-02 against the shipped binary, after the docs were misread as 
 
 A Claude Code "marketplace" is not a storefront: it is a directory or git URL holding a `.claude-plugin/marketplace.json` manifest, added with `/plugin marketplace add <path/url>`, and **a local path is accepted**. Nothing is published or submitted anywhere.
 
-So migrating to supported `--channels` is: a manifest file, the existing McpBridge channel wrapped as a plugin, one registry value, and a launch-flag swap. The allowlist check is skipped entirely for dev-loaded channels, so building the supported path cannot disturb the dev-flag path still in use.
+So migrating to supported `--channels` was: a manifest file, the existing McpBridge channel wrapped as a plugin, one registry value, and a launch-flag swap. Because the allowlist check is skipped entirely for dev-loaded channels, building the supported path could not disturb the dev-flag path that was still in use during the rollout — which is what allowed the fleet to migrate one agent at a time rather than all at once.
 
-**Not yet exercised end-to-end.**
+**Exercised end-to-end 2026-08-04** (plans 754.1 and 754.2). 3dproppipeline piloted, overwatch followed, then vaexdev and spark; vaexdev2 was born on it. spark completed a channel round trip with overwatch on a freshly launched migrated session. **Note the limit of that evidence:** a round trip proves delivery works, not the absence of silent drops — a dropped event leaves no trace at the receiver, so it is unobservable from one side and would need a counted sequence of numbered pings to measure.
 
 ## The risk pinning does NOT cover: `tengu_harbor`
 
