@@ -16,7 +16,7 @@ scope: global
 
 ## How to use it
 
-- **Cross-charter comm is the legitimate exception to "ephemerals speak in their own channel."** 3dproppipeline is a different orchestrator, not a within-plan ephemeral, so `hive_send_message(agentKey="3dproppipeline", ...)` is the right tool for sending requests to it. (See `feedback_ephemerals_speak_in_own_channel` for the general rule and why this specifically isn't covered by it.)
+- **Reaching 3dproppipeline requires `hive_send_message(agentKey="3dproppipeline", ...)`.** It is a *virtual* orchestrator — Kyle launches it, the server does not — so neither of you can reach the other by speaking into your own output. See [[reference_how_to_reach_another_agent]]. (This used to be phrased as an exception to a rule about ephemerals; that rule never applied to either of you, and the memory carrying it has been retired.)
 - **You must manually watch its channel for responses.** Per Kyle 2026-04-15: *"for now you need to watch its channel for responses manually, we don't have that baked in yet but it's coming."* So after sending a request:
   1. `hive_send_message(agentKey="3dproppipeline", message=<request>)` to dispatch the work
   2. `hive_channel_watch(keys=["3dproppipeline"])` to subscribe — auto-subscription-on-send isn't wired up yet

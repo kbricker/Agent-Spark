@@ -17,7 +17,7 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 - Kyle requires a researched plan in the Hive plan system before writing any code
 
 ### See [feedback_build_straight_through.md](feedback_build_straight_through.md)
-- When the design is locked and Kyle says build/proceed, execute the whole plan end-to-end — don't stop to checkpoint after the foundation
+- "When the design is locked and Kyle says build/proceed, execute the whole plan end-to-end — don't stop to checkpoint after the foundation"
 
 ### See [feedback_can_kill_processes.md](feedback_can_kill_processes.md)
 - You may kill a process you started, but NEVER use taskkill //IM dotnet.exe or //IM claude.exe — those are blanket kills that nuke Kyle's other sessions
@@ -38,7 +38,7 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 - Before editing a config or index file, check whether something downstream overwrites or overrides it — a generated block, a fence comment, or a .d/ drop-in directory. The file you are about to edit is often not the authority, and the edit fails silently.
 
 ### See [feedback_coderabbit_ratelimit_batch_pushes.md](feedback_coderabbit_ratelimit_batch_pushes.md)
-- CodeRabbit's adaptive rate limit counts every push's incremental review — batch commits during fast iteration loops, and skip @coderabbitai commands (resolve/full review) unless genuinely needed
+- "CodeRabbit's adaptive rate limit counts every push's incremental review — batch commits during fast iteration loops, and skip @coderabbitai commands (resolve/full review) unless genuinely needed"
 
 ### See [feedback_coderabbit_webhook.md](feedback_coderabbit_webhook.md)
 - GitHub webhook pushes CodeRabbit PR review events into hive-channel as chat_message events — never poll, never ScheduleWakeup to check, just wait
@@ -47,16 +47,13 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 - A plan's definition of done is "the user can do the thing the plan promised." If the on-disk shape is correct but the user can't mint / edit / assign from the editor, the plan is not done — no matter how clean the tests are.
 
 ### See [feedback_dont_assume_staged_scope.md](feedback_dont_assume_staged_scope.md)
-- Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle
+- "Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle"
 
 ### See [feedback_dont_jump_in.md](feedback_dont_jump_in.md)
 - When Kyle raises a concern mid-flow, stop and present options. Don't extrapolate the fix and start executing it.
 
 ### See [feedback_enforce_user_tech_choices.md](feedback_enforce_user_tech_choices.md)
 - When user specifies a technology stack, agents MUST follow it exactly — don't let agents substitute frameworks
-
-### See [feedback_ephemerals_speak_in_own_channel.md](feedback_ephemerals_speak_in_own_channel.md)
-- Ephemerals speak in their own dedicated hive-channel and the spawning orchestrator is already watching it. Reports and heartbeats must be normal assistant output, NOT hive_send_message calls targeting the orchestrator's inbox. Per Kyle 2026-04-15.
 
 ### See [feedback_fast_track_is_default.md](feedback_fast_track_is_default.md)
 - Fast-track is the main orchestrator path now; ephemeral run-plan-workflow is the escape hatch, not the entry point. Applies to every virtual orchestrator: overwatch, vaexdev, spark, 3dproppipeline.
@@ -113,7 +110,7 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 - When drafting plan descriptions / fleshing out checklists, stick to the behaviors Kyle actually named. Don't extrapolate a UX affordance and ship it as if it were authorized.
 
 ### See [feedback_one_ticket_one_branch_pr.md](feedback_one_ticket_one_branch_pr.md)
-- One ticket = one branch + one PR. Don't fragment a single plan into per-sub-fix branches/PRs.
+- "One ticket = one branch + one PR. Don't fragment a single plan into per-sub-fix branches/PRs."
 
 ### See [feedback_orchestrate_proactively.md](feedback_orchestrate_proactively.md)
 - After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
@@ -201,6 +198,9 @@ Copies of `C:\Projects\wfa2\orchestrator-shared\memory\`. Every agent in the fle
 
 ### See [reference_github_ssh.md](reference_github_ssh.md)
 - WonderForge GitHub repos use custom SSH host github-second.com (kyle@wonderforge.io key)
+
+### See [reference_how_to_reach_another_agent.md](reference_how_to_reach_another_agent.md)
+- Before replying to an orchestrator, reporting a result, or wondering why your last message went unanswered — check whether your output reaches Hive at all, because for interactive agents it does not
 
 ### See [reference_multi_agent_research.md](reference_multi_agent_research.md)
 - Research findings on multi-agent patterns, failure modes, and scaling limits for software development tasks
