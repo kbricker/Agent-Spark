@@ -41,6 +41,18 @@ reasoning is the valuable part; the conclusion is already in the code.
 - **question** — raised, not yet resolved. Stays `open=true` until answered.
 - **answer** — resolves a question; pass `questionId` to link it. An unlinked
   answer leaves the question open forever.
+
+  **A question raised in the plan's DESCRIPTION has no id, so its answer cannot
+  be logged directly** — `hive_plan_log_add` returns `400: Answer entries
+  require questionId`. This is common: plans routinely raise open questions in
+  their prose ("open art call for Kyle: 4K or 1K?") long before anyone answers
+  them. Log a `question` entry first, capturing it verbatim from the
+  description, then log the `answer` against that id. Two calls, not one.
+
+  Do this rather than downgrading the answer to a `note`. A note records what
+  was decided but leaves nothing marked as having been open, so the plan reads
+  as though the question was never asked — and the open-question sweep in the
+  review pass has nothing to close. (Found by vaexdev2 on #794, 2026-08-04.)
 - **deferral** — scope moved. Requires `disposition`: `PREREQUISITE` (must
   happen first), `FOLLOW_UP` (later), `PRECLUDED` (will not happen). Pass
   `linkedPlanId` when it landed somewhere.
