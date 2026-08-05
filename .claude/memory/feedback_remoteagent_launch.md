@@ -1,6 +1,6 @@
 ---
 name: RemoteAgent launch method
-description: How to properly start and stop the RemoteAgent WPF app — never launch from bash
+description: NEVER launch RemoteAgent from bash — overwatch owns starting/stopping the WPF app; how to do it properly
 type: feedback
 scope: global
 ---
