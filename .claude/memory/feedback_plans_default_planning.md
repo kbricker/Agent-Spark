@@ -1,6 +1,6 @@
 ---
 name: Plans default to Planning, not Backlog
-description: Two checks before every hive_plan_create — should this be a fork of an existing plan instead, and is the status Planning (never Backlog, which is Kyle's manual "get this out of my face" bucket)
+description: Before every hive_plan_create — fork an existing plan if one owns the problem, and status = Planning, NEVER Backlog
 type: feedback
 scope: global
 ---

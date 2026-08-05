@@ -1,6 +1,6 @@
 ---
 name: Move tickets when work starts
-description: The ticket status must track reality at three moments — first edit (Development), PR opened (CodeReview), merged+deployed (Completed). Applies to inline fast-track work, not just agent spawns.
+description: Ticket status tracks reality — first edit→Development, PR opened→CodeReview, merged+deployed→Completed; inline work too
 type: feedback
 scope: global
 ---
