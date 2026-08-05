@@ -43,5 +43,5 @@
       }
     ]
   },
-  "autoMemoryDirectory": ".claude/memory"
+  "autoMemoryDirectory": "C:/Projects/spark/.claude/memory"
 }
