@@ -5,7 +5,7 @@ metadata:
   node_type: memory
   type: reference
   originSessionId: e8c504bb-6cd6-40d5-9d92-91587acca2e6
-  modified: 2026-07-30T04:47:08.541Z
+  modified: 2026-08-07T00:03:25.849Z
 ---
 
 Spark's projects include **real hardware it can drive**, not just repos. The
@@ -20,6 +20,10 @@ failure mode is not forgetting an IP — it is forgetting that I am allowed.
 - **Start and stop my own processes** — soaks, samplers, test harnesses.
 - **Shut cell1 down**: `ssh cell1 'sudo -n /usr/sbin/shutdown -h now'`. Kyle
   added a scoped NOPASSWD rule for poweroff/shutdown/`systemctl poweroff`.
+- **Wake cell1 up** from the desk: `uv run python -m hardware.bench.wake
+  cell1` (WoL; proven from full power-off 2026-08-06, sshd in 24 s). cell1
+  stays OFF when idle — wake it as the first step of cell work, shut it
+  down when done.
 - **Switch mains power** via `hardware/bench/kasa.py` — including
   **`192.168.86.44`, the bench light**. Works from the desk too, so power is
   reachable with cell1 off.

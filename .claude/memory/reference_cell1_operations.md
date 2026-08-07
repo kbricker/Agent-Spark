@@ -1,9 +1,11 @@
 ---
 name: reference_cell1_operations
 description: "cell1 (TendWright hardware runtime) — hardware identity, and the ssh/process gotchas that have already cost time"
-metadata:
+metadata: 
   node_type: memory
   type: reference
+  originSessionId: 11c17a47-4933-4687-abab-e2d1fdc5c628
+  modified: 2026-08-07T00:03:29.358Z
 ---
 
 cell1 is the TendWright hardware runtime: the box the arm and cameras are wired to. `ssh cell1`, repo at `~/TendWright`, `uv` at `~/.local/bin/uv`. It is a **runtime box, not a dev box** — see [[project_tendwright]].
@@ -23,6 +25,7 @@ cell1 is the TendWright hardware runtime: the box the arm and cameras are wired 
 - **Verify on a SEPARATE connection.** A launch and its verification in one ssh command can both report success while the process dies with the channel.
 - **Do not restart or kill services on cell1 without asking Kyle first** (standing rule). Reading state is always fine.
 - **I CAN shut cell1 down.** Kyle added a scoped sudoers rule: `(root) NOPASSWD: /usr/sbin/poweroff, /usr/sbin/shutdown, /usr/bin/systemctl poweroff`. Everything else root still needs him.
+- **I CAN wake cell1 from the desk**: `uv run python -m hardware.bench.wake cell1` in `C:\Projects\TendWright` (WoL; proven 2026-08-06, sshd in 24 s from full off). BIOS was always willing; the OS side is armed by `wol-enp4s0.service`. cell1 stays off when idle.
 - **`sudo -n true` is the WRONG test and I got this wrong on 2026-07-29** — it probes the general `(ALL:ALL) ALL` entry, which needs a password, so it fails even when a scoped NOPASSWD grant exists. I told Kyle I could not shut the box down while a rule to do exactly that was sitting in sudoers. **Always `sudo -n -l`** to see what is actually permitted.
 - `v4l2-ctl` is **not installed**. Query cameras through OpenCV instead.
 
