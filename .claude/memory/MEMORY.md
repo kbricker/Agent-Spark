@@ -21,6 +21,10 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - reference_cell1_operations.md — cell1 (TendWright hardware runtime, Minisforum UM350) — hardware identity, no BIOS update exists, MUJOCO_GL=egl …
 
 <!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
+## Parked
+
+- project_space_web_sims.md — docs/space-web-sims.md is a parked future project — leave untracked, NEVER commit it to Agent-Spark (public repo)
+
 ## Global (managed by propagate-shared-config — copies of `wfa2/orchestrator-shared/memory/`; edit canonical, never these, the next sync reverts local edits silently)
 - feedback_agent_branch.md — Before any agent does work, first instruct it to checkout the correct branch — step 1 for all agents
 - feedback_always_plan.md — Kyle requires a researched plan in the Hive plan system before writing any code
