@@ -245,12 +245,9 @@ Brief each subagent as if it's a colleague who just walked in:
 
 ## Persistent agents and wake/sleep
 
-Fast-track runs inline on the orchestrator's main thread and via Agent/Task subagents — it does **not** dispatch to persistent named agents (vaexdev2, vaexdev3, vaexserverdev, forge) in its own flow. Per plan #280 those agents now boot Offline (`AutoSpinDown: true`) and require an explicit `hive_agent_wake` to come up.
+Fast-track runs inline on the orchestrator's main thread and via Agent/Task subagents — it does **not** dispatch to persistent named agents in its own flow. Per plan #280, remote-class persistent agents (today that is **forge**; vaexdev3/vaexserverdev are dormant records pending #759) boot Offline (`AutoSpinDown: true`) and require an explicit `hive_agent_wake` to come up. **Virtual orchestrators (vaexdev2, spark, ...) are NOT wake targets** — the server refuses a cold-start wake on them (plan 782.10; a wake on an already-running virtual returns a harmless no-op); they come up via their workspace launch script, and you reach a running one with `hive_send_message`.
 
-When fast-track delegates to a sub-skill that does touch a persistent agent, the wake/sleep wrap is that sub-skill's responsibility, not yours:
-
-- **`/deploy-hive`** wakes forge as its step 0 and sleeps it as its final step.
-- **`/run-plan-workflow`** wakes the assigned dev agent (vaexdev2 / vaexdev3 / vaexserverdev / forge) before dispatch and sleeps it after the work is committed.
+When fast-track delegates to a sub-skill that does touch a persistent agent, the wake/sleep wrap is that sub-skill's responsibility, not yours. Today only one sub-skill dispatches to a remote-class agent: **`/deploy-hive`** wakes forge as its step 0 and sleeps it as its final step. (`/run-plan-workflow` spawns ephemerals via `hive_spawn_agent` — no wake/sleep involved.)
 
 You should not pre-wake a persistent agent inside fast-track on the assumption it'll be needed — wake/sleep has a measurable cost (process spin-up, clone re-attach), so leave it to the sub-skill that actually dispatches. If you find yourself reaching for `hive_agent_wake` at the fast-track layer, that's usually a signal the work belongs in `/run-plan-workflow` instead.
 
