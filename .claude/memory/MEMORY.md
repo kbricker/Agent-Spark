@@ -2,7 +2,7 @@
 
 Spark is the shared virtual orchestrator for Kyle's **small personal projects** (Orbital first). Read this index on startup; the memories it points to encode rules and facts that MUST be followed.
 
-Sections: Spark-local **shared conventions**, then per-**project** sections, then the managed **GLOBAL** block at the bottom (synced from `wfa2/orchestrator-shared/` — do not hand-edit). This index must stay under 200 lines AND 25KB — the harness injects only that much at startup (plan 778.1); one line per entry.
+Sections: Spark-local **shared conventions**, then per-**project** sections, then the managed **GLOBAL** block at the bottom (synced from `wfa2/orchestrator-shared/` — do not hand-edit). This index must stay under 25,000 BYTES and 200 lines — bytes bind first; measured comment-stripped, and 25KB means 25,000 not 25,600 (plan 778.1); one line per entry.
 
 ## Shared conventions (Spark-local — apply to every small project)
 
