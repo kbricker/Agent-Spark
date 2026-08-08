@@ -8,6 +8,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 - feedback_personal_repo_git_identity.md — Spark's projects are Kyle's PERSONAL repos — commit as Kyle Bricker <kyle.bricker@gmail.com>, never the WonderForge …
 - user_printing_tree_supports.md — Kyle always 3D-prints with tree supports (PLA+ default) — prefers wasted material over failed prints; design CAD for …
+- feedback_probe_live_state_for_readiness.md — Answer "are you ready / is X up" from a live read-only probe, never from memory or docs — state drifts silently
 
 ## Orbital
 
