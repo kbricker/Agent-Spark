@@ -1,15 +1,15 @@
 ---
-name: Re-watch agent on hive-channel after every spawn (kill drops watches)
-description: hive_kill_agent silently removes the agent key from the hive-channel watch list. After any respawn — especially same-key respawn — call hive_channel_watch again or events go silent.
+name: An empty channel watch list looks exactly like a quiet fleet
+description: Watch lists are process-local, so any process boundary clears them. Silence is ambiguous — check hive_channel_watching before diagnosing agents as stuck.
 type: feedback
 scope: global
 ---
 
-After calling `hive_kill_agent`, the killed agent's key is dropped from the hive-channel watch list. Any subsequent `hive_spawn_agent` (even under the same key) starts un-watched — `agent_working`, `agent_idle`, and `chat_message` events will NOT arrive until you re-call `hive_channel_watch`.
+**The kill-drop bug this file was originally written about is FIXED and has been since 2026-04-17.** `hive_kill_agent` does *not* drop the agent's key from the watch list. Do not add defensive re-watches on that basis, and do not re-file it.
 
-**Why:** Observed during the plan #136/#68 smoke test on 2026-04-09. After killing test-plan136 and respawning, no notifications arrived. `hive_channel_watching` returned "(none)". Re-calling `hive_channel_watch` immediately fixed it. This caused a real debug detour — symptoms looked like the agent was stuck or hooks weren't firing, but it was just the watch list being silently cleared. Tracked as a backlog plan to fix server-side, but the bug remains until then.
+Fixed in commit `b78697a` (plan #183, addressing CodeRabbit review), whose message reads: *"Preserve watchedAgents membership across AgentRemoved so restart and respawn paths don't silently drop channel forwarding."* Verified 2026-08-08: the only two `watchedAgents.delete` calls left in `McpBridge/src/index.ts` are the 200-entry cap eviction (line 94) and explicit `hive_channel_unwatch` (line 1672). Neither is the kill path.
 
-**How to apply:** Whenever you spawn an agent, call `hive_channel_watch [key]` immediately after the spawn — even if you "already watched it earlier in the session". The cheapest reliable pattern is: spawn → watch → send message, every time. Don't trust that a previous watch survived a kill. If notifications go quiet on an agent you expect to be running, check `hive_channel_watching` first before assuming the agent is broken.
+The original ticket (#149, filed 2026-04-10) was fixed **seven days later** and nobody closed it, so this memory kept asserting *"the bug remains until then"* for four months — in five agents' system prompts, while the memory budget was the binding constraint on two other plans. #149 was cancelled 2026-08-08. **That history is the reason this file still exists rather than being deleted: the general rule below is true, load-bearing, and was buried under a dead bug.**
 
 ## The general rule: watch lists are process-local
 
