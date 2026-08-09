@@ -71,13 +71,53 @@ reasoning is the valuable part; the conclusion is already in the code.
   the time: most corrections target the plan description, a checklist item, a
   commit, or something said in chat. Set it when, and only when, the thing being
   corrected is another log entry.
+
+  **`supersedes` says the earlier entry was WRONG. If it was right and has
+  merely been overtaken, you want `replaces` instead** — see below. Getting this
+  backwards is not cosmetic: "what have we gotten wrong?" is how agent
+  reliability gets measured, and filing reversals there fills it with things
+  nobody got wrong.
+- **`replaces`** — not a type, a pointer available on ANY type. It says the
+  entry it names was **correct when written and has since been overtaken**: a
+  reversal, a closed loop, a re-scope. Measured across the corpus at 13 against
+  32 `supersedes`, so roughly a third of all supersession is this rather than
+  repair.
+
+  Real cases, all of which would have been libel as `supersedes`: a deferral
+  that got reversed because the work shipped after all; a note saying "not yet
+  done" against work that is now done; a derived list that shrank because its
+  inputs changed. **Nobody was wrong in any of them.**
+
+  The test is one question: *was the earlier entry wrong, or did the world
+  move?* Same validation as `supersedes` — same entity, resolvable, no
+  self-reference — and the two are **mutually exclusive**, refused at write time
+  if both are set. Pick whichever is true.
+
+  **If `replaces` is rejected with `MCP error -32602`, your session predates it.**
+  MCP tool schemas load once, at session start, so a session that spawned its
+  bridge before the #842 deploy holds the old parameter list no matter what the
+  server accepts. A server restart does not fix it and neither does a SignalR
+  reconnect — only a fresh agent session does. **Do not downgrade to a plain
+  `supersedes` to get the write through.** That reintroduces exactly the
+  mislabelling this pointer exists to end, silently, while looking like
+  compliance. Write the entry without a pointer, say in its text which entry it
+  overtakes, and tell overwatch your session needs relaunching.
 - **evidence** — a measurement that changed what was believed. Distinct from a
   decision, which is a choice about what to do; evidence is what moved the
   argument. Counts, benchmarks, a corpus you actually went and measured.
 - **reclassification** — an earlier entry's TYPE was wrong; its content stands.
   Pass `reclassifies` (the entry id) and `reclassifiedTo` (what it should read
-  as). Both are required, the target must be on the same entity, and a retype to
-  the type it already has is rejected.
+  as). Both are required, and the target must be on the same entity.
+
+  A retype to the type it already has is rejected **unless it attaches a pointer
+  the target does not have** — because a reclassification can also carry
+  `supersedes` or `replaces` on its target's behalf, recording an edge the
+  original author had no field to write. That is how an edge gets attached to an
+  entry that must keep its current type. `reclassifiedTo: correction` is legal
+  only WITH `supersedes`, naming what the retyped entry corrects.
+
+  Pointers on a reclassification describe its **target**, never itself. A
+  reclassification supersedes nothing; it records that something else does.
 
   **This is not a correction.** A correction says the entry was wrong; a
   reclassification says it was right and filed under the wrong label. Most of
