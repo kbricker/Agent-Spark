@@ -35,7 +35,8 @@ reasoning is the valuable part; the conclusion is already in the code.
 
 ## Entry types, and what each is for
 
-`hive_plan_log_add` takes: `question`, `answer`, `decision`, `deferral`, `note`.
+`hive_plan_log_add` takes: `question`, `answer`, `decision`, `deferral`, `note`,
+`correction`, `evidence`, `reclassification`.
 
 - **decision** — a choice was made. The default and most common.
 - **question** — raised, not yet resolved. Stays `open=true` until answered.
@@ -56,12 +57,67 @@ reasoning is the valuable part; the conclusion is already in the code.
 - **deferral** — scope moved. Requires `disposition`: `PREREQUISITE` (must
   happen first), `FOLLOW_UP` (later), `PRECLUDED` (will not happen). Pass
   `linkedPlanId` when it landed somewhere.
-- **note** — context that is not a choice: research findings, a correction, a
-  process observation.
+- **note** — context that is not a choice: a process observation, something that
+  needs saying but does not fit the types above. It is the catch-all, so reach
+  for it last.
+- **correction** — an earlier entry turns out to be wrong. Pass `supersedes`
+  with that entry's id. **Whenever you are about to write "CORRECTION to the
+  entry above", use this type and set the pointer instead** — "the entry above"
+  stops meaning anything the moment entries are retrieved out of order, which is
+  exactly what a retriever does. The id must name an entry on the same plan; a
+  dangling one is rejected at write time.
 
-Entries are **immutable**. A correction is a new entry, never an edit. That is
-deliberate — being able to see that a decision was reversed, and why, is more
-valuable than a tidy history.
+  `supersedes` is optional, and leaving it off is correct roughly two thirds of
+  the time: most corrections target the plan description, a checklist item, a
+  commit, or something said in chat. Set it when, and only when, the thing being
+  corrected is another log entry.
+- **evidence** — a measurement that changed what was believed. Distinct from a
+  decision, which is a choice about what to do; evidence is what moved the
+  argument. Counts, benchmarks, a corpus you actually went and measured.
+- **reclassification** — an earlier entry's TYPE was wrong; its content stands.
+  Pass `reclassifies` (the entry id) and `reclassifiedTo` (what it should read
+  as). Both are required, the target must be on the same entity, and a retype to
+  the type it already has is rejected.
+
+  **This is not a correction.** A correction says the entry was wrong; a
+  reclassification says it was right and filed under the wrong label. Most of
+  the corpus predates the type set being taken seriously — a great many
+  `decision`s are really `evidence` and a great many `note`s are really
+  `decision`s — and retyping those is the point of the type set existing.
+
+  The target entry is never touched. Reads report its original `type` alongside
+  an `effectiveType`, so both "what was written" and "what it turned out to be"
+  survive. Newest retype wins, so getting one wrong is fixable by doing it again.
+
+Entries are **immutable**. A correction is a new entry, never an edit, and so is
+a retype — there is no route in the API that modifies an entry that already
+exists. That is deliberate, and for plans it is also forced: plan entries live
+inside revision files that ARE the audit trail, so editing one would rewrite
+history to claim it always said that.
+
+Those eight are the whole set, and the set is closed on evidence: plan #837
+measured all 1,618 entries in the corpus and added only what earned it.
+`premise`, `reframe` and `rejected` were each proposed and each rejected by the
+same measurement. Do not ask for more types; ask whether the entry you are about
+to write is really a `note`.
+
+### Logs on things that are not plans
+
+The log is composable, addressed by `(entityType, entityId)` —
+`hive_shaping_log` and `hive_shaping_log_add` take that pair instead of a plan
+id. Today that means specs as well as plans. Entries may carry an optional
+free-text `anchor` naming a section within the entity, which is how an
+individual **article** gets its own log without articles being objects:
+
+```text
+hive_shaping_log_add(entityType="spec", entityId="articles",
+                     entries=[{type:"decision", text:"...", anchor:"article-5"}])
+hive_shaping_log(entityType="spec", entityId="articles", anchor="article-5")
+```
+
+Everything above applies unchanged — same types, same immutability, same
+record-as-it-happens discipline. `hive_plan_log` / `hive_plan_log_add` remain
+the right tools for plans.
 
 ## Scope splits go through `hive_plan_fork`, never hand-rolled
 
