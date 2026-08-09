@@ -105,16 +105,21 @@ reasoning is the valuable part; the conclusion is already in the code.
 - **evidence** — a measurement that changed what was believed. Distinct from a
   decision, which is a choice about what to do; evidence is what moved the
   argument. Counts, benchmarks, a corpus you actually went and measured.
-- **reclassification** — an earlier entry's TYPE was wrong; its content stands.
-  Pass `reclassifies` (the entry id) and `reclassifiedTo` (what it should read
-  as). Both are required, and the target must be on the same entity.
+- **reclassification** — an earlier entry's TYPE was wrong, or it needs an edge
+  its author had no field to record; its content stands either way. `reclassifies`
+  (the entry id) is always required and its target must be on the same entity.
 
-  A retype to the type it already has is rejected **unless it attaches a pointer
-  the target does not have** — because a reclassification can also carry
-  `supersedes` or `replaces` on its target's behalf, recording an edge the
-  original author had no field to write. That is how an edge gets attached to an
-  entry that must keep its current type. `reclassifiedTo: correction` is legal
-  only WITH `supersedes`, naming what the retyped entry corrects.
+  **`reclassifiedTo` is OPTIONAL.** Set it to retype the entry. Omit it when the
+  annotation's only job is attaching a `supersedes`/`replaces` edge — which is
+  how an edge lands on an entry that must KEEP its type, such as an `answer`
+  whose question link would break, or a `decision` you do not want relabelled.
+  What is refused is an annotation supplying **neither**: no type and no pointer
+  says nothing about the entry it names.
+
+  A retype to the type it already has is likewise rejected **unless it attaches a
+  pointer the target does not have** — same rule, same reason. And
+  `reclassifiedTo: correction` is legal only WITH `supersedes`, naming what the
+  retyped entry corrects.
 
   Pointers on a reclassification describe its **target**, never itself. A
   reclassification supersedes nothing; it records that something else does.

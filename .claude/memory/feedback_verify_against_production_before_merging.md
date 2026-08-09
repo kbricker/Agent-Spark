@@ -12,7 +12,7 @@ Kyle, 2026-08-09, after plan #842 shipped a shaping-log feature across two PRs a
 
 ## Why, from the case that produced it
 
-#842 was merged on a green suite, deployed, and used to backfill 42 pointer edges. Verifying those edges against the live API *afterwards* immediately found a defect: every annotation was publishing as a duplicate end of the edge it recorded. Real, worth finding, and it would have shipped.
+Plan #842 was merged on a green suite, deployed, and used to backfill 42 pointer edges. Verifying those edges against the live API *afterward* immediately found a defect: every annotation was publishing as a duplicate end of the edge it recorded. Real, worth finding, and it would have shipped.
 
 But finding it in that order cost a second PR, a fresh opening review, and a rate-limit stall that blocked the close-out entirely. Found before the merge, it was one more commit inside a review cycle already in flight.
 
