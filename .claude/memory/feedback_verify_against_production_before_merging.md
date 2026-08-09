@@ -34,4 +34,4 @@ Every push is a review. So everything that could change the diff must happen *be
 
 All three were already written down. Doing them out of order is what cost the runs, not doing them at all.
 
-See [[feedback_coderabbit_ratelimit_batch_pushes]] for the batching half, and [[feedback_never_skip_review]] for why the answer is never to merge unreviewed.
+Agents composing `role:pr-workflow` hold two related rules: one on batching pushes because every push is a review run, and one requiring review before merge. Named rather than wikilinked on purpose — this file is CORE and applies to every agent, including those that never open a PR, so linking into a role bundle would dangle for them. (It did: linkcheck caught exactly that for spark and 3dproppipeline, which is what the tier rule is for.)
