@@ -14,7 +14,7 @@ The failure mode is specific and nasty: **the artifact looks correct to every hu
 2026-08-10, none of them found by a check, all found incidentally:
 
 1. **A shaping-log decision that settled an open question.** Entry `8777b01a` on plan #842 names question `34b49573` by id in its own first paragraph and says in plain words that it reverses it. But it was typed `decision`, not `answer` with a `questionId`, and `BuildAnsweredIndex` keys on the link. The corpus reported the question open for a day while the text said otherwise.
-2. **A hand-built `MEMORY.md`.** hivedev's index carried the managed `## Global` / `## Role:` headings but none of the `<!-- BEGIN/END -->` marker comments. Those headings are decoration the generator never reads; the markers are the whole locating mechanism. On the next run it would have found no managed region, taken the first-time path, and appended a second complete copy of every block — 32,112 bytes against a 25,000 cap, growing on every run after.
+2. **A hand-built `MEMORY.md`.** hivedev01's index carried the managed `## Global` / `## Role:` headings but none of the `<!-- BEGIN/END -->` marker comments. Those headings are decoration the generator never reads; the markers are the whole locating mechanism. On the next run it would have found no managed region, taken the first-time path, and appended a second complete copy of every block — 32,112 bytes against a 25,000 cap, growing on every run after.
 3. **A memory's index hook.** A canonical memory's `description` was edited and the file propagated to six workspaces without regenerating the indexes that quote it. Every workspace pointed at that memory with a hook that no longer matched it — and the hook is the part loaded into context.
 
 ## How to apply
