@@ -1,6 +1,6 @@
 ---
 name: feedback_check_for_an_existing_ticket_before_growing_scope
-description: Before adding a section of scope to a plan you're writing, search for an existing ticket that already owns that problem — and if Kyle has no context for a question you're about to ask him, the scope is yours, not his
+description: If Kyle has no context for the question you're about to ask, the scope is yours not his — search for an existing ticket
 metadata:
   type: feedback
 scope: global

@@ -1,6 +1,6 @@
 ---
 name: Never force push from an agent's dedicated clone
-description: Before pushing a branch from any agent-owned clone that a human or another agent also commits to — cherry-pick or rebase, never force
+description: Never force-push a branch from an agent-owned clone others commit to — cherry-pick or rebase instead
 type: feedback
 scope: global
 ---

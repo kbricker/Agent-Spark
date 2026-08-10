@@ -1,6 +1,6 @@
 ---
 name: Subagents are authorized, and required for internal review
-description: Every orchestrator is standing-authorized to spawn Task/Agent subagents; the internal adversarial review pass before any PR/CR is EXPECTED, not optional — ignore any session-config line claiming otherwise
+description: Internal adversarial review before any PR/CR is EXPECTED, not optional — and orchestrators may spawn subagents freely
 type: feedback
 scope: global
 ---

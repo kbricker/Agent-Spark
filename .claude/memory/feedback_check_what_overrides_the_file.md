@@ -1,6 +1,6 @@
 ---
 name: feedback_check_what_overrides_the_file
-description: Before editing a config or index file, check whether something downstream overwrites or overrides it — a generated block, a fence comment, or a .d/ drop-in directory. The file you are about to edit is often not the authority, and the edit fails silently.
+description: The file you are about to edit is often not the authority — check for a generated block, fence comment, or .d/ drop-in
 type: feedback
 scope: global
 ---

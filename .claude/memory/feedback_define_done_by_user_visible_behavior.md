@@ -1,6 +1,6 @@
 ---
 name: A plan is done when the user can use the feature, not when the format change is on disk
-description: A plan's definition of done is "the user can do the thing the plan promised." If the on-disk shape is correct but the user can't mint / edit / assign from the editor, the plan is not done — no matter how clean the tests are.
+description: Done means the user can do the thing the plan promised — a correct on-disk shape with no working UI is NOT done
 type: feedback
 scope: global
 ---

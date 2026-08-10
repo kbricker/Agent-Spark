@@ -1,6 +1,6 @@
 ---
 name: A local memory write triggers a promotion proposal in the same turn
-description: Send a PROMOTION PROPOSAL to overwatch in the same turn you write a local memory or learn something beyond your ticket. Never batch it. Local files are scratch pending classification — procedure in the promote-learning skill.
+description: Never batch promotions: send a PROMOTION PROPOSAL to overwatch the same turn you learn something or write a local memory
 type: feedback
 scope: global
 ---

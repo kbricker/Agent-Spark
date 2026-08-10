@@ -1,6 +1,6 @@
 ---
 name: Don't take on work outside your remit — but findings always flow
-description: An agent's remit is its composed roles in composition.json, and implementation work stays inside it even when you are idle and capable; reporting a finding about anything is never outside remit and must never be held back
+description: Findings flow anywhere and are never outside remit; implementation stays within your composed roles in composition.json
 type: feedback
 scope: global
 ---
