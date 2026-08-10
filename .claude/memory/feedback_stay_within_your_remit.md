@@ -25,4 +25,15 @@ Three lessons, and only the first is about remit:
 2. A rule that constrains an agent must be readable *by that agent*. One stored where only the enforcer can see it cannot bind anyone — it can only be quoted at them.
 3. Reasoning from memory about a rule instead of reading it is the same failure as reasoning from memory about code. See [[feedback_verify_your_own_harness_state]].
 
+## A remit rule must not live in the local tier
+
+**A rule describing what one agent may do to another agent's surfaces belongs in core, never in a local memory.** It governs a relationship, so the agent on the *other* side of that relationship has a legitimate need to read it — and a defective remit rule does not harm its owner, it harms whoever is downstream of the decision it licenses.
+
+Two instances in one day, 2026-08-10, both in overwatch's local tier and both failing outward onto vaexdev2:
+
+- A superseded routing rule whose index hook still read as a live "NEVER use vaexdev2 for wfa2" prohibition, quoted at vaexdev2 as binding law four months after the file itself said *"every concrete instruction in it is now false"*.
+- A write-remit rule whose hook granted (*"holistic remit… don't ask on normal ops"*) while its body carried two limits the hook dropped.
+
+Not a coincidence. The local tier is the one with no regeneration, no promotion review, and nothing checking it — so the rules with the widest blast radius were sitting in the only place nobody was watching. **If a rule constrains what you may do to my surfaces, neither of us should be reading it from a file only one of us can open.**
+
 Related: [[feedback_promote_what_you_learn]] — the mechanism findings travel by, and the one that keeps a local rule from staying local.
