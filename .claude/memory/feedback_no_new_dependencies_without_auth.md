@@ -15,3 +15,13 @@ scope: global
 - "Transitive" is not a loophole. If adding package A pulls in ten new packages as dependencies, that's eleven new deps, and Kyle needs to see the tree before you install.
 - Dev agents on every plan must also respect this. Orchestrator briefings for dev-* agents must include the rule (a pointer to the `no-new-deps` skill) as part of Phase 1.5 kickoff.
 - If an orchestrator has a procedural gate skill available (`no-new-deps`), invoke it every time rather than relying on memory — the skill's ritual is harder to skip than a silent mental check. Orchestrators without such a skill should treat the propose-and-wait pattern as equally non-negotiable.
+
+## This gates what AGENTS add — not what Kyle already authorized
+
+**A dependency Kyle brought in himself, or agreed with a human collaborator, is authorized by definition.** The rule exists so an agent never installs something Kyle would have pushed back on; it is not a mandate to police the manifest against Kyle.
+
+Kyle 2026-08-10, on `com.unity.polybrush` appearing in VaEx's manifest without a ticket: *"I worked with the artist on that polybrush, its a tool they are using in the project, not much to do with us so its fine."* **Authoring and DCC tooling the art team adopts is their call and Kyle's, not an agent's to gate.**
+
+**Noticing it was still right.** vaexdev flagged the arrival, told Kyle, and did not chase it — that is the correct shape, and it cost one sentence. Do the same: report an unexplained manifest change once, then drop it. What you must not do is stay silent because it *looks* like someone else's, since that is indistinguishable from a dep that slipped in unnoticed.
+
+**Not a loophole for you.** "It is only an editor tool" is not authorization for an agent to add one. The distinction is *who added it*, never *what kind of package it is*.
