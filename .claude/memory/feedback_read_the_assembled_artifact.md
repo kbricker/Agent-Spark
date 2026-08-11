@@ -1,6 +1,6 @@
 ---
 name: Read the assembled artifact, not just your diff
-description: "Before committing text you drafted for a file you couldn't fully read, read the assembled file in place — correct text goes false by adjacency, and the diff never shows it"
+description: "Read the assembled file in place, not just your diff — correct text goes false by adjacency, and the diff never shows it; most of all for text drafted blind"
 type: feedback
 scope: global
 ---
