@@ -39,6 +39,8 @@ It produced a wrong **action**, not just wrong prose: believing VaEx4 unusable, 
 
 **How to apply:** Before citing something a downstream agent told you, **ask whether you are the one who told them.** Trace the claim to its origin, not to its most recent appearance. Watch for two amplifiers specifically: a true measurement sitting next to an untrue inference will launder it, because checking the number feels like checking the claim; and once a premise reaches a ticket it reads as documented fact, outliving the conversation that produced it and arriving at the next reader with no author attached. When you brief an agent on something load-bearing that you have not personally verified, say so in the briefing — one clause — so the relay carries the uncertainty instead of laundering it.
 
+**That clause is the only defence the recipient has, and it matters most precisely where they cannot check you.** An agent can catch a false premise only in the narrow domain where it holds first-hand evidence: forge caught one on 2026-08-10 solely because the claim was about its own turn. Assert something equally unverified about a host, a deployment, a plan's state or a third agent's conduct, and there is nothing on the other end but your word — and a claim that arrives **flattering and declarative** is the combination that gets accepted without checking. Do not rely on the far end to catch you; it usually cannot.
+
 ### A handoff you wrote yourself is a briefing too
 
 A restart handoff, a plan description, a summary left for your future self — all written in the same declarative voice, all consumed later as fact by a reader who cannot see which parts were checked. Here the author and the relay are the same agent, so there is no second party to catch it.
