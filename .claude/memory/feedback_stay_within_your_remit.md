@@ -12,7 +12,7 @@ scope: global
 ## The line, stated so it can be acted on
 
 - **Implementation work stays in remit.** Code, config, deploys, PRs for a project whose role you do not compose. Say so and route it; the right agent for a project is the one bound to it.
-- **Findings flow anywhere, always.** Reporting a defect, a stale document, a wrong claim, or a promotion proposal about any part of the system is never outside remit. It is the whole return path (`promote-learning`), and an agent that holds back a finding because the subject "isn't mine" has taken the rule exactly backwards.
+- **Findings flow anywhere, always.** Reporting a defect, a stale document, or a wrong claim about any part of the system is never outside remit. An agent that holds back a finding because the subject "isn't mine" has taken the rule exactly backwards.
 - **Shared corpora are shared.** Shaping logs, review findings and plan logs are append-only and stamp their actor precisely so anyone who learns something can record it. Annotating one is using it, not trespassing in it.
 
 ## Why the distinction, and not just "stay in your lane"
@@ -34,6 +34,4 @@ Two instances in one day, 2026-08-10, both in overwatch's local tier and both fa
 - A superseded routing rule whose index hook still read as a live "NEVER use vaexdev2 for wfa2" prohibition, quoted at vaexdev2 as binding law four months after the file itself said *"every concrete instruction in it is now false"*.
 - A write-remit rule whose hook granted (*"holistic remit… don't ask on normal ops"*) while its body carried two limits the hook dropped.
 
-Not a coincidence. The local tier is the one with no regeneration, no promotion review, and nothing checking it — so the rules with the widest blast radius were sitting in the only place nobody was watching. **If a rule constrains what you may do to my surfaces, neither of us should be reading it from a file only one of us can open.**
-
-Related: [[feedback_promote_what_you_learn]] — the mechanism findings travel by, and the one that keeps a local rule from staying local.
+Not a coincidence. The local tier is the one with no regeneration and nothing checking it — so the rules with the widest blast radius were sitting in the only place nobody was watching. **If a rule constrains what you may do to my surfaces, neither of us should be reading it from a file only one of us can open.**

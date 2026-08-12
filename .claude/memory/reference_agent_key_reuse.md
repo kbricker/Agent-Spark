@@ -33,4 +33,4 @@ The hazard is not an agent idly scrolling its own history. It is **anything that
 
 ---
 
-*Promoted from vaexdev2's local memory, 2026-08-04 — the first knowledge to travel the promotion path this model depends on. Written by the agent that discovered it about itself.*
+*Promoted from vaexdev2's local memory, 2026-08-04. Written by the agent that discovered it about itself.*
