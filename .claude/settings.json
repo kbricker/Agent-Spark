@@ -25,7 +25,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c \"export HIVE_AGENT_KEY=spark && bash C:/Projects/wfa2/hooks/hive-status-working.sh\"",
+            "command": "node C:/Projects/wfa2/hooks/hive-status-working.mjs --agent spark",
             "timeout": 10
           }
         ]
@@ -36,7 +36,29 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c \"export HIVE_AGENT_KEY=spark && bash C:/Projects/wfa2/hooks/hive-status-idle.sh\"",
+            "command": "node C:/Projects/wfa2/hooks/hive-status-idle.mjs --agent spark",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/hive-context-snapshot.mjs --agent spark",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/hive-subagent-stop.mjs --agent spark",
             "timeout": 10
           }
         ]
