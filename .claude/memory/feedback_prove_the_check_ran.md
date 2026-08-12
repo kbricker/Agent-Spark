@@ -16,7 +16,7 @@ This is not the same as [[feedback_verify_before_asserting]]. There the failure 
 - Two probe negatives where a silent failure to connect and a genuine "unsupported" were the same empty output — one of which was *one of the two answers the probe existed to distinguish*.
 - A proof written to `/tmp`, which node resolved to a nonexistent `C:\tmp`. It returned empty for **both** the pre-fix and post-fix versions. It surfaced only because the author expected the pre-fix run to differ and it didn't.
 
-The sixth was caught before it happened: overwatch specified a pinning test that would have passed on a branch where no production path could ever set the field it asserted — **a fixture proving the mapping on plumbing that did not exist.** It was specified *because* of the earlier four, in a form that would have produced a fifth. Watching for a failure mode at one level while writing it in at the level above is exactly how it survives.
+The sixth was caught before it happened: overwatch specified a pinning test that would have passed on a branch where no production path could ever set the field it asserted — **a fixture proving the mapping on plumbing that did not exist.** It was specified *because* of the five above, in a form that would have produced a sixth. Watching for a failure mode at one level while writing it in at the level above is exactly how it survives.
 
 **How to apply — make the check prove itself before you read its verdict:**
 
