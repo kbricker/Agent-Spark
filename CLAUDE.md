@@ -10,11 +10,18 @@ Spark exists so small personal projects get a real orchestrator (plans, fast-tra
 
 ## Restart handoff (fresh process launch only)
 
-This rule applies ONLY to the interactive orchestrator main session, at a fresh process launch. Subagents, headless runs, and scheduled routines must NEVER touch `.claude/restart-handoff.md`. A context-compaction resume is NOT a startup — do not consume the handoff after compaction.
+At session start, right after reading MEMORY.md — and ONLY in the interactive main session at a fresh launch (never a subagent, headless run, scheduled routine, or a context-compaction resume) — run:
 
-At session start, right after reading MEMORY.md: if `.claude/restart-handoff.md` exists, CLAIM it before reading it, in exactly this sequence: `mkdir -p .claude/restart-journal`, then a no-clobber claim loop: `mv -n .claude/restart-handoff.md .claude/restart-journal/<yyyy-MM-dd-HHmmss>.md` (timestamp = time of consumption, local, 24h — obtain it with a SEPARATE `date` call and write the filename as a literal; a `TS=$(date ...)` assignment inside the claim command defeats the Bash allow rule and re-prompts on every single launch) — if the source still exists after the attempt, the target was occupied: increment a numeric suffix (`-2`, `-3`, ...) and retry, bounded at 5 attempts (a source that survives 5 no-clobber attempts is a move FAILURE — permissions or filesystem trouble, not collisions — use the fallback below); any existing path counts as occupied and no journal entry is ever overwritten. Then verify `.claude/restart-handoff.md` no longer exists. Only after it is confirmed gone: read the journal file you just created and act on it — run its verification checks, re-establish its watch list (then poll each watched agent's current state once — events during the restart were lost), and resume its work. A crash between claim and read loses only the trigger — the content is safe in the journal for Kyle to point at. If the move fails for any reason, fall back to read-then-delete: read the handoff, DELETE it, and only then act — deletion beats replay; if deletion also fails, stop and tell Kyle before acting on the handoff.
+```
+node C:/Projects/wfa2/hooks/claim-restart-handoff.mjs
+```
 
-If the file doesn't exist, start normally. Never read `.claude/restart-journal/` at startup except the single file you just claimed — it is an archive, not an input. Handoffs are written by the `prepare-restart` skill when Kyle says "get ready for a restart".
+It claims the handoff in one literal command — all file work is internal to the script, so nothing prompts — and prints what to do next:
+- `NONE` — no handoff; start normally.
+- `CLAIMED` / `RECOVERED` — act on the printed content: run its verification checks, re-establish its watch list (then poll each watched agent once, since events during the restart were lost), and resume its work.
+- `ERROR_STOP` — stop and tell Kyle; do not act on the handoff.
+
+Handoffs are written by the `prepare-restart` skill when Kyle says "get ready for a restart".
 
 ## Memories vs. skills
 
