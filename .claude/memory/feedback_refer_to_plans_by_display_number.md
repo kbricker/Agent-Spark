@@ -13,4 +13,4 @@ Applies to prose everywhere an agent writes: chat, plan names and descriptions, 
 
 **Re-parenting, and how much to care.** Display numbers change when a plan is grouped under a parent after the fact — #654 lived a full day standalone before #664 existed, and its number changed retroactively with no migration. When you re-parent, **make a quick pass and fix the obvious references**: the plan's own name and description, and any sibling plan that points at it. Do not chase every historical mention. Pushed branch names, existing commit messages and old log entries stay as they are — they are immutable, and rewriting history to chase a renumber costs more than it returns. Kyle 2026-07-28: *"hygene dictates we should make a pass and fix that, but I dont want to get crazy on that, its more important that going forward you speak consistantly with the subticket display number."*
 
-Going forward beats cleaning up backwards. See [[feedback_plan_state_lifecycle]] and [[feedback_record_as_you_shape]].
+Going forward beats cleaning up backwards. See [[feedback_plan_preconditions]] and [[feedback_record_as_you_shape]].

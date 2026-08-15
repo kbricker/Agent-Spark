@@ -1,27 +1,20 @@
 ---
 name: Never add new dependencies without express authorization
-description: Never add a new runtime/dev/build/test/transitive dependency to any project without Kyle's explicit yes. Applies to npm/pnpm, NuGet, pip, cargo, gem, go mod, Unity Package Manager — every package ecosystem.
+description: Add a dependency only with a damn-good reason and Kyle's explicit yes — no surprises; use the no-new-deps skill to propose one
 type: feedback
 scope: global
 ---
 
-**Before adding any new dependency to any project Kyle owns, stop and get explicit authorization in chat.** This rule is package-manager-agnostic — it applies to every ecosystem (npm/pnpm for JS/TS, NuGet for .NET/C#, Unity Package Manager for Unity, pip for Python, cargo for Rust, gem for Ruby, go mod for Go, apt/brew for system deps, anything else). There are no escape hatches. No "it's just a dev dep." No "it's transitive so it doesn't count." No "it's tiny." No "I'll swap it out later." A yes from Kyle before install, or no install.
+Adding a dependency is never an agent's call to make silently. It's not that new deps are banned — it's that they must be **smart** (a damn-good reason) and **never a surprise** (Kyle is informed and says yes before install). So: propose in chat and wait for an explicit "yes add X." A yes before install, or no install.
 
-**Why:** Kyle has discovered accumulated framework/dependency creep across the stacks (e.g. React pervasive in the Verlet editor, Node.js + chokidar in the Verlet CLI) that he would have pushed back on if asked. Frameworks and deps shape a codebase's identity — they change what patterns feel natural, what other deps get pulled in next, and how hard it is to change direction later. Kyle's framing 2026-04-15: *"I dont want any node.js in the platform, we already have react all over the place and I didnt want that. NEW SKILL -> NO NEW DEPENDENCIES WITHOUT EXPRESS AUTH."* The explicit callout *"you always forget fucking memories, it needs to be a skill"* made the form clear — a procedural ritual is stickier than a passive rule. verletDev has a dedicated `no-new-deps` gate skill that codifies the proposal-and-auth ritual; orchestrators without that skill follow the same rule inline — propose in chat, wait for a "yes add X," then install.
+This is package-manager-agnostic (npm/pnpm, NuGet, pip, cargo, gem, go mod, Unity Package Manager, apt/brew) and covers every category — runtime, dev, build, test, and transitive. None of "it's just a dev dep," "it's transitive," "it's tiny," or "I'll swap it later" is a reason to skip the ask; those are the rationalizations that let creep in unnoticed.
 
-**How to apply:**
-- The moment you see yourself about to add a dep — run an install command, recommend a package, scope one into a plan description, accept a review suggestion that would pull one in, or follow a tutorial that assumes one — STOP. Propose in chat with: package name, ecosystem, why you need it, what it replaces or enables, and what it pulls transitively. Wait for an explicit "yes add X."
-- Applies to every package in any repo and every dep category: runtime, dev, build, test, transitive. `package.json` dependencies and devDependencies both count. `.csproj` PackageReference counts. Unity `manifest.json` entries count. `requirements.txt`, `Cargo.toml`, `go.mod`, `Gemfile` — all count.
-- "Transitive" is not a loophole. If adding package A pulls in ten new packages as dependencies, that's eleven new deps, and Kyle needs to see the tree before you install.
-- Dev agents on every plan must also respect this. Orchestrator briefings for dev-* agents must include the rule (a pointer to the `no-new-deps` skill) as part of Phase 1.5 kickoff.
-- If an orchestrator has a procedural gate skill available (`no-new-deps`), invoke it every time rather than relying on memory — the skill's ritual is harder to skip than a silent mental check. Orchestrators without such a skill should treat the propose-and-wait pattern as equally non-negotiable.
+**What a damn-good reason looks like — the bar for approving:**
+- **It absorbs something genuinely messy** you don't want to get distracted hand-rolling — a reverse-engineered protocol, a brittle firmware-sensitive integration, a nasty parser. Kyle on approving `bambulabs_api` (#655): *"it does something messy that we don't want to get distracted on."* A convenience wrapper around a clean problem (an FSM, a small utility) does NOT pass — hand-roll those.
+- **It's actively maintained** — recent releases, a responsive maintainer, a healthy issue tracker. A dependency is maintenance you inherit; an abandoned one is a liability (unpatched CVEs, eventual fork-or-rip-out). Flag last-published date, maintainer activity, and any abandoned or security-flagged transitives.
 
-## This gates what AGENTS add — not what Kyle already authorized
+**Why:** Kyle has hit accumulated creep he'd have pushed back on (React through the Verlet editor, Node + chokidar in the Verlet CLI). Deps shape a codebase's identity — what patterns feel natural, what gets pulled in next, how hard it is to change direction. Kyle 2026-04-15: *"I dont want any node.js in the platform... NO NEW DEPENDENCIES WITHOUT EXPRESS AUTH"* and *"you always forget fucking memories, it needs to be a skill."*
 
-**A dependency Kyle brought in himself, or agreed with a human collaborator, is authorized by definition.** The rule exists so an agent never installs something Kyle would have pushed back on; it is not a mandate to police the manifest against Kyle.
+**How to apply:** Invoke the global **`no-new-deps`** skill — it's the procedural gate (manifest check, transitive fan-out inspection, maintenance status, proposal format), and its ritual is harder to skip than a mental check. Propose: package, ecosystem, why (which criterion above it meets), what it replaces/enables, the transitive tree. Wait for the yes. Dev-agent briefings carry the same pointer.
 
-Kyle 2026-08-10, on `com.unity.polybrush` appearing in VaEx's manifest without a ticket: *"I worked with the artist on that polybrush, its a tool they are using in the project, not much to do with us so its fine."* **Authoring and DCC tooling the art team adopts is their call and Kyle's, not an agent's to gate.**
-
-**Noticing it was still right.** vaexdev flagged the arrival, told Kyle, and did not chase it — that is the correct shape, and it cost one sentence. Do the same: report an unexplained manifest change once, then drop it. What you must not do is stay silent because it *looks* like someone else's, since that is indistinguishable from a dep that slipped in unnoticed.
-
-**Not a loophole for you.** "It is only an editor tool" is not authorization for an agent to add one. The distinction is *who added it*, never *what kind of package it is*.
+**This gates what AGENTS add — not what Kyle already authorized.** A dep Kyle brought in himself, or agreed with a human collaborator, is authorized by definition. Kyle 2026-08-10, on `com.unity.polybrush` in VaEx's manifest: *"its a tool they are using in the project... so its fine."* Still report an unexplained manifest change once, then drop it — silence is indistinguishable from a dep that slipped in. The distinction is *who added it*, never *what kind of package it is*.

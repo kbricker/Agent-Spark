@@ -16,4 +16,4 @@ Fast-track is the default orchestration path for all plans across overwatch, vae
 - If unsure, propose fast-track and ask Kyle only if the scope feels genuinely heavy.
 - Do NOT ask for fast-track authorization on every small plan — that inverts back to the old model.
 
-**Note:** Plan #A (to be filed) formalizes this in the fast-track-plan skill and rolls out to all three orchestrators. Until that ships, follow this memory as the operative rule.
+The `fast-track-plan` skill holds the operative procedure; this memory is the default-vs-escape-hatch rule and the why behind it.

@@ -17,6 +17,10 @@ scope: global
 - `hive_send_message` — directed to a specific agent key
 - `hive_respond` — reply on your own channel
 
+## If the agent you need is asleep
+
+Some agents boot Offline and sleep between tasks (forge, and any `AutoSpinDown` agent, per plan #280). A message to a sleeping agent may not rouse it — **wake it first with `hive_agent_wake({agentKey})`**, then message and watch, then `hive_agent_sleep` when done. Before assuming an agent you need is unavailable — or asking Kyle — check your own MCP tools: `hive_agent_list`, `hive_agent_status`, `hive_agent_wake`. Kyle 2026-08-14 hit exactly this: vaexdev2 did not realise it could wake forge and had to be reminded to look.
+
 ## Why this is easy to get wrong
 
 The reverse rule is real and correct for the agents it covers: a server-spawned ephemeral's stdout *is* captured, so telling it to call `hive_send_message` is redundant work and a routing-bug risk. That guidance lives with `run-plan-workflow`, which is where ephemerals get briefed.

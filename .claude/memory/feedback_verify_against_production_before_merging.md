@@ -1,9 +1,8 @@
 ---
-name: feedback-verify-against-production-before-merging
-description: "For a change that transforms data or ships a new invariant, verify the RESULT against production before merging — verifying after merge turns one PR into two and finds defects when the bad data is already live"
-metadata:
-  node_type: memory
-  type: feedback
+name: Verify against production before merging
+description: If a change transforms data or adds an invariant, verify the RESULT against production BEFORE merging, not after
+type: feedback
+scope: global
 ---
 
 Kyle, 2026-08-09, after plan #842 shipped a shaping-log feature across two PRs and roughly seven CodeRabbit review runs: *"it's a ton of cycling for an iteration on the shaping logs it feels inefficient."*

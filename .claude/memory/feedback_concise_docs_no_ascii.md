@@ -21,4 +21,4 @@ Long prose documents rot silently because nobody re-reads them end to end — in
 
 The reasoning that makes a decision defensible is not the same content as the decision someone needs to act on. Inlining all of it stops the doc being the thing it was written to be: a BOM you order from, a build guide you work from.
 
-Related: [[feedback_record_as_you_shape]] — the shaping log is where the long WHY goes, which is what makes cutting it from the deliverable safe rather than lossy. Also [[feedback_no_unrequested_ux]] and [[feedback_kyle_does_not_edit_tickets]].
+Related: [[feedback_record_as_you_shape]] — the shaping log is where the long WHY goes, which is what makes cutting it from the deliverable safe rather than lossy. Also [[feedback_no_unrequested_ux]] and [[feedback_kyle_reads_and_directs]].

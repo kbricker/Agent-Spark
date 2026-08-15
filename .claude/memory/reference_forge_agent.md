@@ -31,12 +31,9 @@ scope: global
 - **Do it yourself (vaexdev):** game code, Unity content, VaEx PRs, gameplay data — forge is not a game dev.
 - **Escalate to overwatch:** Hive platform changes (AgentStudio2/McpBridge/RemoteAgent), agent identity provisioning, Slack channel allowlisting, anything hitting the claude-infra IAM wall.
 
-## Hard security rules (non-negotiable, from forge's own bootstrap brief)
+## Credentials
 
-1. NEVER read or display a service-account key file — write-only from creation.
-2. NEVER commit credentials, keys, or secret values to git.
-3. NEVER output Mongo URIs, API keys, or OAuth secrets in chat — redact if a tool returns one.
-4. All secrets live in Secret Manager (or Windows Credential Manager locally) and are pulled at runtime — never `.env` files, never hardcoded.
+Credential-level work is forge's exclusively — see [[feedback_credentials_radioactive]]. forge holds the detailed operating rules in its own memory; everyone else routes credential work to forge and never touches a credential directly.
 
 ## Gotcha
 

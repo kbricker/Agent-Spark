@@ -1,6 +1,6 @@
 ---
 name: Verify Edit success before committing and claiming cleanup landed
-description: When an Edit tool call fails (string-match mismatch), the file is unchanged on disk. Never claim a cleanup "landed" without running git diff first — I shipped a lying commit message on 2026-04-13 because I assumed an Edit succeeded when it hadn't
+description: A failed Edit (string-not-found) leaves the file unchanged — run git diff before you claim a cleanup/removal landed
 type: feedback
 scope: global
 ---

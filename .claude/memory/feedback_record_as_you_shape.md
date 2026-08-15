@@ -13,4 +13,4 @@ Record plan shaping **as it happens** via `hive_plan_log_add` — a question whe
 
 **How to apply:** Call `hive_plan_log_add` in the same turn the exchange happens; never batch to the end of a session. A sweep only happens if someone asks, and a discipline that depends on being asked is not a discipline. Before claiming a session is captured, read the log back and compare it against `git log` — every commit that changed a design should map to an entry.
 
-This memory is a pointer, kept deliberately short. The skill is canonical: if the two disagree, the skill wins and this file is stale. See [[feedback_plan_state_lifecycle]]; the earned-autonomy plan that consumes these logs is #641.
+This memory is a pointer, kept deliberately short. The skill is canonical: if the two disagree, the skill wins and this file is stale. See [[feedback_plan_preconditions]]; the earned-autonomy plan that consumes these logs is #641.

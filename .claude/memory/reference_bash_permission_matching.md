@@ -53,4 +53,4 @@ That is a single command with no assignment for the matcher to see. Every assign
 
 ## Related
 
-Keep bare `Bash` + `PowerShell` in the allow list ([[feedback_blanket_shell_allows]]) — it is still correct and still matches everything without an assignment. `.claude/settings.local.json` is machine-managed; treat mints as a signal that a command shape needs fixing, not as config to curate.
+Keep bare `Bash` + `PowerShell` in the allow list — still correct, still matches everything without an assignment. (The standing decision to blanket-allow them is overwatch's; overwatch owns permission management.) `.claude/settings.local.json` is machine-managed; treat mints as a signal that a command shape needs fixing, not as config to curate.

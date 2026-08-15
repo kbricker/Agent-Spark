@@ -1,21 +1,28 @@
 ---
 name: Never defer scope unilaterally — the ticket's user-facing goal IS the scope
-description: A ticket's user-facing goal IS its scope — never carve it into a "polish follow-up" of your own invention to get a PR shipped. If the user still can't do the thing, the plan isn't done.
+description: Do the scope Kyle named, exactly — never substitute, shift, or defer it; change scope only by convincing him first
 type: feedback
 scope: global
 ---
 
-**The rule:** It is not my job to defer scope. Ever. If the ticket's stated purpose is "bring X to the user," then the scope is "the user can do X through the product's own surface, without hand-editing files." Carving that up into "ship the engine now, follow up with UI later" is a scope shift I am not authorized to make — regardless of how clean the engine diff looks or how green the tests are.
+**It is never an agent's job to defer, shift, or substitute scope.** When Kyle says "ticket X," do X — Kyle 2026-08-14: *"when I say ticket X, do X, that is because its exactly what I think I want, until such a time as im convinced otherwise."* The stated goal IS the scope. Changing what it means is a conversation you have with Kyle and WIN before acting — never a call you make and present as finished.
 
-**Why:** *(The examples below are from Verlet, whose owner verletDev was retired 2026-07-09. They are kept because they are the evidence for the rule, not because Verlet is current. The rule is fleet-wide and applies to every project.)* Plans #248 (material-as-asset), #261 (HDR environments), #177 (MeshRenderer.geometry) all got shipped with correct on-disk format + green e2e, with their user-facing on-ramps filed as "follow-ups" I named "polish." After three of those stacked up, Kyle said (2026-04-19): "the tickets were always about user-facing features, you were the one who chose to defer the actual goals. its madness, whats the point of 6 hours of engine work that does not actually expose the features we enabled, actually took stuff away, cant even set color! its not your job to defer anything ever." The worst case: #248 produced a NET REGRESSION — MeshRenderer used to have inline color / roughness / metalness the user could edit; after #248 those moved to `.mat.json` which the user can't create. Feature got architecturally better, user-experientially worse. Shipping a regression is not shipping progress.
+**Three forbidden shapes, all of which Kyle has had to catch and drag back on track:**
+1. **Substitution** — spinning around the topic, finding something adjacent that *smells like* the goal, doing THAT, and acting like the original scope is done. Doing a different thing is not doing the thing.
+2. **Scope-shifting** — moving the original scope to a NEW ticket instead of doing it. The goal does not relocate to escape being done.
+3. **Deferral** — carving the user-facing goal into a "polish follow-up" of your own invention so a clean PR ships now. If the user still can't do the thing the ticket named, the plan isn't done.
+
+The cost of all three is Kyle's vigilance — he has to notice the drift and correct it. Assume the stated scope is exact and intentional until he says otherwise.
+
+**This is not "never question scope" — the opposite is encouraged.** Push back, raise questions, help refine the goal, propose a fork — all good; that's how scope gets sharper. Kyle 2026-08-14: *"its fine and good for an agent to push back on scope, raise questions, help me refine, fork whatever, but they can never take the decision to deferr scope in their own accord."* The line is the DECISION: you surface the concern and Kyle decides — you never decide to defer, shift, or substitute and then act as if it's settled.
+
+**Why:** *(Examples from Verlet, owner verletDev retired 2026-07-09 — kept as evidence; the rule is fleet-wide.)* Plans #248, #261, #177 shipped with correct on-disk format + green e2e, their user-facing on-ramps filed as "polish follow-ups." Kyle 2026-04-19: *"the tickets were always about user-facing features, you were the one who chose to defer the actual goals... its not your job to defer anything ever."* Worst case: #248 was a NET REGRESSION — MeshRenderer had inline color/roughness/metalness the user could edit; #248 moved them to `.mat.json`, which the user can't create. Architecturally better, user-experientially worse. Shipping a regression is not progress.
 
 **How to apply:**
-- When drafting or reviewing a plan, the scope = the user-facing behavior the ticket names. Engine changes, format migrations, tests are IMPLEMENTATION of that scope, not substitutes for it.
-- If I'm about to file a checklist item as a "follow-up" because the current PR is getting big, STOP. Present the size problem to Kyle as a scope question: "this plan has grown to X hours; should we split into two plans or ship this one big?" Let Kyle decide the split, not me.
-- Splits MUST preserve end-to-end user usability at the first merge. If Group A leaves the user with less than they had before Group A started, Group A is broken — either add the missing UI to Group A or don't ship Group A until Group B lands too.
-- "This is polish" is a phrase I should be suspicious of when I type it. Polish is tooltips, shortcuts, animations. The primary authoring UX for an asset type is NOT polish — it's the feature.
-- If a plan is "expose X to the user" and the PR leaves the user unable to create/edit/assign X via the editor, the PR is incomplete, not just "v1." Do not merge it.
+- Scope = the user-facing behavior the ticket names. Engine changes, format migrations, tests are IMPLEMENTATION of that scope, not substitutes for it.
+- If a PR is getting big, STOP and present it to Kyle as a scope question — "grown to X hours; split into two, or ship one big?" Let Kyle decide the split, not you.
+- Splits MUST preserve end-to-end user usability at the first merge. If Group A leaves the user with less than before, add the missing UI to Group A or don't ship it until Group B lands.
+- "This is polish" is a phrase to distrust when you type it. Polish is tooltips, shortcuts, animations — not the primary authoring UX for the feature.
+- If a plan is "expose X to the user" and the PR leaves the user unable to create/edit/assign X via the editor, it's incomplete — do not merge it.
 
-**Pairs with:**
-- `feedback_define_done_by_user_visible_behavior.md` — the "user can [verb] the thing" validation item
-- `feedback_no_unrequested_ux.md` — don't invent surfaces Kyle didn't ask for (the mirror image: don't omit surfaces the ticket required either)
+**Pairs with:** [[feedback_define_done_by_user_visible_behavior]] (the "user can [verb] the thing" item); [[feedback_no_unrequested_ux]] (the mirror — don't invent surfaces Kyle didn't ask for, nor omit surfaces the ticket required).
