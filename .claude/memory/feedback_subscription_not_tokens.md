@@ -9,7 +9,7 @@ scope: global
 
 Kyle, 2026-08-03: *"max sub is insanly cheap compared to tokens, im never going to tokens until they take away subs and I have a suger daddy."*
 
-**Why:** we run four interactive orchestrators plus every ephemeral, at Opus tier, effectively continuously. Under the subscription that is a fixed monthly cost. Metered at API rates it is an open-ended bill scaling with how much work the fleet does — which is exactly the thing we want to increase. The economics do not merely disfavour the API path; they invert the incentive to use the platform at all.
+**Why:** we run several interactive orchestrators, plus every subagent they fan out to, at Opus tier, effectively continuously. Under the subscription that is a fixed monthly cost. Metered at API rates it is an open-ended bill scaling with how much work the fleet does — which is exactly the thing we want to increase. The economics do not merely disfavour the API path; they invert the incentive to use the platform at all.
 
 **How to apply:**
 

@@ -31,7 +31,7 @@ Write for a cold reader — the fresh session has zero session-local context. No
 
 ## Startup consumption (the post-restart half)
 
-The consumption rule lives in each orchestrator workspace's CLAUDE.md so the fresh session sees it at launch. **The block below is canonical — the CLAUDE.md copies must match it verbatim (sans the blockquote `>` markers).** propagate-shared-config does NOT touch CLAUDE.md; changing this block requires a manual pass over all four workspaces (overwatch, vaexdev, spark, 3dproppipeline).
+The consumption rule lives in each workspace's CLAUDE.md so the fresh session sees it at launch. **It is in FIVE workspaces — overwatch, vaexdev, vaexdev2, spark, 3dproppipeline** (correctly absent from hivedev01, which RemoteAgent starts). Verify by grepping `claim-restart-handoff` across the managed workspaces rather than trusting this list; vaexdev2 was missing from it for weeks, and it is the one instance whose silent divergence from vaexdev the composition model exists to prevent. **The block below is canonical — the CLAUDE.md copies must match it verbatim (sans the blockquote `>` markers).** propagate-shared-config does NOT touch CLAUDE.md; changing this block requires a manual pass over all FIVE workspaces named above — vaexdev2 included, and it is the one that gets forgotten.
 
 > ## Restart handoff (fresh process launch only)
 >

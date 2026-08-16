@@ -2,7 +2,7 @@
 name: Orchestrate proactively — start workflows, watch workers, move things along
 description: After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
 type: feedback
-scope: global
+scope: role:orchestrator
 ---
 
 Always follow through on orchestration end-to-end: send messages to kick off work, watch for agent completion events, read results, and take the next pipeline step. Never stop at just updating a plan status — that's paperwork, not orchestration.

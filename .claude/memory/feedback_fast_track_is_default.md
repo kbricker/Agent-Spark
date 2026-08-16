@@ -1,19 +1,19 @@
 ---
 name: Fast-track is the default workflow
-description: Fast-track is the main orchestrator path now; ephemeral run-plan-workflow is the escape hatch, not the entry point. Applies to every virtual orchestrator: overwatch, vaexdev, spark, 3dproppipeline.
+description: Fast-track is THE orchestration path on every plan — play dev + review inline, fan out to subagents. If you are reading this, it applies to you.
 type: feedback
 scope: global
 ---
 
-Fast-track is the default orchestration path for all plans across overwatch, vaexdev, spark and 3dproppipeline. The orchestrator plays dev + review inline and is free to spawn Agent/Task subagents at its discretion for fan-out (parallel dev on independent sub-areas), leveraging the shared prompt cache. Ephemeral dev/review/test via `run-plan-workflow` is the **escape hatch** for large, risky, architecturally-unknown, or multi-agent-coordination work — not the default.
+Fast-track is the orchestration path for all plans, on every agent. You play dev + review inline and are free to spawn Agent/Task subagents at your discretion for fan-out (parallel dev on independent sub-areas), leveraging the shared prompt cache. **There is no second path.** Work too large for one context gets decomposed across subagents, not handed to a different pipeline.
 
-**Why:** Kyle set this rule on 2026-04-19 during an orchestrator-comparison discussion. Reasoning: spawning ephemerals has real startup cost, breaks cache sharing, and for the size of most plans is overkill. Fast-track + fan-out via subagents keeps cache warm, parallelizes where useful, and shaves the spawn/clone/kill cycle entirely. This reverses the prior default where run-plan-workflow was the expected path and fast-track required explicit authorization.
+**Why:** Kyle set this rule on 2026-04-19 during an orchestrator-comparison discussion. Reasoning: spawning a separate agent process has real startup cost, breaks cache sharing, and for the size of most plans is overkill. Fast-track + fan-out via subagents keeps the cache warm, parallelises where useful, and shaves the spawn/clone/kill cycle entirely. The separate-process pipeline it replaced was retired outright on 2026-08-16.
 
 **How to apply:**
 - On a new plan, default to fast-track (invoke `fast-track-plan` skill).
 - Use Agent/Task subagents for parallelizable sub-work — independent files, parallel research, multi-file reviews.
-- Only reach for `run-plan-workflow` when the change is genuinely large (broad scope, many files, architectural risk) or when real dev/review/test agent isolation is needed (long-running Playwright tests, destructive experiments, multi-day plans).
-- If unsure, propose fast-track and ask Kyle only if the scope feels genuinely heavy.
+- When a plan is too large for one context, DECOMPOSE it across subagents by sub-area. There is nowhere else to send it.
+- When work genuinely needs a second independent session — Kyle asking for a review that is not your own, or a project you do not own — that is a handoff to another NAMED agent taking a ticket of its own, and the first thing you tell it is to check out the right branch. It is not a spawn.
 - Do NOT ask for fast-track authorization on every small plan — that inverts back to the old model.
 
-The `fast-track-plan` skill holds the operative procedure; this memory is the default-vs-escape-hatch rule and the why behind it.
+The `fast-track-plan` skill holds the operative procedure; this memory is the rule and the why behind it.

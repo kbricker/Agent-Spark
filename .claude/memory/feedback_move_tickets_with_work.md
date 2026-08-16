@@ -11,7 +11,7 @@ A plan's status must match what is actually happening to it, at three moments:
 - **The moment the PR exists** → `CodeReview`, with `prUrl` and `gitBranch` set
 - **After merge and any deploy** → `Completed`, with every checklist item checked
 
-**This applies to work YOU do inline, not just work you dispatch.** The old wording was keyed entirely on "when spawning a dev agent" — but fast-track is the default path and it never spawns a dev agent, so the trigger condition was never met on the workflow we actually use. The rule fired only on the escape hatch. If you are editing files for a plan, the plan is in Development, no matter whose hands are on the keyboard.
+**This applies to work YOU do inline, not just work you delegate.** An older wording keyed the trigger entirely on dispatching work to someone else, so on the path we actually use — you editing files yourself — the condition was never met and the rule never fired. If you are editing files for a plan, the plan is in Development, no matter whose hands are on the keyboard.
 
 **Why:** the dashboard is Kyle's only view of what is in flight. A plan in Planning while its code is being written — or in CodeReview after it shipped — makes the board describe a world that does not exist, and a stalled plan becomes indistinguishable from a healthy one. Kyle has raised this repeatedly. Measured 2026-07-30: of 190 open plans, 143 sat in Planning; 16 of those had checklist items already checked and 2 were fully checked; 5 more carried a branch or PR while still pre-Development; 5 had a PR and had never been closed.
 

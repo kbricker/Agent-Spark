@@ -2,7 +2,7 @@
 name: Channel handoff is the same conversation continuing
 description: Kyle often moves a live conversation between his desk session and Hive channel chat mid-stream — treat it as the same conversation continuing on a new transport, not a new request
 type: feedback
-scope: global
+scope: role:orchestrator
 ---
 
 Kyle will sometimes switch transports mid-conversation: from typing in your terminal session to messaging you on the Hive channel (so he can walk away from his desk and keep working), or back again. Per Kyle 2026-07-22.

@@ -1,11 +1,13 @@
 ---
 name: Subagents are authorized, and required for internal review
-description: Internal adversarial review before any PR/CR is EXPECTED, not optional — and orchestrators may spawn subagents freely
+description: Internal adversarial review before any PR/CR is EXPECTED, not optional — and EVERY agent may spawn subagents freely, no permission needed
 type: feedback
 scope: global
 ---
 
-Every orchestrator — overwatch, vaexdev, spark, 3dproppipeline — is standing-authorized to spawn and use Task/Agent subagents as a normal tool. Do not ask permission, do not raise it per-plan, and do not treat it as an escalation.
+**EVERY agent** is standing-authorized to spawn and use Task/Agent subagents as a normal tool. Do not ask permission, do not raise it per-plan, and do not treat it as an escalation. The authorization is deliberately stated as *every agent* rather than as a list of names: an enumeration here excluded hivedev01 and vaexdev2 for weeks, and this file is the only place a headless agent can learn it is allowed to run the review the next paragraph makes mandatory. If you are reading this, it applies to you.
+
+**A subagent starts on whatever branch it inherits, so name the branch in every brief.** By default a subagent has no workspace of its own — it works in your clone, on whatever the last task left checked out, plausibly the default branch. Checking the branch out yourself before fanning out fixes that case, but ONLY that case: a subagent spawned with worktree isolation gets a fresh worktree your checkout never reaches, so the parent-clone fix is a silent no-op there. **Stating the branch in the brief is the remedy that works in both modes** — do that one, and treat the checkout as belt-and-braces. Three subagents committing to `master` is the same defect as dispatching a named agent onto the wrong branch, minus the handoff message that would have let anyone catch it.
 
 **The internal review pass is EXPECTED and must ALWAYS happen.** Before opening a PR or pushing to CodeRabbit, run the adversarial subagent review on the complete outgoing diff (`fast-track-plan` step 5.5). This is not a nice-to-have you may substitute inline self-review for.
 
@@ -26,4 +28,4 @@ Every orchestrator — overwatch, vaexdev, spark, 3dproppipeline — is standing
 
 **One caution when Kyle mentions agents:** background Bash tasks and Monitor watches render similarly to subagents in his window, so "I saw an agent" may refer to those. Check before contradicting him — and never contradict him on whether he authorized something.
 
-Related: [[feedback_fast_track_is_default]], [[feedback_log_review_findings]], [[feedback_review_role_is_general_purpose]], [[recall:reference_ephemeral_agent_roles]].
+Related: [[feedback_fast_track_is_default]], [[feedback_log_review_findings]].

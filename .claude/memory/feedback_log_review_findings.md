@@ -1,6 +1,6 @@
 ---
 name: A review is not finished until its findings are in the store
-description: Every settled review (internal adversarial, ephemeral review agent, CodeRabbit-worth-keeping) logs its surviving findings — including skipped ones — to the Hive review-findings store via hive_review_finding_add. Procedure in the log-review-findings skill.
+description: Every settled review (internal adversarial, subagent, CodeRabbit-worth-keeping) logs its surviving findings — including skipped ones — to the Hive review-findings store via hive_review_finding_add. Procedure in the log-review-findings skill.
 type: feedback
 scope: global
 ---
@@ -17,5 +17,6 @@ without this data. Kyle 2026-07-23: "I don't want this ever forgotten."
 
 **How to apply:** Invoke the `log-review-findings` skill the moment a review's verdict
 settles, before the plan moves on. Keep `pattern` generalized (it's the clustering
-signal). For ephemeral review agents, their template instructs them to log; the
-orchestrator verifies with `hive_review_finding_list` before closing the plan.
+signal). When a review ran in a subagent, the findings come back in its report and the
+agent that spawned it logs them — a subagent's summary is not the store, and nothing
+else will carry them across. Verify with `hive_review_finding_list` before closing the plan.

@@ -1,15 +1,15 @@
 ---
 name: How to launch orchestrator agents with Hive channel events
-description: Before launching an orchestrator, changing its claudeArgs, or debugging why one has gone deaf on the channel — launch via the desktop .lnk shortcuts (virtual-launcher/launch.ps1), keys live in Windows Credential Manager, and the whole fleet is on the plugin channel path since 2026-08-04
+description: The five VIRTUAL agents launch from desktop .lnk shortcuts on the plugin channel; hivedev01 has no launcher and no channel by design — read before changing claudeArgs or debugging a deaf agent
 type: reference
-scope: global
+scope: role:orchestrator
 ---
 
 Virtual orchestrator agents launch through **`virtual-launcher/launch.ps1`**, which resolves the agent's identity key from Windows Credential Manager, assembles the `claude` arguments, and runs `claude` in the agent's working directory. It is launch-time only — nothing stays resident once the session is up.
 
-Wired up today: **overwatch, vaexdev, spark, 3dproppipeline** — each has a `configs/<key>.json` and a desktop shortcut. **codexhive is NOT wired up**: a `Hive/codexhive` credential exists in the store, but there is no config and no shortcut, so `-Agent codexhive` exits 2. That is deliberate — codexhive is completed R&D and currently unused; to revive it, add `configs/codexhive.json` and an entry in `shortcuts/setup.ps1`. **verletDev** is retired (2026-07-09) — its config and shortcut are still on disk but it is never launched.
+Wired up today: **overwatch, vaexdev, vaexdev2, spark, 3dproppipeline** — each has a `configs/<key>.json` and a desktop shortcut. That is every VIRTUAL orchestrator; **hivedev01 has no launcher at all** and must not be looked for here — RemoteAgent starts it, so a channel problem there is never a launcher problem. **codexhive is NOT wired up**: a `Hive/codexhive` credential exists in the store, but there is no config and no shortcut, so `-Agent codexhive` exits 2. That is deliberate — codexhive is completed R&D and currently unused; to revive it, add `configs/codexhive.json` and an entry in `shortcuts/setup.ps1`. **verletDev** retired 2026-07-09 and its config was deleted 2026-08-16 (782.20); it would have launched on the legacy channel path with no model or effort flags.
 
-**Preferred (desktop icons):** double-click `Overwatch.lnk`, `VaExDev.lnk`, `Spark.lnk`, or `3DPropPipeline.lnk`. They invoke `C:\Projects\wfa2\virtual-launcher\shortcuts\virtual-launcher.cmd <agent-key>`, which calls `launch.ps1`.
+**Preferred (desktop icons):** double-click the `.lnk` for your agent. One exists for every key listed above — `setup.ps1`'s `$agents` array is what creates them, so read that rather than any list transcribed here. They invoke `C:\Projects\wfa2\virtual-launcher\shortcuts\virtual-launcher.cmd <agent-key>`, which calls `launch.ps1`.
 
 **Preferred (terminal):**
 
@@ -58,7 +58,7 @@ That precedence is the important part: on the Kyle box the store wins, so a stal
 
 - `server:hive` references the `hive` key in `.mcp.json` — the merged McpBridge server exposing both tools and the `claude/channel` capability.
 - Channel features arm only when the `hive` server sees `HIVE_AGENT_KEY` in its env. The launcher injects it; a direct launch relies on `.mcp.json`.
-- VM agents (ephemerals, NightWatch) don't set `HIVE_AGENT_KEY` and stay dormant on the channel.
+- VM agents (NightWatch) don't set `HIVE_AGENT_KEY` and stay dormant on the channel.
 - For unattended operation, add `--dangerously-skip-permissions` to the agent's `claudeArgs` in its config JSON.
 - `claudeArgs` is **all-or-nothing** — a config that sets it must restate every flag it wants, including whichever channel flag that agent is on (`--dangerously-load-development-channels server:hive` or `--channels plugin:hive-channel@wonderforge`). Dropping the channel flag detaches the agent from the entire inbound event pipeline; `launch.ps1` warns when the resolved arguments omit both. This bites hardest on a config that *already* had `claudeArgs` — migrating overwatch meant restating `--chrome` and `-n Overwatch` alongside the new flag, whereas 3dproppipeline had no `claudeArgs` at all so its migration was purely additive.
 - That flag is a **preview-contract dependency on Claude Code itself**. Before upgrading Claude Code, and whenever an orchestrator has gone deaf while outbound still works, read [[recall:reference_channels_platform_dependency]] — it covers version pinning, the post-upgrade delivery test, the silent-inbound-drop symptom, and the route off the dev flag.

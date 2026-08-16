@@ -1,14 +1,14 @@
 ---
 name: commit-config
-description: Commit and push changes to the current orchestrator's own config repo after edits — memory files, skills, hooks, MEMORY.md, settings, CLAUDE.md, .mcp.json. Use when Kyle says "commit your config" or after a batch of config edits. The skill auto-adapts to whichever orchestrator is running it (overwatch, vaexdev, spark, 3dproppipeline).
+description: Commit and push changes to your own workspace config repo after edits — memory files, skills, hooks, MEMORY.md, settings, CLAUDE.md, .mcp.json. Use when Kyle says "commit your config" or after a batch of config edits. Works for EVERY propagation-managed agent, not only the virtual orchestrators — find your own row in the dispatch table rather than checking whether you are named here.
 scope: global
 ---
 
 # Commit Orchestrator Config
 
-Each virtual orchestrator has its own workspace repo that holds its `.claude/` directory, hooks, settings, and CLAUDE.md. When any of that changes, the repo should be committed and pushed so the config is version-controlled and Kyle's other hosts / fresh clones pick it up.
+Each managed agent has its own workspace repo that holds its `.claude/` directory, hooks, settings, and CLAUDE.md. When any of that changes, the repo should be committed and pushed so the config is version-controlled and Kyle's other hosts / fresh clones pick it up.
 
-This skill runs in the **current orchestrator's** workspace. Which orchestrator that is depends on the session — use the dispatch table below to pick the right repo path, branch, and remote.
+This skill runs in **your own** workspace. Which agent that is depends on the session — use the dispatch table below to pick the right repo path, branch, and remote. If you genuinely cannot find your row, stop rather than guessing one — a wrong row pushes your config into another agent's remote. Say so in your output; if you have no interactive channel, leave the work uncommitted and report it rather than improvising.
 
 ## Per-orchestrator dispatch table
 
@@ -16,10 +16,12 @@ This skill runs in the **current orchestrator's** workspace. Which orchestrator 
 |---|---|---|---|
 | overwatch | `C:\Projects\overwatch` | `master` | `git@github-second.com:WonderForge/overwatch.git` |
 | vaexdev | `C:\Projects\vaexdev` | `master` | `git@github-second.com:WonderForge/vaexdev.git` |
+| vaexdev2 | `C:\Projects\vaexdev2` | `master` | **none — local repo only; commit, do not push. NEVER push to vaexdev's remote: it is a different instance, not a mirror** |
+| hivedev01 | `C:\Projects\hivedev01` | `master` | **none — local repo only; commit, do not push** |
 | spark | `C:\Projects\spark` | `master` | `git@github.com:kbricker/Agent-Spark.git` |
 | 3dproppipeline | `C:\Projects\3dproppipeline` | `master` | `git@github-second.com:WonderForge/3dPropPipeline.git` |
 
-(verletDev retired 2026-07-09 — its workspace at `C:\Projects\verletDev` is frozen, never commit there. Roster per `reference_virtual_orchestrators`.)
+(verletDev retired 2026-07-09 — its workspace at `C:\Projects\verletDev` is frozen, never commit there. **The roster authority is `composition.json`'s `managedBy` field, not this table and not a memory** — every roster transcribed into prose in this corpus has gone stale, this one included.)
 
 When you run this skill, identify which orchestrator you are (from session context / agent key / the working directory you're in), then use the matching row's values everywhere the procedure references `<repo-path>`, `<branch>`, etc.
 
@@ -105,7 +107,7 @@ EOF
 git -C <repo-path> push origin <branch>
 ```
 
-Use the branch name from the dispatch table (all four current orchestrators: `master`).
+Use the branch name from the dispatch table (every propagation-managed workspace: `master`).
 
 **Never** force-push. If the push is rejected because the remote is ahead, pull with `git pull --rebase origin <branch>`, resolve any conflicts, and push again. Do not `--force` or `--force-with-lease` unless Kyle explicitly says so.
 
@@ -118,7 +120,7 @@ One or two sentences: what committed, what the SHA is, and that it's pushed.
 - **Pre-commit hooks:** the global commit rules say never skip hooks. If a hook fails, fix the underlying issue and create a **new** commit — do not `--amend` the failing one.
 - **Unrelated local changes:** if `git status` shows changes in files you didn't touch in this session (stale edits from a prior session, auto-generated files), don't silently include them. Ask Kyle whether to include them, stash them, or leave them unstaged.
 - **MEMORY.md drift:** whenever you add or rename a memory file, MEMORY.md needs to be updated in the same commit so the index stays accurate. Never commit a new memory file without also updating the index.
-- **Wrong branch:** all four current orchestrators use `master`. The dispatch table is canonical — if in doubt, run `git -C <repo-path> branch --show-current` to verify before pushing.
+- **Wrong branch:** every propagation-managed workspace use `master`. The dispatch table is canonical — if in doubt, run `git -C <repo-path> branch --show-current` to verify before pushing.
 - **Wrong SSH alias:** WonderForge repos use `github-second.com`; spark uses plain `github.com` (kbricker account). Check `git -C <repo-path> remote -v` if auth errors surface.
 - **Secrets:** the `.gitignore` excludes secret files. If you ever see `secrets.json` or `appsettings.Development.json` staged, unstage immediately — something is broken.
 

@@ -8,7 +8,7 @@ scope: global
 You may kill processes you spawned yourself (e.g. a RemoteAgent or AgentStudio2 server you just started in the background). But you MUST target them by PID, not by image name.
 
 **FORBIDDEN — never run these:**
-- `taskkill //F //IM dotnet.exe` — kills every .NET process including other orchestrators' sessions, AgentStudio2 instances, any running ephemeral Claude Code dotnet hosts
+- `taskkill //F //IM dotnet.exe` — kills every .NET process including other orchestrators' sessions, AgentStudio2 instances, and any other Claude Code dotnet host on the box
 - `taskkill //F //IM claude.exe` — kills every Claude Code session Kyle has open, destroying their state and conversation context
 - Any `//IM <image>` form that targets a shared binary
 

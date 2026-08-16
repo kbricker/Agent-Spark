@@ -1,6 +1,6 @@
 ---
 name: no-new-deps
-description: Procedural gate that MUST be invoked before any new dependency is added to any package or project (runtime, dev, build, test, or transitive). Forces an explicit proposal-and-auth ritual. Applies to every orchestrator directly AND to every ephemeral dev agent during plan execution. Invoke whenever you're about to install, recommend, or scope-in a dependency the project doesn't already have.
+description: Procedural gate that MUST be invoked before any new dependency is added to any package or project (runtime, dev, build, test, or transitive). Forces an explicit proposal-and-auth ritual. Applies to every agent directly AND to every subagent it spawns during plan execution. Invoke whenever you're about to install, recommend, or scope-in a dependency the project doesn't already have.
 scope: global
 ---
 
@@ -97,13 +97,15 @@ Install via the correct package manager for the project. Record the approval in 
 
 Before committing, run `git diff` against the lockfile (`pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`, `packages.lock.json`, `Cargo.lock`, `Gemfile.lock`, `go.sum`, Unity `packages-lock.json`, etc.) and check the transitive fan-out matches what you disclosed in the proposal. If there's a surprise (significantly more transitives than you said, or transitives you didn't mention), STOP, revert the install, go back to Step 3 with the corrected disclosure, and get re-approval.
 
-## Dev agents during plan execution
+## Subagents during plan execution
 
-If you are a dev agent spawned on a plan and you hit a "I need library X for this" moment during implementation:
+**This section only reaches a subagent if you put it in the brief** — see "The spawning agent's responsibility" below. It is written as instructions TO a subagent so it can be quoted straight into one.
+
+If you are a subagent working a piece of a plan and you hit a "I need library X for this" moment:
 
 1. **Do not install.** Do not edit any package manifest. Do not experiment with install commands to "see if it works."
-2. **Stop work.** Report via your own channel output (the orchestrator is subscribed) with the Step 3 proposal shape. Include: the plan ID, the checklist item you're working on, and a concrete "write it ourselves vs. install" tradeoff.
-3. **Wait for the orchestrator to relay to Kyle and come back with an explicit yes/no.** Do NOT assume the implementation path requires the dep — if Kyle says no, rework the approach.
+2. **Stop and return.** Your final output is the report — give it the Step 3 proposal shape. Include: the plan ID, the checklist item you're working on, and a concrete "write it ourselves vs. install" tradeoff.
+3. **The agent that spawned you relays to Kyle and comes back with an explicit yes/no.** Do NOT assume the implementation path requires the dep — if Kyle says no, the approach gets reworked.
 4. **Default to writing it yourself** if any ambiguity exists in whether you're authorized. The cost of hand-rolling a small utility is lower than the cost of accumulated framework debt.
 
 ## Escape hatches
@@ -116,6 +118,8 @@ If you find yourself wanting to skip this skill because "surely this one is fine
 
 Everything currently listed in any project's package manifest is inherited state — not newly added. This skill does not retroactively challenge existing deps. Migrations off any of them (replatforming a CLI, replacing a UI framework, swapping file watchers, swapping an HTTP client) are separate architectural conversations that need their own scoped planning, not something a plan can silently implicate.
 
-## Orchestrator responsibility
+## The spawning agent's responsibility
 
-Every dev-agent kickoff briefing on every plan — via `run-plan-workflow` Phase 1.5 — MUST include a pointer to this skill with language like: *"Before adding any dependency during implementation, invoke the `no-new-deps` skill and follow its procedural gate. Do not install anything not currently in the project's package manifest without explicit Kyle authorization relayed through the orchestrator. Default to writing it yourself if in doubt."*
+A subagent does not load this skill. It sees only the brief you write, so the gate reaches it only if you put it there. **Every subagent brief that could plausibly touch implementation MUST carry** language like: *"Before adding any dependency, stop and report a proposal — do not install anything not already in the project's package manifest. Default to writing it yourself if in doubt."*
+
+And read its report for the shape rather than the word: "I added X", "pulled in Y to handle Z", a new import of something unfamiliar. A subagent that installed something and mentioned it in passing has satisfied nothing, and the manifest diff is the only reliable check — run `git diff` against the lockfile before you commit its work.

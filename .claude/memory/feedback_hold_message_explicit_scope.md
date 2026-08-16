@@ -2,7 +2,7 @@
 name: HOLD / stand-down messages must explicitly forbid plan metadata edits too
 description: When telling a dev agent to stand down, "don't write code" is NOT sufficient — they will still edit plan checklists/descriptions if they think they're applying a review. Name every forbidden surface explicitly.
 type: feedback
-scope: global
+scope: role:orchestrator
 ---
 
 When pausing a dev agent mid-flight, do NOT say "don't write any code" as your only restriction. Dev agents interpret that literally: no file edits, no commits, no branch work — but **plan metadata edits via MCP (checklist items, descriptions, status) are NOT code** and they will happily proceed.
@@ -20,6 +20,8 @@ When pausing a dev agent mid-flight, do NOT say "don't write any code" as your o
 >
 > Reply with "standing down" to confirm and stay idle until you receive explicit new instructions from {your orchestrator key}.
 
-The same principle applies to review and test agents, adapted to their surfaces — review's stand-down should also forbid plan checklist edits since review is often in the "propose changes" role.
+The same principle applies whatever job the agent you are standing down was doing — one doing review work must also be told not to edit plan checklist items, since it is in the "propose changes" role and checking an item asserts the work is done.
+
+(Stopping a SUBAGENT is a different mechanism and not what this file is about: a subagent returns rather than idling, so there is no hold message and no "standing down" acknowledgement to wait for. Stop it and read what it returned.)
 
 **Broader principle:** when an agent takes initiative you didn't want, the fix is in your next briefing, not in hoping it won't happen again. Error on the side of over-enumeration in HOLD messages — the token cost is trivial next to the cost of reconstructing mutated state.

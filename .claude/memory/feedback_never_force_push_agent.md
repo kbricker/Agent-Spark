@@ -17,4 +17,4 @@ NEVER force push from an agent's dedicated clone to overwrite a shared branch. A
 
 **This gets sharper, not softer, as instances multiply.** With two agents on one project (plan 782.2) every shared branch has at least three possible writers — Kyle in the main clone and one agent in each of theirs. Historical clone assignments in older memories (`vaexdev2` in VaEx3, `vaexdev3` in VaEx4) date from the dormant remote-agent records and are not current; read the live assignment rule rather than assuming a clone from an old note.
 
-Related: [[feedback_agent_branch]]
+The companion rule — put a dispatched agent on the right branch before it starts, rather than fixing it after — is orchestrator-tier and reaches only agents that dispatch, so it is stated there rather than linked from here.

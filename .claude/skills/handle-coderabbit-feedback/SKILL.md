@@ -1,6 +1,7 @@
 ---
 name: handle-coderabbit-feedback
 description: Autonomous CodeRabbit review-response loop on an open PR — fix → push (auto-triggers review) → read verdict → loop, with minimal @coderabbitai chatter (quota). Includes rate-limit retry + terminal-signal recognition.
+scope: global
 ---
 
 # Handle CodeRabbit Feedback
@@ -9,7 +10,7 @@ Once Kyle has given functional approval on a PR ("functionally ready", "go ahead
 
 ## When to use this skill
 
-Kyle says "handle rabbit", "work the rabbit loop", "the PR is functionally ready", "go ahead and merge after rabbit", or otherwise gives functional approval on a PR that still needs automated review cleanup. Also use as a sub-step of `/run-plan-workflow` Phase 1.75 or `/fast-track-plan` when CodeRabbit findings arrive.
+Kyle says "handle rabbit", "work the rabbit loop", "the PR is functionally ready", "go ahead and merge after rabbit", or otherwise gives functional approval on a PR that still needs automated review cleanup. Also use as a sub-step of `/fast-track-plan` when CodeRabbit findings arrive.
 
 ## Important — CR auto-triggers on every push
 
@@ -26,7 +27,7 @@ Repeat until CodeRabbit comes back clean, then merge.
 1. **Read the latest CR review.** CR publishes automatically after each push. Watch for the channel event. When the event arrives, read the message carefully — classify it against the signal table below before acting.
 2. **Distinguish actionable from informational.** Focus on actionable findings and nits you decide to absorb. Apply `manage-scope-creep` sift to anything adjacent-but-outside the diff.
 3. **Fix or push back.**
-   - If findings are correct: dispatch the dev agent (already alive from `run-plan-workflow`) with a concrete briefing. Dev fixes, runs tests, commits, **pushes — that push automatically triggers CR pass N+1**. For fast-track plans, the orchestrator fixes directly.
+   - If findings are correct: fix them, run the tests, commit, **push — that push automatically triggers CR pass N+1**. Fan out to subagents only for a large round of independent findings (see below); you own the diff either way.
    - **ONE PUSH PER REVIEW CYCLE. This is a hard rule, not a preference.** When a review arrives, fix EVERY finding in it, run the internal pass (step 3.5), fix what that finds too — then push ONCE. Never push per finding, per finding-cluster, or "while you think about the rest". Findings that arrive mid-triage join the same push.
      - Why it is stated this hard: the previous wording said "piggyback the fix-push *when possible*, only push standalone when the PR is merge-blocked" — which never fires on the common case (a PR whose only remaining work IS the CR fixes) and whose escape clause explicitly licensed a standalone push exactly when the loop is hottest. On wfa2#119 that guidance permitted three pushes in twenty minutes, consumed the entire fleet-wide hourly allowance on ONE PR, and stalled the merge behind a 30-minute cooldown. The cost is per-cycle; guidance that reasons per-push cannot see it.
      - The push cadence sets the review cadence. Every push is a review run, so pushing three times means asking for three reviews whether or not you wanted them.
@@ -94,16 +95,16 @@ Steps:
 
 **Why the +30s:** CR's limits are adaptive fair-usage (rolling window; reviews free up as earlier ones age out — see `reference_coderabbit_rate_limits`). The wait line states time until the next review becomes available. A few seconds of slack avoids the edge case where we retrigger just before the window frees and get rate-limited again.
 
-## When to spawn a fix agent vs patch inline
+## When to fan out vs patch inline
 
-- **Inline (orchestrator directly):** small finding, 1-3 line tweak, obvious fix, fast-track plan.
-- **Dev agent (already persistent on this plan):** anything that requires repo context — renames, refactors, multi-file changes, or anything where you'd have to read surrounding code to get right. Applies only to `/run-plan-workflow` (persistent agents). Fast-track orchestrators patch inline.
+- **Inline:** small finding, 1-3 line tweak, obvious fix. This is the common case — you already hold the diff and the reasoning behind it, which is the context a fix needs.
+- **Subagents:** a large round spanning many files, where the findings are independent of each other. Give each subagent a disjoint set of files and the specific findings against them, and re-read the assembled result yourself before pushing — a fix that is correct in isolation can still contradict a sibling fix.
 
-Do not spawn a NEW agent just for the rabbit loop. The dev agent from `/run-plan-workflow` is still alive for this reason — it already knows the codebase state.
+Do not hand a whole review round to one subagent and push what comes back. You own the diff; a summary is not a diff.
 
 ## Fix all findings now — do not defer
 
-Do not leave "low priority" findings for a follow-up PR to save review cost. You're already in the PR, CodeRabbit is already reviewing it, the dev agent is already running. The marginal cost of fixing a nit now is near zero; the cost of re-opening this PR later is real.
+Do not leave "low priority" findings for a follow-up PR to save review cost. You're already in the PR, CodeRabbit is already reviewing it, and you already hold the diff. The marginal cost of fixing a nit now is near zero; the cost of re-opening this PR later is real.
 
 ## When to stop the loop and ask Kyle
 

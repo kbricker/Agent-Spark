@@ -2,7 +2,7 @@
 name: An empty channel watch list looks exactly like a quiet fleet
 description: Watch lists are process-local, so any process boundary clears them. Silence is ambiguous — check hive_channel_watching before diagnosing agents as stuck.
 type: feedback
-scope: global
+scope: role:orchestrator
 ---
 
 **Watch lists are process-local — any process boundary clears them.** A restart empties the list on either launch path (dev flag or `--channels plugin:hive-channel@wonderforge`); this is expected, not a migration symptom (confirmed 2026-08-03: both overwatch's and its own list read `(none)` after restart, though it knew it had `3dproppipeline` watched before).

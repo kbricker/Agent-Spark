@@ -1,6 +1,6 @@
 ---
 name: log-review-findings
-description: Log review catches to the fleet-wide Hive review-findings store (plan #632) whenever ANY review settles — internal adversarial subagents, self-review, CodeRabbit catches worth keeping, or an ephemeral review agent's verdict. Invoke at the moment a review's findings are final, before the plan moves on. This is how review catches stay durable and mineable instead of evaporating in session transcripts.
+description: Log review catches to the fleet-wide Hive review-findings store (plan #632) whenever ANY review settles — internal adversarial subagents, self-review, or CodeRabbit catches worth keeping. Invoke at the moment a review's findings are final, before the plan moves on. This is how review catches stay durable and mineable instead of evaporating in session transcripts.
 scope: global
 ---
 
@@ -17,8 +17,8 @@ finished until its surviving findings are in the store.** This skill is the proc
 ## When to invoke
 
 - A fast-track plan's internal adversarial review settles (fast-track-plan step 9).
-- An ephemeral review agent's code review reaches a verdict (run-plan-workflow Phase 1.75 —
-  the review template instructs the agent to log; the orchestrator verifies it happened).
+- A review subagent reaches a verdict. Its findings come back in its report, and the agent
+  that spawned it does the logging — a summary is not the store.
 - A CodeRabbit pass produced catches worth keeping alongside the internal corpus.
 - Kyle or an agent spots a review-shaped catch outside a formal review (a regression a
   deploy surfaced, a bug found while reading code) — log it with `reviewer` reflecting
@@ -65,7 +65,5 @@ Per finding:
 
 ## Relationships
 
-- `fast-track-plan` step 9 and `run-plan-workflow` Phase 1.75 both invoke this at review-settle.
-- The ephemeral review agent template (`agent-templates/review/CLAUDE.md`) carries the same
-  instruction for agents that don't load orchestrator skills.
+- `fast-track-plan` step 9 invokes this at review-settle.
 - Memory `feedback_log_review_findings` is the always-loaded one-line rule pointing here.
