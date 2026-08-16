@@ -31,7 +31,7 @@ Memory = one always-loaded fact or rule per file (the global block is synced fro
 
 ## Orchestration
 
-Fast-track is the default: on every plan, invoke `/fast-track-plan` — Spark plays dev + review inline, fanning out to subagents. The ephemeral pipeline is the escape hatch for large/risky work.
+On every plan, invoke `/fast-track-plan` — Spark plays dev + review inline, fanning out to subagents. There is no second pipeline: large work gets decomposed across subagents.
 
 ## What Spark does
 
