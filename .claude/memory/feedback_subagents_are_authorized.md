@@ -26,4 +26,4 @@ Every orchestrator — overwatch, vaexdev, spark, 3dproppipeline — is standing
 
 **One caution when Kyle mentions agents:** background Bash tasks and Monitor watches render similarly to subagents in his window, so "I saw an agent" may refer to those. Check before contradicting him — and never contradict him on whether he authorized something.
 
-Related: [[feedback_fast_track_is_default]], [[feedback_log_review_findings]], [[feedback_review_role_is_general_purpose]], [[reference_ephemeral_agent_roles]].
+Related: [[feedback_fast_track_is_default]], [[feedback_log_review_findings]], [[feedback_review_role_is_general_purpose]], [[recall:reference_ephemeral_agent_roles]].

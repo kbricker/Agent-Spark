@@ -19,6 +19,6 @@ Kyle, 2026-08-03: *"max sub is insanly cheap compared to tokens, im never going 
 - The trigger that would reopen this is Anthropic removing subscription access, not a capability we want appearing on the API side. Until then, "it's on the API" is a sufficient reason to stop evaluating.
 - Small one-off API calls for a specific job are a different question from moving fleet workloads; if one ever seems warranted, ask rather than assuming this rule blocks it.
 
-**Consequence worth stating plainly:** it means some platform risks are accepted rather than mitigated, because the only mitigation available is an API-billed rearchitecture. The right response is to make the acceptance explicit and make the failure fast to diagnose — see [[reference_channels_platform_dependency]], where `tengu_harbor` is exactly that case.
+**Consequence worth stating plainly:** it means some platform risks are accepted rather than mitigated, because the only mitigation available is an API-billed rearchitecture. The right response is to make the acceptance explicit and make the failure fast to diagnose — see [[recall:reference_channels_platform_dependency]], where `tengu_harbor` is exactly that case.
 
 Related: [[feedback_no_new_dependencies_without_auth]], [[feedback_research_before_asking]].

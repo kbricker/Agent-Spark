@@ -38,6 +38,6 @@ Number (3) is the shape worth remembering: a real defect, correctly fixed, with 
 
 ## Related
 
-The complement to this one is [[reference_bash_permission_matching]] — rules that *are* loaded but fail to match. Same visible symptom, opposite cause, and the two are worth distinguishing before either is investigated: this memory is "no rules loaded", that one is "rules loaded, this call doesn't match". Reaching for the wrong one costs the hours described above.
+The complement to this one is [[recall:reference_bash_permission_matching]] — rules that *are* loaded but fail to match. Same visible symptom, opposite cause, and the two are worth distinguishing before either is investigated: this memory is "no rules loaded", that one is "rules loaded, this call doesn't match". Reaching for the wrong one costs the hours described above.
 
 See also [[feedback_check_what_overrides_the_file]] (the file you are editing is often not the authority), [[feedback_check_docs_on_harness_friction]] (read the current permission docs before theorising — semantics move between versions), and [[feedback_verify_your_own_harness_state]] (verify what your session can actually do rather than accepting an account of it).

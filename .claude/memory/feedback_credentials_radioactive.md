@@ -14,4 +14,4 @@ scope: global
 
 forge holds the detailed operating rules in its own memory; this is the fleet guardrail that keeps everyone else's hands off. The asymmetry is the point: routing to forge costs a message; a leaked credential is a full incident with no fix-forward — the key is revoked and every secret behind it rotated.
 
-Related: [[reference_forge_agent]] (how to reach and wake forge).
+Related: [[recall:reference_forge_agent]] (how to reach and wake forge).
