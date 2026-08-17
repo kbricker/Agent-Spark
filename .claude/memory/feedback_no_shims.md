@@ -1,6 +1,6 @@
 ---
 name: Never leave shims when moving code
-description: When refactoring code to a new location, always delete the old location and update every caller in the same change — never leave a forwarder/pass-through stub behind. Shims cause spaghetti.
+description: Never leave a forwarder stub behind — delete the old location and update every caller in the same change
 type: feedback
 scope: global
 ---

@@ -1,6 +1,6 @@
 ---
 name: HOLD / stand-down messages must explicitly forbid plan metadata edits too
-description: When telling a dev agent to stand down, "don't write code" is NOT sufficient — they will still edit plan checklists/descriptions if they think they're applying a review. Name every forbidden surface explicitly.
+description: Standing an agent down must name every forbidden surface — they still edit plan checklists and descriptions
 type: feedback
 scope: role:orchestrator
 ---

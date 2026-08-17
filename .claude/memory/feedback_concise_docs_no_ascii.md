@@ -1,6 +1,6 @@
 ---
 name: Docs for Kyle are scannable bullet lists — no ASCII diagrams, no walls of prose
-description: Deliverable docs are reference material Kyle scans under time pressure — bullets over prose, no ASCII/box-drawing diagrams in markdown because they do not render, and compression is a correctness pass rather than a style one
+description: Compressing a deliverable doc is a correctness pass, not style — bullets over prose, never ASCII diagrams
 type: feedback
 scope: global
 ---
