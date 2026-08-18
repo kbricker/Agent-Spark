@@ -1,13 +1,13 @@
 ---
 name: How to launch orchestrator agents with Hive channel events
-description: "Five VIRTUAL agents: .lnk launchers, plugin channel; hivedev01 has neither by design; read for claudeArgs or deaf agents"
+description: "Six VIRTUAL agents: .lnk launchers, plugin channel; hivedev01 has neither by design; read for claudeArgs or deaf agents"
 type: reference
 scope: role:orchestrator
 ---
 
 Virtual orchestrator agents launch through **`virtual-launcher/launch.ps1`**, which resolves the agent's identity key from Windows Credential Manager, assembles the `claude` arguments, and runs `claude` in the agent's working directory. It is launch-time only — nothing stays resident once the session is up.
 
-Wired up today: **overwatch, vaexdev, vaexdev2, spark, 3dproppipeline** — each has a `configs/<key>.json` and a desktop shortcut. That is every VIRTUAL orchestrator; **hivedev01 has no launcher at all** and must not be looked for here — RemoteAgent starts it, so a channel problem there is never a launcher problem. **codexhive is NOT wired up**: a `Hive/codexhive` credential exists in the store, but there is no config and no shortcut, so `-Agent codexhive` exits 2. That is deliberate — codexhive is completed R&D and currently unused; to revive it, add `configs/codexhive.json` and an entry in `shortcuts/setup.ps1`. **verletDev** retired 2026-07-09 and its config was deleted 2026-08-16 (782.20); it would have launched on the legacy channel path with no model or effort flags.
+Wired up today: **overwatch, vaexdev, vaexdev2, spark, 3dproppipeline, finley** — each has a `configs/<key>.json` and a desktop shortcut. That is every VIRTUAL agent, which is no longer the same set as every virtual ORCHESTRATOR: finley (added 2026-08-18, plan 929) launches exactly like the rest but composes no `orchestrator` role, so he does not hold this memory; **hivedev01 has no launcher at all** and must not be looked for here — RemoteAgent starts it, so a channel problem there is never a launcher problem. **codexhive is NOT wired up**: a `Hive/codexhive` credential exists in the store, but there is no config and no shortcut, so `-Agent codexhive` exits 2. That is deliberate — codexhive is completed R&D and currently unused; to revive it, add `configs/codexhive.json` and an entry in `shortcuts/setup.ps1`. **verletDev** retired 2026-07-09 and its config was deleted 2026-08-16 (782.20); it would have launched on the legacy channel path with no model or effort flags.
 
 **Preferred (desktop icons):** double-click the `.lnk` for your agent. One exists for every key listed above — `setup.ps1`'s `$agents` array is what creates them, so read that rather than any list transcribed here. They invoke `C:\Projects\wfa2\virtual-launcher\shortcuts\virtual-launcher.cmd <agent-key>`, which calls `launch.ps1`.
 
@@ -65,7 +65,7 @@ That precedence is the important part: on the Kyle box the store wins, so a stal
 
 ## The whole fleet is on the supported `--channels` path
 
-**As of 2026-08-04 (plan 754.2) every active virtual agent launches with `--channels plugin:hive-channel@wonderforge` and no dev flag:** `overwatch`, `vaexdev`, `vaexdev2`, `spark`, `3dproppipeline`. 3dproppipeline was the pilot on 2026-08-03 (754.1), overwatch followed the same day, vaexdev and spark migrated on 2026-08-04, and vaexdev2 was born on it. (verletDev is retired as of 2026-07-09 and codexhive is parked — neither launches, so neither is on either path.)
+**As of 2026-08-04 (plan 754.2) every active virtual agent launches with `--channels plugin:hive-channel@wonderforge` and no dev flag:** `overwatch`, `vaexdev`, `vaexdev2`, `spark`, `3dproppipeline`, and `finley`, which was BORN on that path 2026-08-18 (plan 929) rather than migrated — so it has no `_rollback` hive block in its workspace `.mcp.json` and no dev-flag state to revert to. 3dproppipeline was the pilot on 2026-08-03 (754.1), overwatch followed the same day, vaexdev and spark migrated on 2026-08-04, and vaexdev2 was born on it. (verletDev is retired as of 2026-07-09 and codexhive is parked — neither launches, so neither is on either path.)
 
 **The dev flag still works and is NOT deprecated.** `launch.ps1`'s guard accepts either form and warns only if a config has neither (or confusingly, both). Keep the rollback path in mind: every migrated workspace's `.mcp.json` carries its original `hive` server definition in a `_rollback` key, and reverting means restoring that block into `mcpServers` **and** reverting `claudeArgs` in the launcher config. Both halves, or you get an agent with no channel at all.
 

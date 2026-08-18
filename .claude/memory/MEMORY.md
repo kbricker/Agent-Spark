@@ -85,7 +85,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_hold_message_explicit_scope.md — Standing an agent down must name every forbidden surface — they still edit plan checklists and descriptions
 - feedback_orchestrate_proactively.md — After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
 - feedback_use_channel_events.md — Watch for agent_idle/agent_working events from hive-channel instead of blind sleeps when waiting for agent responses
-- reference_channel_launch.md — Five VIRTUAL agents: .lnk launchers, plugin channel; hivedev01 has neither by design; read for claudeArgs or deaf agents
+- reference_channel_launch.md — Six VIRTUAL agents: .lnk launchers, plugin channel; hivedev01 has neither by design; read for claudeArgs or deaf agents
 <!-- END ROLE SECTION: orchestrator -->
 
 <!-- BEGIN RETRIEVAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
