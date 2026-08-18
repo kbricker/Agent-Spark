@@ -1,6 +1,6 @@
 ---
 name: A prose reference is not a link — the machine-readable half is the half review cannot see
-description: When an artifact has a human-readable form and a machine-readable one (index markers, a questionId, a quoted description), review reads the prose and the tool reads the link — so a correct-looking artifact with the link missing passes review and fails silently
+description: Prose isn't a link — set questionId/index markers in the same edit; review reads prose only, missing links fail silently
 type: feedback
 scope: global
 ---

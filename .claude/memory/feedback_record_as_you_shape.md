@@ -1,6 +1,6 @@
 ---
-name: feedback_record_as_you_shape
-description: Hive plan shaping logs are the system of record for WHY — capture every entry via hive_plan_log_add at the moment it happens, in shaping AND in dev and review. Invoke the shaping-log skill for the full discipline and the entry types.
+name: Record shaping-log entries as they happen, never batched
+description: hive_plan_log_add every entry as it happens (shaping AND dev/review) — the WHY record; entry types in shaping-log skill
 type: feedback
 scope: global
 ---

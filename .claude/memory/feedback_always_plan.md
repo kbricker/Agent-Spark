@@ -1,6 +1,6 @@
 ---
 name: Always plan before building
-description: Always research and write a formal plan before building — never skip to code, never shortcut a shallow spec to a review agent
+description: Research and write a formal plan before building — never skip to code; only a true one-line obvious fix skips planning
 type: feedback
 scope: global
 ---

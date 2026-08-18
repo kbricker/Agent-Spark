@@ -1,6 +1,6 @@
 ---
 name: Channel handoff is the same conversation continuing
-description: Kyle often moves a live conversation between his desk session and Hive channel chat mid-stream — treat it as the same conversation continuing on a new transport, not a new request
+description: Kyle's mid-stream switch between desk and Hive channel is the same conversation on a new transport, not a new request
 type: feedback
 scope: role:orchestrator
 ---

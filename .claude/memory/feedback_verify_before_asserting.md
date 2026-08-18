@@ -1,6 +1,6 @@
 ---
 name: Verify before asserting
-description: Verify a claim against actual state before asserting — never assume; agreement or your own past words aren't verification
+description: Verify claims against actual state before asserting — never assume; agreement or your own past words aren't verification
 type: feedback
 scope: global
 ---

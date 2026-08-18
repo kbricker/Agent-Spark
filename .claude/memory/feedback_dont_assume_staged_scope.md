@@ -1,10 +1,7 @@
 ---
-name: feedback_dont_assume_staged_scope
-description: "Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle"
-metadata: 
-  node_type: memory
-  type: feedback
-  originSessionId: 400e37cd-b566-48d9-a980-db9a78f4a783
+name: Ask Kyle which staged files belong in the commit
+description: Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle
+type: feedback
 scope: global
 ---
 

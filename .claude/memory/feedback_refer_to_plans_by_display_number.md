@@ -1,6 +1,6 @@
 ---
-name: feedback_refer_to_plans_by_display_number
-description: Once a plan has a parent, call it by its display number (664.1), not its underlying id (654) — the dotted number carries the relationship and is what the dashboard actually shows. The bare id stays the API argument.
+name: A parented plan's display number is its name
+description: Once a plan has a parent, call it by display number (664.1), not bare id (654); the bare id stays the API argument
 type: feedback
 scope: global
 ---

@@ -1,8 +1,7 @@
 ---
-name: feedback_never_kill_chrome
+name: Never kill Chrome by image or process name
 description: NEVER kill Chrome by any means — Kyle works on this machine and blanket kills destroy his open work
-metadata:
-  type: feedback
+type: feedback
 scope: global
 ---
 

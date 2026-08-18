@@ -1,5 +1,5 @@
 ---
-name: feedback_check_what_overrides_the_file
+name: Check which config layer wins before you edit
 description: The file you are about to edit is often not the authority — check for a generated block, fence comment, or .d/ drop-in
 type: feedback
 scope: global

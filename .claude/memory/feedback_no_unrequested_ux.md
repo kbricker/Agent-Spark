@@ -1,6 +1,6 @@
 ---
 name: Don't invent UX surfaces Kyle didn't ask for
-description: When drafting plan descriptions / fleshing out checklists, stick to the behaviors Kyle actually named. Don't extrapolate a UX affordance and ship it as if it were authorized.
+description: Plan descriptions and checklists list only behaviors Kyle named — never ship an inferred UX affordance as authorized
 type: feedback
 scope: global
 ---

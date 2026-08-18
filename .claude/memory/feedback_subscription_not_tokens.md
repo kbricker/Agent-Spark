@@ -1,6 +1,6 @@
 ---
 name: Never design for per-token API billing while subscriptions exist
-description: Kyle's Max subscription is dramatically cheaper than metered API tokens — never propose an architecture that moves fleet work onto per-token billing, and rule those options out early rather than costing them
+description: Never propose moving fleet work onto per-token API billing — rule those options out early rather than costing them
 type: feedback
 scope: global
 ---

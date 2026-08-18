@@ -1,10 +1,7 @@
 ---
-name: feedback_build_straight_through
-description: "When the design is locked and Kyle says build/proceed, execute the whole plan end-to-end — don't stop to checkpoint after the foundation"
-metadata: 
-  node_type: memory
-  type: feedback
-  originSessionId: 66311e42-0c25-4d00-8ffb-b5da58106411
+name: Build straight through once the design is locked
+description: Design locked, Kyle says build/proceed — run the whole plan end-to-end, don't stop to checkpoint after the foundation
+type: feedback
 scope: global
 ---
 

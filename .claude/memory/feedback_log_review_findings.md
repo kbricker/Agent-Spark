@@ -1,6 +1,6 @@
 ---
 name: A review is not finished until its findings are in the store
-description: Every settled review (internal adversarial, subagent, CodeRabbit-worth-keeping) logs its surviving findings — including skipped ones — to the Hive review-findings store via hive_review_finding_add. Procedure in the log-review-findings skill.
+description: Every settled review (internal, subagent, CodeRabbit) logs surviving and skipped findings via hive_review_finding_add
 type: feedback
 scope: global
 ---

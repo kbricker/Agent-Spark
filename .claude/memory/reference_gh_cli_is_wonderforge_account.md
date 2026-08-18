@@ -1,10 +1,7 @@
 ---
-name: reference_gh_cli_is_wonderforge_account
+name: The gh CLI only holds the kyle-wf WonderForge account
 description: gh CLI is authenticated as kyle-wf (WonderForge) — it cannot create PRs on kbricker personal repos (Spark projects)
-metadata: 
-  node_type: memory
-  type: reference
-  originSessionId: 08c4549d-0dcb-4d3f-b861-a56f84597918
+type: reference
 scope: global
 ---
 

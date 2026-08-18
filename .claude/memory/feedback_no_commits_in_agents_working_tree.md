@@ -1,8 +1,7 @@
 ---
-name: no-commits-in-agents-working-tree
+name: Check the branch before committing in an agent's checkout
 description: Never commit in a repo checkout an agent is actively working in — check current branch first
-metadata:
-  type: feedback
+type: feedback
 scope: global
 ---
 

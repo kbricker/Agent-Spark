@@ -1,6 +1,6 @@
 ---
 name: How to launch orchestrator agents with Hive channel events
-description: The five VIRTUAL agents launch from desktop .lnk shortcuts on the plugin channel; hivedev01 has no launcher and no channel by design — read before changing claudeArgs or debugging a deaf agent
+description: "Five VIRTUAL agents: .lnk launchers, plugin channel; hivedev01 has neither by design; read for claudeArgs or deaf agents"
 type: reference
 scope: role:orchestrator
 ---

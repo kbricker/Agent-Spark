@@ -1,6 +1,6 @@
 ---
 name: Fast-track is the default workflow
-description: Fast-track is THE orchestration path on every plan — play dev + review inline, fan out to subagents. If you are reading this, it applies to you.
+description: Fast-track is THE orchestration path on every plan for every agent — play dev + review inline, fan out to subagents
 type: feedback
 scope: global
 ---

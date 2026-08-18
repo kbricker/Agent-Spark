@@ -15,7 +15,7 @@ But retrieval only fires when someone searches, and **an agent does not search f
 
 - Naming the topic beats naming the tool. "Search the corpus" is ignorable; "recall the prefab YAML conventions, then author the file" is an instruction.
 - The pack is reachable **without composing anything** — retrieval is fleet-wide and is not filtered by the caller's composition (verified in `RecallStore.Query`, which takes no agent or scope parameter). A subagent needs no role to reach it, which is the property the whole design rests on. If anyone ever adds scope filtering there, this breaks silently.
-- An **empty** result is a real answer meaning the corpus has nothing, not a failure. Read `nearestMiss` to tell a near-miss from a blank before rephrasing, and rephrase at most once.
+- An **empty** result is a real answer meaning the corpus has nothing, not a failure. Read `nearestMiss` to tell a near-miss from a blank before rephrasing, and rephrase at most once. A hit is a candidate, not an answer — read it and confirm it answers what was asked; `unknownTerms` lists identifier-like names in the query (CamelCase, short acronyms, capitalised names — not ordinary words) that the corpus has never mentioned, and no hit can be about those.
 - Behavioural rules are NOT in retrieval and never will be — they stay always-loaded precisely because you cannot search for a rule you have not met. If a subagent needs a guardrail, put it in the brief.
 
 Related: [[feedback_subagents_are_authorized]] (spawning them is expected, not optional).

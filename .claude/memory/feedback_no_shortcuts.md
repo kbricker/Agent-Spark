@@ -1,6 +1,6 @@
 ---
 name: No shortcuts — build it right the first time
-description: Kyle's direct feedback that Hive platform quality is poor because of shortcuts and sloppy architecture, creating endless maintenance that steals time from game development
+description: No shortcuts — build Hive right the first time; sloppy architecture means endless upkeep that steals game-dev time
 type: feedback
 scope: global
 ---

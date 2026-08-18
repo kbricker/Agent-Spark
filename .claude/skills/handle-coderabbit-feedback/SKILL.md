@@ -53,7 +53,7 @@ Repeat until CodeRabbit comes back clean, then merge.
 
 ## Guard against auto-pause as well as rate limits
 
-These are different mechanisms and they need different responses — see `reference_coderabbit_rate_limits`. A **rate limit** names a wait and clears itself. An **auto-pause** names no time, never clears on its own, and silently stops reviewing pushes altogether so a branch accumulates unreviewed commits. Batching fixes into fewer pushes is the single defence that works against both.
+These are different mechanisms and they need different responses — hive_recall `reference_coderabbit_rate_limits`. A **rate limit** names a wait — and when that wait expires NOTHING re-runs the skipped review (Kyle, wfa2 PR #139: "it does not auto wake"); wake it with the next push, or one `@coderabbitai review` when there is nothing to push. An **auto-pause** names no time, never clears on its own, and silently stops reviewing pushes altogether so a branch accumulates unreviewed commits; `@coderabbitai resume` is its recovery. Batching fixes into fewer pushes is the single defence that works against both.
 
 ## CR event signal table
 
@@ -69,7 +69,7 @@ When a channel event arrives carrying a CR message, classify it by matching the 
 | **Terminal ack** | Body ends with `Resolving.` / `Resolving all open comments now.` / `[resolve]` | CR is acknowledging a resolve command; no new review coming for this HEAD | Treat as end-of-loop for this iteration; if no clean-review signal yet, verify via `gh pr view --comments` before merging |
 | **Rate limit** | Contains `Rate limit exceeded` (relay emits it with the verbatim wait line when CR provided one — either `Please wait **N minutes and M seconds**` or the newer `Next review available in:** **N minutes**`) | CR is rate-limited; has specified a wait duration | Trigger the rate-limit retry sub-procedure below |
 | **In-progress** | `Currently processing new changes` | CR is actively reviewing | Wait for the next event — this is a progress ping, not terminal |
-| **Paused** | `Reviews paused` | CR has stopped reviewing this PR | Escalate to Kyle — the auto-loop can't continue without CR |
+| **Paused** | `Reviews paused` | CR has stopped reviewing this PR | Post `@coderabbitai resume` once and watch for review activity; escalate to Kyle only if resume changes nothing |
 
 **Note (relay contract, plan #646):** the webhook handler sanitizes and classifies before dispatch — you receive clean signal-only messages, never raw CodeRabbit markup. Specifically: `Currently processing new changes` is filtered outright; review events relay only on `action=submitted` (no more submitted+edited double posts); a CR review body collapses to its `Actionable comments posted: N` line; walkthrough/banner comments with no signal content are suppressed entirely; rate-limit and paused comments arrive as the clean one-liners in the table above. HTML comments and `<details>` blocks never reach you — patterns that referenced them are retired.
 
@@ -93,7 +93,7 @@ Steps:
 5. **If the retry also rate-limits:** increment the counter and repeat from step 1.
 6. **If the retry succeeds:** reset the counter and resume the normal loop.
 
-**Why the +30s:** CR's limits are adaptive fair-usage (rolling window; reviews free up as earlier ones age out — see `reference_coderabbit_rate_limits`). The wait line states time until the next review becomes available. A few seconds of slack avoids the edge case where we retrigger just before the window frees and get rate-limited again.
+**Why the +30s:** CR's limits are adaptive fair-usage (rolling window; reviews free up as earlier ones age out — hive_recall `reference_coderabbit_rate_limits`). The wait line states time until the next review becomes available. A few seconds of slack avoids the edge case where we retrigger just before the window frees and get rate-limited again.
 
 ## When to fan out vs patch inline
 

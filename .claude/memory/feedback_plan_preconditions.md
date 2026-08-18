@@ -1,6 +1,6 @@
 ---
-name: Plans answer the #624 pre-conditions before dev — state lifecycle and async
-description: Before dev, a plan names every touched stateful surface's lifecycle and every async flow's staleness + single-flight guards — or states none touched
+name: "Plans answer the #624 pre-conditions before dev — state lifecycle and async"
+description: Before dev, plans name each stateful surface's lifecycle and async flow's staleness/single-flight guard, or none touched
 type: feedback
 scope: global
 ---

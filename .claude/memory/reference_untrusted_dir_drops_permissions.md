@@ -1,6 +1,6 @@
 ---
 name: An untrusted project dir silently voids every allow rule
-description: If your project allow rules seem inert, read hasTrustDialogAccepted in ~/.claude.json BEFORE auditing rule syntax — an untrusted directory drops .claude/settings.json entirely, and the denial names a tool so it misreads as one bad rule.
+description: Allow rules inert? Read hasTrustDialogAccepted in ~/.claude.json first — untrusted dirs void .claude/settings.json
 type: reference
 scope: global
 ---

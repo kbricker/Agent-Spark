@@ -1,6 +1,6 @@
 ---
 name: Phase checklist items against the status gates
-description: Phase checklist items against the status gates — anything at-or-after merge is a VALIDATION item, because an unchecked TASK item blocks the move to CodeReview and deadlocks the plan.
+description: Phase checklist items by status gate — anything at-or-after merge is VALIDATION; unchecked TASK items block CodeReview
 type: feedback
 scope: global
 ---

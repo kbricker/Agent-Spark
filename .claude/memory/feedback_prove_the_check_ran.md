@@ -1,6 +1,6 @@
 ---
 name: A check that silently did not run looks exactly like a check that passed
-description: "Green because the verification never applied is indistinguishable from green because the code is right — prove the check ran before believing what it says"
+description: Prove the check ran before believing what it says — a verification that never applied is as green as correct code
 type: feedback
 scope: global
 ---

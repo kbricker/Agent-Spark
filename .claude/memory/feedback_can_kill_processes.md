@@ -1,6 +1,6 @@
 ---
 name: Kill only the specific process you spawned, never by image name
-description: You may kill a process you started, but NEVER use taskkill //IM dotnet.exe or //IM claude.exe — those are blanket kills that nuke Kyle's other sessions
+description: Kill only processes you started, by PID — NEVER taskkill //IM dotnet.exe or //IM claude.exe, they nuke Kyle's sessions
 type: feedback
 scope: global
 ---

@@ -1,6 +1,6 @@
 ---
-name: feedback_research_before_asking
-description: Exhaust the research you can do alone before asking Kyle to gather information — never use him as a sensor for something that is publicly documented
+name: Research it yourself before asking Kyle to go look
+description: Exhaust your own research before asking Kyle to gather info — never use him as a sensor for what's publicly documented
 type: feedback
 scope: global
 ---

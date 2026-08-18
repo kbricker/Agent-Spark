@@ -1,8 +1,7 @@
 ---
-name: feedback_check_for_an_existing_ticket_before_growing_scope
+name: Find the owning ticket before growing a plan's scope
 description: If Kyle has no context for the question you're about to ask, the scope is yours not his — search for an existing ticket
-metadata:
-  type: feedback
+type: feedback
 scope: global
 ---
 

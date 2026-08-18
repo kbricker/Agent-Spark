@@ -1,6 +1,6 @@
 ---
-name: feedback_no_docstrings
-description: NEVER write function docstrings, in any codebase — 100% rule; don't sweep existing ones, and ignore CodeRabbit docstring-coverage warnings
+name: Never write function docstrings in any codebase
+description: NEVER write function docstrings anywhere — 100% rule; don't sweep existing ones; ignore CodeRabbit docstring warnings
 type: feedback
 scope: global
 ---

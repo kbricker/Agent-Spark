@@ -1,6 +1,6 @@
 ---
 name: Fix workflow problems when you hit them, or ticket them
-description: When a process or workflow defect surfaces mid-task, fix it then and there — or file a ticket so it gets circled back to. Breaking context is worth it; leaving Kyle to catch the same failure repeatedly is not
+description: Fix a workflow or process defect the moment you hit it, or file a ticket to circle back — breaking context is worth it
 type: feedback
 scope: global
 ---

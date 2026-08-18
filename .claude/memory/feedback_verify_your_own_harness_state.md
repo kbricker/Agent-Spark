@@ -1,6 +1,6 @@
 ---
 name: A claim about your own state gets checked against your own tool surface before you accept it
-description: When anyone tells you what your session can or cannot do — schema version, restart status, whether you are gated — check the tool actually in question before accepting it as a gate; you hold better evidence about yourself than the sender does
+description: Check the tool in question before accepting any claim about your own session — schema, restart, gating — as a gate
 type: feedback
 scope: global
 ---

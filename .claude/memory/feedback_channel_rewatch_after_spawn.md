@@ -1,6 +1,6 @@
 ---
 name: An empty channel watch list looks exactly like a quiet fleet
-description: Watch lists are process-local, so any process boundary clears them. Silence is ambiguous — check hive_channel_watching before diagnosing agents as stuck.
+description: Check hive_channel_watching before calling silent agents stuck — process boundaries clear the process-local watch list
 type: feedback
 scope: role:orchestrator
 ---
