@@ -1,6 +1,6 @@
 ---
 name: Plans default to Planning, not Backlog
-description: Before every hive_plan_create — fork an existing plan if one owns the problem, and status = Planning, NEVER Backlog
+description: Before every hive_plan_create — SEARCH for a plan that already owns the problem, fork it; status = Planning, never Backlog
 type: feedback
 scope: global
 ---
@@ -28,6 +28,19 @@ The tell that produced the error: the split was drawn on **research vs build**, 
 So the normal life of a ticket is **rough goal → research → shaped scope → build**, all in one plan. Refinement is the ticket's early phase, not a precursor to it. Treating the end of research as the end of the ticket splits at the point nearly every plan passes through, which is how you get two plans for one piece of work.
 
 Practical consequence: when research on a plan concludes and the way forward is clear, the default is to **rewrite that plan's description and checklist in place** and carry on. A plan whose scope changed as it was shaped is working exactly as intended — it does not need a successor.
+
+## How do you know an existing plan owns it? SEARCH — the test above assumes knowledge you do not have
+
+This is the half that was missing until 2026-08-19, and its absence is why the rule kept being followed and duplicates kept happening anyway. Kyle: *"we have been forking things we find into new tickets, then later you or I notice it is close to or similar to something already ticketed, then we have to merge/consolidate."*
+
+**Search on the QUESTION the work answers, not the words of your title.** Two duplicates found in one consolidation pass, and neither would have been caught by matching titles:
+
+- **782.25 and 782.33 were SIBLINGS in the same epic.** Titles: "the roster settings file is never on an agent's resolution path" and "emit autoMemoryDirectory for every spawned agent". No shared keyword. Same question — *does the settings file we write actually reach the running agent?* — and 782.33's fix rested on an assumption 782.25 had already measured false. Browsing the epic would not have caught it; the titles genuinely describe different things.
+- **544.1 and 782.31 had near-identical titles** — "Rename agent taxonomy: virtual -> interactive" and "Agent taxonomy: rename virtual -> agent" — six weeks apart, in different epics, both live and each proposing a different target name for the same enum. Nobody scanned the full corpus at create time, so a trivially findable duplicate survived until a consolidation pass.
+
+**Mechanically:** `GET /api/plans?includeCompleted=true` and match against name + description. Note the default call **omits Completed and Cancelled** (246 open vs 922 total), and finished work is exactly what you want to find — a duplicate of a Completed plan means you should be reading its outcome, not rebuilding it. Search across ALL epics: both cases above crossed or ignored epic boundaries. `hive_recall` does not help here yet — its corpus is curated memory files, not plans (834.2).
+
+**And the answer may be "add an item", not "fork".** See [[feedback_fork_cleanup_as_you_find_it]]: the destination for a finding is usually a ticket that already covers the subject, and a new plan has to earn itself.
 
 Fuller reasoning, and the fork-vs-create ordering rules, live in the `shaping-log` skill (§ Scope splits) and `fast-track-plan` step 1. This memory exists because those are on-demand skills and this decision happens at tool-call time.
 

@@ -56,7 +56,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_no_unrequested_ux.md — Plan descriptions and checklists list only behaviors Kyle named — never ship an inferred UX affordance as authorized
 - feedback_output_reaches_nobody.md — Virtual agents' terminal output goes only to Kyle's screen — reach any agent via hive_send_message / hive_respond
 - feedback_plan_preconditions.md — Before dev, plans name each stateful surface's lifecycle and async flow's staleness/single-flight guard, or none touched
-- feedback_plans_default_planning.md — Before every hive_plan_create — fork an existing plan if one owns the problem, and status = Planning, NEVER Backlog
+- feedback_plans_default_planning.md — Before every hive_plan_create — SEARCH for a plan that already owns the problem, fork it; status = Planning, never …
 - feedback_prose_reference_is_not_a_link.md — Prose isn't a link — set questionId/index markers in the same edit; review reads prose only, missing links fail silently
 - feedback_prove_the_check_ran.md — Prove the check ran before believing what it says — a verification that never applied is as green as correct code
 - feedback_read_the_assembled_artifact.md — Read the assembled file in place — correct text goes false by adjacency and no diff shows it; worst when drafted blind
