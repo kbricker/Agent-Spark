@@ -1,6 +1,6 @@
 ---
 name: Plans default to Planning, not Backlog
-description: Before every hive_plan_create — SEARCH for a plan that already owns the problem, fork it; status = Planning, never Backlog
+description: Before every hive_plan_create — SEARCH for a plan that owns the problem, fork it; status = Planning, never Backlog
 type: feedback
 scope: global
 ---
