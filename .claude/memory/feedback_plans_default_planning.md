@@ -40,7 +40,7 @@ This is the half that was missing until 2026-08-19, and its absence is why the r
 
 **Mechanically:** `GET /api/plans?includeCompleted=true` and match against name + description. Note the default call **omits Completed and Cancelled** (246 open vs 922 total), and finished work is exactly what you want to find — a duplicate of a Completed plan means you should be reading its outcome, not rebuilding it. Search across ALL epics: both cases above crossed or ignored epic boundaries. `hive_recall` does not help here yet — its corpus is curated memory files, not plans (834.2).
 
-**And the answer may be "add an item", not "fork".** See [[feedback_fork_cleanup_as_you_find_it]]: the destination for a finding is usually a ticket that already covers the subject, and a new plan has to earn itself.
+**And the answer may be "add an item", not "fork".** The destination for a finding is usually a ticket whose subject already covers it — as a checklist item, or as a paragraph in its description. A new plan has to earn itself on a different owner, a different deliverable, or a gate the host ticket would be blocked behind. Kyle 2026-08-19: *"its annoying how many tickets we create, this epic will never end if we add tickets to it endlessly."*
 
 Fuller reasoning, and the fork-vs-create ordering rules, live in the `shaping-log` skill (§ Scope splits) and `fast-track-plan` step 1. This memory exists because those are on-demand skills and this decision happens at tool-call time.
 
