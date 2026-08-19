@@ -1,6 +1,6 @@
 ---
 name: Plans default to Planning, not Backlog
-description: Before every hive_plan_create — SEARCH for a plan that owns the problem, fork it; status = Planning, never Backlog
+description: On any new discovery — SEARCH for a home FIRST; a new ticket is the LAST resort; status = Planning, never Backlog
 type: feedback
 scope: global
 ---
@@ -11,13 +11,16 @@ scope: global
 
 `hive_plan_create` is a tool you can reach for at any moment, so this check has to live somewhere always loaded rather than in a skill you might not invoke.
 
-**The test — did this scope ever belong to an existing plan?**
+**Search for a HOME first. A new ticket is the LAST resort.** Kyle 2026-08-19: *"'search for a proper home' on new discovery should happen first, and forking a new ticket is the last resort."* This is a precedence ladder, not a menu — take the first rung that fits and stop:
 
-- **Yes → `hive_plan_fork`.** Fork stamps lineage on both ends and auto-appends a linked deferral on the parent. A hand-rolled create gives you two plans with no relationship, and the connection then lives only in prose someone remembered to write.
-- **No, we merely found it while working there → `hive_plan_create`**, plus a provenance note on both plans.
-- **It's just the next phase of work already in an existing plan's scope → neither. Keep working that plan.**
+1. **The next phase of work already in an existing plan's scope → neither fork nor create. Keep working that plan.**
+2. **A ticket whose subject already covers it → add it there** as a checklist item, or as a paragraph in its description. Most findings land here.
+3. **Its own deliverable, but the scope belonged to an existing plan → `hive_plan_fork`.** Fork stamps lineage on both ends and auto-appends a linked deferral on the parent. A hand-rolled create gives you two plans with no relationship, and the connection then lives only in prose someone remembered to write.
+4. **Nothing owns it → `hive_plan_create`**, plus a provenance note on both plans.
 
-That third branch is the one that gets missed. Kyle, 2026-08-03: *"no agent should make a new ticket so blithly... its super annoying how you bloat tickets with scope that makes little sense, and create new tickets when they are not needed."*
+Rungs 3 and 4 have to EARN themselves — on a different owner, a different deliverable, or a gate the host ticket would be blocked behind. "I found it while working somewhere else" is not one of those; it is what rung 2 is for.
+
+Rung 1 is the one that gets missed. Kyle, 2026-08-03: *"no agent should make a new ticket so blithly... its super annoying how you bloat tickets with scope that makes little sense, and create new tickets when they are not needed."*
 
 **Worked example of getting it wrong (2026-08-03).** Plan #754 said in its own scope: *"if it works, packaging the Hive channel as a plugin gets us onto supported `--channels`."* When Kyle authorised that build, a new plan #773 was created for it. But the scope was already #754's — the answer was fork, or simply carry on. Kyle had to notice the two plans were the same work and ask *"so these are the same ticket?"* before it was caught. It was reparented to 754.1.
 
