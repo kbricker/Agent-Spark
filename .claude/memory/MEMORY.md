@@ -20,6 +20,10 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - reference_lab_control_authority.md — spark may actuate ONLY: cell1 wake (WoL from desk) + shutdown, mains, bench light, ARM POWER (default OFF, per-task; ON anywhere, OFF only from cell1) — powering the arm is mine, MOVING it unattended never is; check each gate first; topology: TendWright/docs/lab-inventory.md
 - reference_cell1_operations.md — cell1 (TendWright hardware runtime, Minisforum UM350) — hardware identity, no BIOS update exists, MUJOCO_GL=egl …
 
+## Camera host
+
+- reference_camera_host.md — Camera host (GarageBox, `ssh camhost`, 192.168.86.142) — Dell 7070 SFF Frigate NVR; Docker ready, NO sudo grant, setup doc in CameraHost/
+
 <!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
 ## Global (managed by propagate-shared-config — copies of `wfa2/orchestrator-shared/memory/`; edit canonical, never these, the next sync reverts local edits silently)
 - feedback_always_plan.md — Research and write a formal plan before building — never skip to code; only a true one-line obvious fix skips planning
