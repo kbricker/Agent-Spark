@@ -548,6 +548,11 @@ record:
 - **`unattended-upgrades` is on by default** in Ubuntu. Packages move on their own, and a service restarting mid-week is worth checking before blaming a config change.
 - **Pure motion does not appear in the Review page.** The scrollable event list is built on object detection — that is why detection is enabled here rather than motion alone. Motion-only segments still show on the recordings timeline.
 - **Aspect ratio mismatch between main and sub stream** makes Frigate's boxes land in the wrong place. A 16:9 main pairs with a 16:9 sub.
+- **XiongMai/Sofia account message IDs** (confirmed against the sofiactl reference client, whose 1472/1473 users pair matched the Sunba exactly): 1470 full authority list, 1472 users get, 1474 groups, 1482 add user, 1484 modify user, 1486 delete user, **1488 modify password** (response 1489). Request N answers on N+1.
+- **The 1488 password payload is flat**, shaped like the login packet rather than the `Name`-plus-same-named-key convention every config op uses: `{"Name": "", "SessionID": sid, "EncryptType": "MD5", "NewPassWord": <hash of new>, "PassWord": <hash of old>, "UserName": "admin"}`. Both passwords go through `sofia_hash()`.
+- **Changing a XiongMai password breaks its RTSP URLs**, because the URL embeds a hash of the password rather than the password. Regenerate both the main and sub URLs in the same change or the streams go dark. Keep the hash in `.env` and reference it as `{VAR}` from the go2rtc block.
+- **1488 updates `Password` but leaves `PasswordV2` stale.** That looks alarming and is not: DVRIP login validates the former, and the old password is correctly refused afterwards. Do not try to hand-write a V2 blob.
+- **Do not assume a camera's ONVIF authenticates.** The Sunba accepts `GetDeviceInformation` with *any* password - blank, correct, or garbage. Verify with a deliberately wrong password before believing a camera's ONVIF is protected; on this board the real access control is DVRIP on 34567, not ONVIF on 8899.
 - **Frigate self-protects on a full disk** by deleting the oldest hour, ahead of the retention policy.
 
 ---
