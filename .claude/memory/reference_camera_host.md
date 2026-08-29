@@ -58,13 +58,15 @@ Both ethernet cameras are live in Frigate and clean (5 fps each, 0 skipped, dete
 - Wrong camera. Hourly `du` for 2026-08-28: `side` wrote ~1.2 GB EVERY hour, 03:00 and noon alike (~28 GB/day), while `outdoor` tracked real street traffic (450 MB at midday, 1.6 GB at 18:00, ~18 GB/day). The indoor camera was the bigger consumer and the only continuous one.
 - Wrong lever. Both streams are VBR with a bitrate CAP, so bytes = bitrate x hours recorded. Resolution does not enter it — 4K to 1440p at an unchanged 2560 kbps cap would have saved nothing and merely raised quality per pixel.
 
-**Root cause of `side`: it is in an unlit garage, so it sits in IR/night mode around the clock even at noon.** `improve_contrast: true` stretches that dark, grainy IR frame until sensor noise reads as motion, and it recorded a solid empty garage 24/7. Set to **`improve_contrast: false` on 2026-08-29** (config line 97; `outdoor` deliberately left at `true`). Backup at `~/frigate/config/config.yml.bak-20260829`. Effect not yet measured — needs a full day, then a week.
+**Root cause of `side`: it is in an unlit garage, so it sits in IR/night mode around the clock even at noon.** `improve_contrast: true` stretches that dark, grainy IR frame until sensor noise reads as motion, and it recorded a solid empty garage 24/7. Set to **`improve_contrast: false` on 2026-08-29** (config line 97; `outdoor` deliberately left at `true`). Backups at `~/frigate/config/config.yml.bak-20260829` and `.bak2-20260829`. **Effect not yet measured — needs a full day, then a week.**
+
+**Do not try to validate either fix by counting segment files.** Frigate's recorder writes segments continuously and a later retention pass prunes the ones with no motion, so a file count taken minutes after a restart measures writing, not keeping. The only valid measure is hourly `du` on `storage/recordings/<date>/<hour>/<camera>` after the pruning pass has run.
 
 **`contour_area` is resolution-INDEPENDENT — do not "scale" it per camera.** Frigate resizes every motion frame to `motion.frame_height` (default 100 rows, aspect preserved) and measures contour area on that; `resize_factor` only maps boxes back to full-res. So 30 means the same on a 1920x1080 detect stream as on an 800x448 one. Verified in `frigate/motion/improved_motion.py` in the running container.
 
 Still open:
 - **Sunba admin password is still blank.** ONVIF refuses `SetUser` and the DVRIP password msgid is unknown — **do not guess the msgid**, a wrong write could corrupt the account table. LAN-only exposure now that P2P is off and nothing is forwarded.
-- **`outdoor` needs a motion mask** over the road and the far side of the street. Needs Kyle to say where his property ends in the frame.
+- **`outdoor` mask is a first pass.** Applied 2026-08-29 covering the FAR SIDE of the street only — neighbour's garage, buildings opposite, far-kerb parked cars — per Kyle; the road itself is deliberately unmasked so passing traffic still records. Polygon `0.33,0,1,0,1,0.26,0.47,0.27,0.33,0.14`, verified by rendering it over a live detect frame, not by trusting the numbers. Not yet masked and the next suspects if `outdoor` still records flat around the clock: the near foliage top-left (~x 0-0.37, y 0-0.30) and the street tree on the right, both of which move in wind.
 - **No DHCP reservations yet** — host and both cameras are on plain DHCP leases.
 - Retention must be set to a number that is TRUE once the false motion is fixed and a real week measured. Do not leave 30 if the disk cannot hold 30.
 
