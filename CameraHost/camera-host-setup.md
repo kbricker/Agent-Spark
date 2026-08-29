@@ -51,11 +51,17 @@ Buy links:
 
 Reserve all three by MAC address in the router's DHCP settings. Reservations, not device-side static IPs — the router stays the single source of truth.
 
-| Device | Reserved IP | MAC source |
-|---|---|---|
-| Camera host | 192.168.86.__ | `ip link show` on the host after install |
-| Outdoor camera | 192.168.86.__ | sticker on the camera, or the router's client list |
-| Ethernet camera 2 | 192.168.86.__ | same |
+**All three reservations are in place in Google Wifi as of 2026-08-29.**
+
+| Device | Reserved IP | MAC | Frigate name |
+|---|---|---|---|
+| Camera host (GarageBox, Dell 7070 SFF) | 192.168.86.142 | `a4:bb:6d:aa:6e:ed` | — (NIC is `eno1`) |
+| Amcrest IP2M-841B, in the garage | 192.168.86.48 | `9c:8e:cd:09:b9:95` | `side` |
+| Sunba IPC_NT98566_N8F, street-facing PTZ | 192.168.86.139 | `00:12:34:cf:64:c9` | `outdoor` |
+
+Frigate UI: **https://192.168.86.142:8971** (self-signed cert, so the browser will warn). Shell: `ssh camhost`.
+
+To re-read any of those MACs later: `ip link show eno1` on the host, and `ip neigh show` on the host for the two cameras — both are on the same segment, so they sit in its ARP table.
 
 ### "Local only" — what is actually true
 

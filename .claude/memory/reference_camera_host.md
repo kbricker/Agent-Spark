@@ -52,7 +52,9 @@ The camera host is the Frigate NVR for the house security cameras. `ssh camhost`
 
 Both ethernet cameras are live in Frigate and clean (5 fps each, 0 skipped, detector ~12 ms). Recording motion-only, retention configured at 30 days.
 
-**Retention is currently fiction.** Measured 2026-08-29: disk 98% full, 12 GB free, only 9 days held. ~46 GB/day. Frigate self-protects by evicting the oldest hour, so the failure mode is silently short retention, never a crash or a warning.
+**History was wiped clean on 2026-08-29** at Kyle's instruction, after the fixes below went in: all `recordings/` and `clips/` deleted from inside the container (everything is root-owned and there is no sudo here, so `docker exec` is the route). 414 GB freed — disk went 98% -> 5%, 425 GB available. The DB was NOT deleted: Frigate 0.17 keeps the UI login in `frigate.db`, so removing it would reset the admin password and lock Kyle out. Consistent backup at `~/frigate/config/frigate.db.bak-20260829` (taken with sqlite3's `.backup()` against the live DB). Frigate restarted healthy and is recording fresh from 2026-08-29 12:12.
+
+**Before the wipe, retention was fiction:** disk 98% full, 12 GB free, only 9 days held against a configured 30, burning ~46 GB/day. Frigate self-protects by evicting the oldest hour, so the failure mode is silently short retention, never a crash or a warning. Whether that is fixed is now an open measurement — the clock restarted 2026-08-29.
 
 **The 2026-08-20 diagnosis of that was wrong on both counts — do not repeat it.** It blamed the Sunba's 4K main stream and proposed dropping to 1440p.
 - Wrong camera. Hourly `du` for 2026-08-28: `side` wrote ~1.2 GB EVERY hour, 03:00 and noon alike (~28 GB/day), while `outdoor` tracked real street traffic (450 MB at midday, 1.6 GB at 18:00, ~18 GB/day). The indoor camera was the bigger consumer and the only continuous one.
@@ -67,8 +69,8 @@ Both ethernet cameras are live in Frigate and clean (5 fps each, 0 skipped, dete
 Still open:
 - **Sunba admin password is still blank.** ONVIF refuses `SetUser` and the DVRIP password msgid is unknown — **do not guess the msgid**, a wrong write could corrupt the account table. LAN-only exposure now that P2P is off and nothing is forwarded.
 - **`outdoor` mask is a first pass.** Applied 2026-08-29 covering the FAR SIDE of the street only — neighbour's garage, buildings opposite, far-kerb parked cars — per Kyle; the road itself is deliberately unmasked so passing traffic still records. Polygon `0.33,0,1,0,1,0.26,0.47,0.27,0.33,0.14`, verified by rendering it over a live detect frame, not by trusting the numbers. Not yet masked and the next suspects if `outdoor` still records flat around the clock: the near foliage top-left (~x 0-0.37, y 0-0.30) and the street tree on the right, both of which move in wind.
-- **No DHCP reservations yet** — host and both cameras are on plain DHCP leases.
-- Retention must be set to a number that is TRUE once the false motion is fixed and a real week measured. Do not leave 30 if the disk cannot hold 30.
+- ~~DHCP reservations~~ **done.** All three reserved in Google Wifi as of 2026-08-29: host `.142` (`a4:bb:6d:aa:6e:ed`), `side` Amcrest `.48` (`9c:8e:cd:09:b9:95`), `outdoor` Sunba `.139` (`00:12:34:cf:64:c9`). Table is in section 2 of the setup doc.
+- Retention must be set to a number that is TRUE once a real week has been measured from the 2026-08-29 restart. Do not leave 30 if the disk cannot hold 30. With 425 GB free, 30 days needs the two cameras to average under ~14 GB/day combined; they were at 46.
 
 Next session: final physical placement of the host, then the first USB camera — which is the step that needs the udev pinning in section 5 of the doc, and the first thing here that will actually need sudo.
 
