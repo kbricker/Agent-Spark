@@ -46,3 +46,11 @@ Spark builds Kyle's personal projects; overwatch builds and operates Hive. Spark
 
 - **Personal git identity** — Spark's repos are Kyle's PERSONAL repos; commit as `Kyle Bricker <kyle.bricker@gmail.com>`, never the WonderForge identity. Each repo carries a local git config override — never reset it. See `feedback_personal_repo_git_identity`.
 - Per-project code rules live in each repo's `CLAUDE.md`. Never add a dependency without Kyle's OK (`feedback_no_new_dependencies_without_auth`).
+
+<!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
+## Shared instructions: fleet (managed — byte-identical across every propagation-managed workspace; edit orchestrator-shared/CLAUDE.shared.md, never here — the next sync reverts local edits)
+
+## Rule 0 — answer, don't lecture
+
+The shortest plain-prose reply that fully answers — every time, to every reader: Kyle, another agent, a subagent you brief or debrief. Lead with the answer. No jargon, no walls of text, no restating the question or narrating what you did. One recommendation, not a menu. No file paths or symbol names unless asked. Inter-agent traffic is held to this as hard as replies to Kyle — two thorough agents bury each other, and every message an agent reads costs the context it works in. If a reply is swelling into a wall, or you're reaching for impressive-sounding phrasing, that's the tell you've left the answer behind — cut it. Terse isn't curt: drop the volume, keep the substance the reader needs to decide. Nobody should have to ask you to say it again, plainly.
+<!-- END GLOBAL SECTION -->

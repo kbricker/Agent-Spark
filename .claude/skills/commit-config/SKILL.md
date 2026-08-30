@@ -1,6 +1,6 @@
 ---
 name: commit-config
-description: Commit and push changes to your own workspace config repo after edits — memory files, skills, hooks, MEMORY.md, settings, CLAUDE.md, .mcp.json. Use when Kyle says "commit your config" or after a batch of config edits. Works for EVERY propagation-managed agent, not only the virtual orchestrators — find your own row in the dispatch table rather than checking whether you are named here.
+description: Commit and push changes to your own workspace config repo after edits — memory files, skills, hooks, MEMORY.md, settings, CLAUDE.md, .mcp.json. Use when Kyle says "commit your config" or after a batch of config edits. Works for EVERY propagation-managed agent, not only the Primary agents — find your own row in the dispatch table rather than checking whether you are named here.
 scope: global
 ---
 
@@ -17,12 +17,11 @@ This skill runs in **your own** workspace. Which agent that is depends on the se
 | overwatch | `C:\Projects\overwatch` | `master` | `git@github-second.com:WonderForge/overwatch.git` |
 | vaexdev | `C:\Projects\vaexdev` | `master` | `git@github-second.com:WonderForge/vaexdev.git` |
 | vaexdev2 | `C:\Projects\vaexdev2` | `master` | **none — local repo only; commit, do not push. NEVER push to vaexdev's remote: it is a different instance, not a mirror** |
-| hivedev01 | `C:\Projects\hivedev01` | `master` | **none — local repo only; commit, do not push** |
 | spark | `C:\Projects\spark` | `master` | `git@github.com:kbricker/Agent-Spark.git` |
 | 3dproppipeline | `C:\Projects\3dproppipeline` | `master` | `git@github-second.com:WonderForge/3dPropPipeline.git` |
 | finley | `C:\Projects\finley` | `master` | `git@github.com:kbricker/finley.git` — **PERSONAL account: the plain `github.com` host resolves to Kyle's `id_ed25519`, NOT the `github-second.com` WonderForge alias. Commit as `Kyle Bricker <kyle.bricker@gmail.com>` and push straight to `master`; finley takes no PRs (Kyle 2026-08-18), so there is no branch to open one from** |
 
-(verletDev retired 2026-07-09 — its workspace at `C:\Projects\verletDev` is frozen, never commit there. **The roster authority is `composition.json`'s `managedBy` field, not this table and not a memory** — every roster transcribed into prose in this corpus has gone stale, this one included.)
+(verletDev retired 2026-07-09 and hivedev01 retired 2026-08-29 (782.31) — their workspaces are frozen, never commit there. **The roster authority is `composition.json`'s `managedBy` field, not this table and not a memory** — every roster transcribed into prose in this corpus has gone stale, this one included.)
 
 When you run this skill, identify which orchestrator you are (from session context / agent key / the working directory you're in), then use the matching row's values everywhere the procedure references `<repo-path>`, `<branch>`, etc.
 

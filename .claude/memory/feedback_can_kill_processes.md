@@ -1,22 +1,12 @@
 ---
 name: Kill only the specific process you spawned, never by image name
-description: Kill only processes you started, by PID — NEVER taskkill //IM dotnet.exe or //IM claude.exe, they nuke Kyle's sessions
+description: Kill only processes you started, by PID — the kill-guard hook denies image-name kills; provenance is still on you
 type: feedback
 scope: global
 ---
 
-You may kill processes you spawned yourself (e.g. a RemoteAgent or AgentStudio2 server you just started in the background). But you MUST target them by PID, not by image name.
+You may kill processes you spawned yourself (a server or RemoteAgent you started in the background), but only by PID: capture it at spawn from the tool's returned metadata, then `taskkill //F //PID <pid>` (Bash) or `Stop-Process -Id <pid>` (PowerShell). If you lost the PID, identify the exact one via `tasklist` or a CommandLine filter before killing.
 
-**FORBIDDEN — never run these:**
-- `taskkill //F //IM dotnet.exe` — kills every .NET process including other orchestrators' sessions, AgentStudio2 instances, and any other Claude Code dotnet host on the box
-- `taskkill //F //IM claude.exe` — kills every Claude Code session Kyle has open, destroying their state and conversation context
-- Any `//IM <image>` form that targets a shared binary
+**Why:** on 2026-04-17 a `taskkill //F //IM dotnet.exe` + `//IM claude.exe` cleanup killed Kyle's other live Claude sessions and every dotnet process on the box, destroying their in-flight state. Kyle: "NEVER FUCKING DO THIS." Blanket image/name kills are never acceptable on a machine running many concurrent sessions and dev servers.
 
-**Required pattern:**
-- When you start a process in the background, capture its PID from the Bash tool's returned metadata.
-- To stop it later: `taskkill //F //PID <that_pid>` — targets that one process only.
-- If you lost the PID, use `wmic process where "CommandLine like '%<unique-flag>%'"` or check `tasklist` to identify the exact PID before killing.
-
-**Why:** On 2026-04-17 I ran `taskkill //F //IM dotnet.exe` and `taskkill //F //IM claude.exe` to clean up after a local Playwright test. It killed my own session, Kyle's verletdev Claude Code session, and every other dotnet process on the machine — destroying their in-flight state and contexts. Kyle: "that was stupid as shit... NEVER FUCKING DO THIS."
-
-**How to apply:** Before running any `taskkill`, check the flags. If it's `//IM` against a shared image name (dotnet, claude, node, powershell, pwsh, etc.), STOP — switch to PID-based killing. Blanket kills by image name are never acceptable on Kyle's workstation because he runs many concurrent Claude Code sessions and dev servers.
+**How to apply:** `hooks/kill-guard.mjs` (782.32) DENIES the common image/name-based kill forms on both shells, so the pattern list no longer lives here — but it is a backstop against the reflexive blanket kill, not a complete guarantee (exotic spellings can slip it). The rule itself, and the provenance half the hook cannot see, stay yours: the PID you target must be one you started. See [[feedback_never_kill_chrome]] for the stricter Chrome rule.
