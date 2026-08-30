@@ -63,6 +63,18 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/kill-guard.mjs",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "autoMemoryDirectory": "C:/Projects/spark/.claude/memory"
