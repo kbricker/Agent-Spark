@@ -554,6 +554,9 @@ record:
 - **1488 updates `Password` but leaves `PasswordV2` stale.** That looks alarming and is not: DVRIP login validates the former, and the old password is correctly refused afterwards. Do not try to hand-write a V2 blob.
 - **Do not assume a camera's ONVIF authenticates.** The Sunba accepts `GetDeviceInformation` with *any* password - blank, correct, or garbage. Verify with a deliberately wrong password before believing a camera's ONVIF is protected; on this board the real access control is DVRIP on 34567, not ONVIF on 8899.
 - **Frigate self-protects on a full disk** by deleting the oldest hour, ahead of the retention policy.
+- **This box's BIOS cannot be updated from the OS.** `fwupdmgr` stages the Dell capsule correctly and the firmware silently ignores it — no error, no ESRT attempt recorded, version unchanged after reboot. Check `/sys/firmware/efi/esrt/entries/entry0/last_attempt_status`: `0` alongside `last_attempt_version: 0` means the firmware never tried, which is a different failure from a flash that failed. Use a FAT32 USB stick and F12 -> BIOS Flash Update instead. The Secure Boot db and dbx updates in the same batch DID apply from the OS, so a partial success here is normal.
+- **Dell BIOS settings are reachable from Linux** via `dell-wmi-sysman` under `/sys/class/firmware-attributes/`, readable and writable as root when no BIOS admin password is set. `AcPwrRcvry` is the one that matters for an NVR — set `On` so the box returns by itself after a power cut. Re-check it after any BIOS update.
+- **`docker compose stop` survives a reboot.** It marks the container stopped, which overrides the restart policy, so Frigate stays down until an explicit `up -d`. Stopping it cleanly before a reboot is right; just remember to start it after.
 
 ---
 
