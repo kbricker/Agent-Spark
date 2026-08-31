@@ -36,6 +36,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_check_what_overrides_the_file.md — The file you are about to edit is often not the authority — check for a generated block, fence comment, or .d/ drop-in
 - feedback_checklist_items_phase_with_gates.md — Phase checklist items by status gate — anything at-or-after merge is VALIDATION; unchecked TASK items block CodeReview
 - feedback_concise_docs_no_ascii.md — Compressing a deliverable doc is a correctness pass, not style — bullets over prose, never ASCII diagrams
+- feedback_correct_the_assertions_not_just_the_log.md — A plan's description and checklist are assertions a reader acts on — a shaping-log entry does not update them
 - feedback_credentials_radioactive.md — Credentials are radioactive — only forge handles them; never touch a credential yourself, route credential work to forge
 - feedback_define_done_by_user_visible_behavior.md — Done means the user can do the thing the plan promised — a correct on-disk shape with no working UI is NOT done
 - feedback_delegation_boundary.md — Handing work off or spawning an agent? Inline for tight loops, subagent by default, named agent only if it earns it
