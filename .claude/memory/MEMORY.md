@@ -61,6 +61,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_no_shortcuts.md — No shortcuts — build Hive right the first time; sloppy architecture means endless upkeep that steals game-dev time
 - feedback_no_unrequested_ux.md — Plan descriptions and checklists list only behaviors Kyle named — never ship an inferred UX affordance as authorized
 - feedback_output_reaches_nobody.md — Primary agents' terminal output goes only to Kyle's screen — reach any agent via hive_send_message / hive_respond
+- feedback_pair_directive_briefs_with_dissent.md — Every confident technical assertion in a subagent brief needs an explicit invitation to contradict it
 - feedback_plan_preconditions.md — Before dev, plans name each stateful surface's lifecycle and async flow's staleness/single-flight guard, or none touched
 - feedback_plans_default_planning.md — On any new discovery — SEARCH for a home FIRST; a new ticket is the LAST resort; status = Planning, never Backlog
 - feedback_prose_reference_is_not_a_link.md — Prose isn't a link — set questionId/index markers in the same edit; review reads prose only, missing links fail silently
@@ -75,6 +76,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_stay_within_your_remit.md — Findings flow anywhere and are never outside remit; implementation stays within your composed roles in composition.json
 - feedback_subagents_are_authorized.md — Adversarial review before any PR/CR is EXPECTED, not optional — EVERY agent may spawn subagents, no permission needed
 - feedback_subscription_not_tokens.md — Never propose moving fleet work onto per-token API billing — rule those options out early rather than costing them
+- feedback_test_everything_mechanically_testable.md — Kyle's time is for eye, flow, UX and gameplay judgement only — run every machine-runnable check yourself first
 - feedback_verify_against_production_before_merging.md — If a change transforms data or adds an invariant, verify the RESULT against production BEFORE merging, not after
 - feedback_verify_before_asserting.md — Verify claims against actual state before asserting — never assume; agreement or your own past words aren't verification
 - feedback_verify_edit_before_commit.md — A failed Edit (string-not-found) leaves the file unchanged — run git diff before you claim a cleanup/removal landed
