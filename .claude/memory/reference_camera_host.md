@@ -10,7 +10,7 @@ The camera host is the Frigate NVR for the house security cameras. `ssh camhost`
 
 ## Identity (measured 2026-08-20)
 
-- **Dell OptiPlex 7070 SFF**, i5-9500 (6 cores; UHD 630 iGPU does decode + OpenVINO detection), 14 GiB usable, 468 GB NVMe.
+- **Dell OptiPlex 7070 SFF**, i5-9500 (6 cores; UHD 630 iGPU does decode + OpenVINO detection), 14 GiB usable, 468 GB NVMe (WDC PC SN730 SDBQNTY-512G-1001).
 - Hostname **GarageBox**, user **kyle**, **Ubuntu 26.04 LTS Desktop**, `America/Los_Angeles`.
 - NIC **`eno1`**, MAC **`a4:bb:6d:aa:6e:ed`**, **192.168.86.142** (DHCP, no reservation yet).
 - **Desktop, not Server — deliberate.** Kyle had already installed it and would not rebuild. Compensated: `openssh-server` added by hand, and all four sleep/suspend targets masked so it cannot suspend mid-recording. The setup doc still says Server; it has not been corrected.
@@ -82,9 +82,18 @@ Still open:
 
 Next session: final physical placement of the host, then the first USB camera — which is the step that needs the udev pinning in section 5 of the doc, and the first thing here that will actually need sudo.
 
-## No sudo
+## Sudo — NOPASSWD grant added 2026-08-31
 
-`sudo -n -l` reports interactive authentication required — no NOPASSWD grant here, unlike [[reference_cell1_operations]]. Nothing needs it yet; the udev rule that pins the USB cameras will.
+`kyle` has a passwordless grant at `/etc/sudoers.d/kyle-nopasswd`, so this box is administrable end-to-end over SSH, same as [[reference_cell1_operations]]. Not a real privilege increase — `kyle` was already in the `docker` group, which is root by another name.
+
+**If the account password is lost again**, that docker membership IS the recovery route, with no reboot, keyboard or monitor: `docker run --rm -it -v /:/host alpine chroot /host passwd kyle`. Have Kyle run it in his own terminal so the value never enters an agent transcript. Used exactly this way on 2026-08-31.
+
+## BIOS and firmware
+
+- **BIOS is 1.29.0 and CANNOT be flashed from the OS — do not retry that route.** `fwupdmgr` stages the 1.35.0 capsule correctly (20 MB on the ESP, BootNext armed to Boot0002) and Dell's firmware silently ignores it. Failed twice on 2026-08-31. Decisive evidence is ESRT: `/sys/firmware/efi/esrt/entries/entry0/last_attempt_status` and `last_attempt_version` are BOTH `0`, meaning no attempt was recorded at all rather than a failed one. Already ruled out, do not re-check: `CapsuleFirmwareUpdate` is Enabled, no BIOS admin password, ESP has 1.1 GB free, `lowest_supported_fw_version` equals current so it is not a downgrade block. `OsIndicationsSupported` is 0x3, so this firmware has no capsule-on-disk support and fwupd is correctly using the fwupdx64.efi runtime path. **The route is a FAT32 USB stick and F12 -> BIOS Flash Update, on a physical trip.** Tracked as a checklist item on #951.
+- Secure Boot is **disabled**. db is at 2023 and dbx at 20260402 — both applied 2026-08-31, and both of those DID work from the OS.
+- **BIOS settings are readable and writable over SSH** through `dell-wmi-sysman` at `/sys/class/firmware-attributes/dell-wmi-sysman/attributes/` (root; no BIOS admin password set), so auditing or changing one needs no garage trip. Baseline recorded 2026-08-31: `AcPwrRcvry=On` — the box powers itself back up after an outage, which matters because there is **no UPS** — plus `WakeOnLan=LanOnly`, `UsbWake=Enabled`, `CapsuleFirmwareUpdate=Enabled`. Re-check all four after any successful BIOS flash; Dell updates can reset them.
+- Ubuntu holds some apt upgrades back at `phased 0%` (its staged rollout). They are not broken and must not be forced.
 
 ## Gotcha: PowerShell mangles remote ssh commands
 

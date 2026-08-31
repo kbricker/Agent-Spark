@@ -22,7 +22,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 ## Camera host
 
-- reference_camera_host.md — Camera host (GarageBox, `ssh camhost`, 192.168.86.142) — Dell 7070 SFF Frigate NVR; Docker ready, NO sudo grant, setup doc in CameraHost/
+- reference_camera_host.md — Camera host (GarageBox, `ssh camhost`, 192.168.86.142) — Dell 7070 SFF Frigate NVR; NOPASSWD sudo, BIOS needs USB flash not fwupd, setup doc in CameraHost/
 
 <!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
 ## Global (managed by propagate-shared-config — copies of `wfa2/orchestrator-shared/memory/`; edit canonical, never these, the next sync reverts local edits silently)
