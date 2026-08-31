@@ -148,10 +148,10 @@ Before the first push of any fast-track PR branch — the push that opens it to 
 
 > **STATUS GATE — the moment the PR exists, move the ticket:** `hive_plan_update({id, status: "CodeReview", prUrl, gitBranch})`. Do it in the same breath as `gh pr create`, not after CR replies. A plan sitting in Development with a live PR is the second most common stall we measured.
 >
-> **On a no-PR deliverable there is no such moment**, and that is exactly how these plans stall. Move the ticket on the **merge** instead of on a PR that will never exist. Which field to set depends on what shipped, and one case has no clean answer yet:
+> **On a no-PR deliverable there is no such moment**, and that is exactly how these plans stall. Move the ticket on the **merge** instead of on a PR that will never exist. Which field to set depends on what shipped:
 >
 > - **Non-code** (research, spec, docs, ops): set `deliverableType` — `spec` | `doc` | `ops`. Plan #614 made this the supported way to complete with no `prUrl`.
-> - **Code merged without a PR:** point `prUrl` at the **merge commit**. That is an honest record of where the work landed, not the fabricated placeholder #614 exists to eliminate, and it is already what TendWright does. Do **not** reach for `ops` to unstick a code plan — `deliverableType` splits into PR-backed code and non-code, has no value meaning "code merged without a PR", and `DeliverableTypes.IsPrLess` fails closed by design, so guessing makes the board lie about what shipped. The missing value is a real gap, open with Kyle and logged on #614; if you hit it, say so rather than picking whichever value gets you moving.
+> - **Code merged without a PR:** set `deliverableType` to **`commit`** (plan #863) — the gate stops demanding a `prUrl`, and you still point `prUrl` at the **merge commit** as provenance when one exists (an honest record of where the work landed, and already what TendWright does). Do **not** reach for `ops` to unstick a code plan — that renders a code deliverable as ops work and makes the board lie about what shipped. The ticket still walks the full machine — CodeReview is a waypoint on a `commit` plan too, passed at the merge rather than at a PR-open that never happens.
 
 ### 7. Deploy (if applicable)
 
@@ -179,7 +179,7 @@ What each state asserts, since two of them are routinely burned as syntax:
 | `Review` | **Planning review.** The plan is baked; smell-check it for gaps before any work starts. This is a review of the *plan*, not of code — `CodeReview` is the code one. |
 | `Ready` | **Passed review; ready for development.** A deliberate stopping point in the lifecycle — plans rest here. |
 | `Development` | Someone is editing code right now. |
-| `CodeReview` | PR is open. |
+| `CodeReview` | PR is open. On a no-PR deliverable (`deliverableType` commit/spec/doc/ops) that moment never comes — the state is a waypoint passed when the work lands; see the step-6 gate. |
 | `Completed` | Merged, deployed, every item checked. |
 
 Kyle, 2026-08-03: *"review is PLANNING REVIEW, the intent there is to smell check a baked plan to ensure there are no gaps, then its 'ready' meaning ready for development, its a stopping point in the lifecycle of a ticket. we dont use the workflow well at all today."*
@@ -194,7 +194,7 @@ hive_plan_update({id, status: "CodeReview", prUrl, gitBranch})   // after commit
 hive_plan_update({id, status: "Completed"})
 ```
 
-For config-repo plans with no PR, use a descriptive `prUrl` (e.g. direct commit SHA link) or leave null and note it in the commit message.
+For config-repo plans with no PR, set `deliverableType: "commit"` (plan #863) and point `prUrl` at the commit SHA link when one is worth recording — the step-6 no-PR bullet is the full rule; "leave prUrl null" on a PR-backed type is a transition the server refuses.
 
 ### 9. Log review findings to the platform store
 

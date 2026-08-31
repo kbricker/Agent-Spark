@@ -45,7 +45,7 @@ Per finding:
 | `category` | kebab-case class: security-xss, crash-consistency, availability-dos, correctness, efficiency, consistency, maintainability |
 | `severity` | critical / major / minor |
 | `criterion` | task-ripeness criterion 0–6 — which planning check would have prevented this. Set it when you can tell; omit when you can't |
-| `outcome` | fixed / skipped / no_change_needed — **log skipped findings too**, with the reason in `summary`; a deliberately-declined catch is signal |
+| `outcome` | fixed / skipped / no_change_needed / open — **log skipped findings too**, with the reason in `summary`; a deliberately-declined catch is signal. `open` (plan #867) = confirmed and accepted with the fix NOT landed yet |
 | `summary` | one-line statement of the defect (what breaks, under what input) |
 | `pattern` | **the mineable field** — the generalized shape, not the specific bug. "escaper safe for element content reused in attribute context", not "escapeHtml missed quotes in plans.js" |
 
@@ -54,6 +54,13 @@ Per finding:
 ## Discipline
 
 - Log once, when the verdict is settled — not per-iteration while findings are being argued.
+- A confirmed finding whose fix is deferred to a later cycle is logged `open` at settle —
+  never held back until the fix lands, and never mislabelled `skipped` (that tells the
+  mining the fleet DECLINED it). Close it when the fix ships with
+  `hive_review_finding_resolve` (fixed / skipped / no_change_needed + a one-line note).
+  Resolutions are write-once; a resolved finding reads as its resolution's outcome, and
+  `outcome: "open"` on `hive_review_finding_list` is the fleet's live open ledger. A refused
+  resolve means the finding is already closed or was never open — read it, don't retry.
 - Findings are immutable and append-only. A wrong entry is corrected by context, not edited;
   don't spam corrections, get it right at log time.
 - Keep `pattern` general enough to cluster: if two different bugs would produce the same
