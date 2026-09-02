@@ -101,6 +101,24 @@ hive_plan_update({id, assignedAgent: "overwatch", reviewAgent: "overwatch"})
 
 **Fan out here when it helps.** See the "Fan-out pattern" section below.
 
+**Grok dev lane (plans #984/984.1 — flag-gated: agents with `grokLane: true` on their composition.json entry; overwatch and vaexdev today).** One machine-level grok install + Kyle's SuperGrok login serves every flagged primary on this box, and your settings.json carries the dispatcher allow rule only if you are flagged — not flagged means this lane is not yours; implementation goes to your dev subagent as before. Implementation pieces that would go to your dev subagent can instead run on Grok (flat subscription fee — zero Claude context/quota consumed):
+
+```
+git -C <repo> worktree add -b plan<id>/<slug> C:/Projects/grok-worktrees/<repo>-<id> <default>
+node C:/Projects/wfa2/hooks/grok-dispatch.mjs --cwd C:/Projects/grok-worktrees/<repo>-<id> --plan <id> --for-session <your-session-guid> --brief <brief-file>
+```
+
+`--plan` takes the BARE numeric id (a display number like 984.1 is rejected loudly). `--for-session` is the dispatching session's GUID — the directory name in your scratchpad path — and it is what files the dispatch as a subagent row under YOUR agent's accounting (visible on your next turn), exactly like a Claude subagent; without it the work still accounts to the `grok` lane row and the ticket, just not under you.
+
+**One worktree per ticket** — that's what makes 2-3 concurrent grok dispatches on separate tickets safe (the session store is parallel-safe; shared working trees are not). A worktree checks out only tracked files, so local secret files (RemoteAgent appsettings.local.json etc.) never enter grok's working tree (finding 1398 — residual: grok can still read absolute paths anywhere if told to; keep briefs clean). After review, YOU commit/push from the worktree, then `git worktree remove` it.
+
+Run it in the background; the JSON result carries the schema'd report (`summary/changed_files/tests/blockers`), `groundTruth` (git-verified actual changes vs claims, baselined against pre-dispatch dirt — treat `claimedMissing`/`unclaimed` mismatches and any `gitViolation` as findings), and per-(plan, cwd) session continuity — follow-up dispatches with the same `--plan` resume with full context (`--fresh` starts over; plan-less dispatches never resume).
+
+- **Grok is contained by design (984 review):** whitelisted child env (no fleet secrets), no hive identity, hive MCP tools denied, git commit/push/merge/rebase/reset, `gh`, and process-kill denied via grok permission rules, HEAD/branch movement reported as a violation. Don't "fix" a dispatch by weakening these.
+- Compose the brief yourself from your project's dev-subagent definition (overwatch: `.claude/agents/hive-dev.md`; if your workspace has no such file, carry the equivalent role rules — code rules, build commands, review split — in the brief body) + the scoped task + a digest of what `hive_recall` returns for the touched domain — grok reads the workspace CLAUDE.md but has no `.claude/agents/` and no hive tools; everything it needs rides in the brief.
+- **Review split is non-negotiable (Kyle, 2026-09-01): Grok implements, Claude reviews.** Grok output gets the same step 5.5 adversarial pass as any dev work — Grok never reviews, never commits, never pushes.
+- Lane choice: Grok for well-scoped implementation briefs (spares Claude quota); in-session subagents for work needing tight iteration with you or live fleet-tool access.
+
 ### 5. Check for pre-existing uncommitted drift
 
 Before every commit, run `git status` and `git diff` to see what's dirty. Pre-existing uncommitted state is common across orchestrator workspaces — do NOT sweep it into your commit. Use explicit `git add <path>` on only the files you touched. If the plan includes a version bump and the csproj is already dirty-ahead-of-main, fold the existing bump into your commit so git main stays monotonically ahead of what's deployed. See the gotcha on 2026-04-13, plan #178.
