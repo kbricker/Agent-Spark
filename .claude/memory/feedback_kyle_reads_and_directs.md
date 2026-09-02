@@ -1,6 +1,6 @@
 ---
 name: Kyle reads and directs — never hands-on
-description: Kyle reads and directs, never hands-on — CodeRabbit reviews PRs, agents edit tickets; don't build him hands-on controls
+description: About to build Kyle a button or hands-on control? Don't — he reads and directs; CodeRabbit reviews, agents edit tickets
 type: feedback
 scope: global
 ---

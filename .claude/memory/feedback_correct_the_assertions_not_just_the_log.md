@@ -1,6 +1,6 @@
 ---
 name: Logging a change does not correct what the plan asserts
-description: A plan's description and checklist are assertions a reader acts on — a shaping-log entry does not update them
+description: Logged a change to a plan? A reader acts on its description and checklist — a log entry does not update those
 type: feedback
 scope: global
 ---

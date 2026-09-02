@@ -1,6 +1,6 @@
 ---
 name: Anchor propagation checks on the commit, not the tree
-description: Verify a propagation landed with git log against the commit you knew — a clean tree is the SUCCESS state, not absence
+description: Checking a propagation landed? A clean tree is success, not absence — verify with git log against the commit you knew
 type: feedback
 scope: global
 ---

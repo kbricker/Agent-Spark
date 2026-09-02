@@ -1,6 +1,6 @@
 ---
 name: Never call hive_spawn_agent — that pipeline is retired
-description: Never call hive_spawn_agent — the pipeline is retired though the tool still advertises it; fan out subagents instead
+description: hive_spawn_agent still shows in the tool list? It's retired — never call it; fan out subagents instead
 type: feedback
 scope: global
 ---

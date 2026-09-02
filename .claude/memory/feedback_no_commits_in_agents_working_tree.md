@@ -1,6 +1,6 @@
 ---
 name: Check the branch before committing in an agent's checkout
-description: Never commit in a repo checkout an agent is actively working in — check current branch first
+description: About to commit in a clone an agent works in? Check the current branch first — never commit into its working tree
 type: feedback
 scope: global
 ---

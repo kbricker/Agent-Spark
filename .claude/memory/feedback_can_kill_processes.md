@@ -1,6 +1,6 @@
 ---
 name: Kill only the specific process you spawned, never by image name
-description: Kill only processes you started, by PID — the kill-guard hook denies image-name kills; provenance is still on you
+description: Reaching for taskkill? Kill only what you started, by PID — image-name kills are denied and provenance is still on you
 type: feedback
 scope: global
 ---

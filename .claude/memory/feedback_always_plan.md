@@ -1,6 +1,6 @@
 ---
 name: Always plan before building
-description: Research and write a formal plan before building — never skip to code; only a true one-line obvious fix skips planning
+description: Reaching for the editor before a plan exists? Only a true one-line obvious fix skips planning — write the plan first
 type: feedback
 scope: global
 ---

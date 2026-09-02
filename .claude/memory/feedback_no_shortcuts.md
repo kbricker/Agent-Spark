@@ -1,6 +1,6 @@
 ---
 name: No shortcuts — build it right the first time
-description: No shortcuts — build Hive right the first time; sloppy architecture means endless upkeep that steals game-dev time
+description: The quick way tempting? Build Hive right the first time — sloppy architecture means upkeep that steals game-dev time
 type: feedback
 scope: global
 ---

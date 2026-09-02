@@ -1,6 +1,6 @@
 ---
 name: Solve the actual problem, not the literal ask
-description: Implementations must address the root problem — trace all affected paths, not just the obvious one
+description: Fixing the obvious path? Trace every affected path first — address the root problem, not just the literal ask
 type: feedback
 scope: global
 ---

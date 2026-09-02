@@ -1,6 +1,6 @@
 ---
 name: Credentials are radioactive — only forge handles them
-description: Credentials are radioactive — only forge handles them; never touch a credential yourself, route credential work to forge
+description: Task would have you read, paste, or handle a key or token? Stop — credentials are radioactive, route it to forge
 type: feedback
 scope: global
 ---

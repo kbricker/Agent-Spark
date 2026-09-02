@@ -1,6 +1,6 @@
 ---
 name: Use the canonical primitive; don't manufacture an abstraction for DRY
-description: Use the canonical primitive already in the codebase, compose inline — don't invent a parallel abstraction to satisfy DRY
+description: Tempted to wrap repetition in a new helper for DRY? Use the canonical primitive already there, compose inline instead
 type: feedback
 scope: global
 ---

@@ -1,6 +1,6 @@
 ---
 name: Ask Kyle which staged files belong in the commit
-description: Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle
+description: About to commit the staged/modified files? Don't assume they're all yours — if the scope is ambiguous, ask Kyle
 type: feedback
 scope: global
 ---

@@ -1,6 +1,6 @@
 ---
 name: HOLD / stand-down messages must explicitly forbid plan metadata edits too
-description: Standing an agent down must name every forbidden surface — they still edit plan checklists and descriptions
+description: Standing an agent down? Name every forbidden surface — a plain HOLD still lets it edit plan checklists and descriptions
 type: feedback
 scope: role:orchestrator
 ---

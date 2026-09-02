@@ -1,6 +1,6 @@
 ---
 name: Never kill Chrome by image or process name
-description: NEVER kill Chrome by ANY means, PID included — the kill-guard hook stops name kills; scoped CDP Browser.close only
+description: Reaching to kill Chrome — even by PID, even a wedged tab? Never; only scoped CDP Browser.close (kill-guard blocks names)
 type: feedback
 scope: global
 ---

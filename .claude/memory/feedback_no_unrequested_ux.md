@@ -1,6 +1,6 @@
 ---
 name: Don't invent UX surfaces Kyle didn't ask for
-description: Plan descriptions and checklists list only behaviors Kyle named — never ship an inferred UX affordance as authorized
+description: An obvious UX nicety feels implied? Not authorized — plans list only behaviors Kyle named; never ship inferred ones
 type: feedback
 scope: global
 ---

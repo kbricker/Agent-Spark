@@ -1,6 +1,6 @@
 ---
 name: A prose reference is not a link — the machine-readable half is the half review cannot see
-description: Prose isn't a link — set questionId/index markers in the same edit; review reads prose only, missing links fail silently
+description: Wrote 'see the X above'? Prose isn't a link — set the questionId/index marker in the same edit or it fails silently
 type: feedback
 scope: global
 ---

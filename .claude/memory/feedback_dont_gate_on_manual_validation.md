@@ -1,6 +1,6 @@
 ---
 name: Don't gate closure on validations only Kyle can run, or on things that can't happen
-description: Don't gate closure on Kyle-only manual or impossible checks — ship non-breaking work to real use, new ticket if wrong
+description: Closure blocked on a check only Kyle can run, or that can't happen? Ship non-breaking work to use; new ticket if wrong
 type: feedback
 scope: global
 ---

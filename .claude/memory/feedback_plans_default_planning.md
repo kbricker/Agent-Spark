@@ -1,6 +1,6 @@
 ---
 name: Plans default to Planning, not Backlog
-description: On any new discovery — SEARCH for a home FIRST; a new ticket is the LAST resort; status = Planning, never Backlog
+description: New discovery or finding? SEARCH for a home first — a new ticket is the last resort; status Planning, never Backlog
 type: feedback
 scope: global
 ---

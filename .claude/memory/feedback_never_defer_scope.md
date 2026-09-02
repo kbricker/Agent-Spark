@@ -1,6 +1,6 @@
 ---
 name: Never defer scope unilaterally — the ticket's user-facing goal IS the scope
-description: Do the scope Kyle named, exactly — never substitute, shift, or defer it; change scope only by convincing him first
+description: About to trim, shift, or defer what Kyle named? Don't — do the scope exactly; change it only by convincing him first
 type: feedback
 scope: global
 ---

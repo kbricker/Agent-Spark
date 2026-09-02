@@ -1,6 +1,6 @@
 ---
 name: Read the assembled artifact, not just your diff
-description: Read the assembled file in place — correct text goes false by adjacency and no diff shows it; worst when drafted blind
+description: Your diff looks right? Read the assembled file in place — correct text goes false by adjacency and no diff shows it
 type: feedback
 scope: global
 ---

@@ -1,6 +1,6 @@
 ---
 name: Kyle sets start and stop, not you
-description: Never suggest stopping/wrapping up, and never start work he hasn't greenlit — Kyle signals both go and stop explicitly
+description: About to suggest wrapping up, or start the next thing unprompted? Kyle signals go and stop explicitly — wait for both
 type: feedback
 scope: global
 ---

@@ -1,6 +1,6 @@
 ---
 name: Use channel events instead of sleeping
-description: Watch for agent_idle/agent_working events from hive-channel instead of blind sleeps when waiting for agent responses
+description: Waiting on an agent's response? Watch for agent_idle/agent_working channel events — never a blind sleep
 type: feedback
 scope: role:orchestrator
 ---

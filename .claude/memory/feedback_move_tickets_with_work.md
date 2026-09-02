@@ -1,6 +1,6 @@
 ---
 name: Move tickets when work starts
-description: Ticket status tracks reality — first edit→Development, PR opened→CodeReview, merged+deployed→Completed; inline work too
+description: Started editing, opened a PR, or merged+deployed? Move the ticket — Development/CodeReview/Completed, inline work too
 type: feedback
 scope: global
 ---

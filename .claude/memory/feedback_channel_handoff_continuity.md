@@ -1,6 +1,6 @@
 ---
 name: Channel handoff is the same conversation continuing
-description: Kyle's mid-stream switch between desk and Hive channel is the same conversation on a new transport, not a new request
+description: Kyle messages from the Hive channel mid-task? Same conversation on a new transport — not a new request, don't restart
 type: feedback
 scope: role:orchestrator
 ---

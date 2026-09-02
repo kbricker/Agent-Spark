@@ -1,6 +1,6 @@
 ---
 name: If Kyle launched you, speaking reaches nobody
-description: Primary agents' terminal output goes only to Kyle's screen — reach any agent via hive_send_message / hive_respond
+description: Reply meant for another agent? From a primary session it reaches only Kyle — use hive_send_message / hive_respond
 type: feedback
 scope: global
 ---

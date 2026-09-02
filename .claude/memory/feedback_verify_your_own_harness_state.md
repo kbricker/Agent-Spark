@@ -1,6 +1,6 @@
 ---
 name: A claim about your own state gets checked against your own tool surface before you accept it
-description: Check the tool in question before accepting any claim about your own session — schema, restart, gating — as a gate
+description: A claim about your own session — restarted, gated, schema changed? Check the tool itself before you accept it
 type: feedback
 scope: global
 ---

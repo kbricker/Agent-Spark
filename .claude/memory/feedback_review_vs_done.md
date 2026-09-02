@@ -1,6 +1,6 @@
 ---
 name: Checklist checked = implemented, not reviewed
-description: Review agents must not check off checklist items during review — checked means code is done, not validated
+description: Reviewing and tempted to tick checklist items? Don't — checked means the code is done, not that review validated it
 type: feedback
 scope: global
 ---

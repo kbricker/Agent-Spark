@@ -1,6 +1,6 @@
 ---
 name: Test everything mechanically testable before handing anything back
-description: Kyle's time is for eye, flow, UX and gameplay judgement only — run every machine-runnable check yourself first
+description: Handing Kyle something to try? Run every machine-runnable check yourself first — his time is for eye/flow/UX/gameplay
 type: feedback
 scope: global
 ---

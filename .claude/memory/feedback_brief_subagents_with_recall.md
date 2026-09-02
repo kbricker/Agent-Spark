@@ -1,6 +1,6 @@
 ---
 name: Brief subagents to recall their domain pack
-description: Brief a subagent to hive_recall its domain pack before it builds — prefab YAML, shaders and VaEx internals
+description: Spawning a subagent on domain work? Tell it to hive_recall its pack first — prefab YAML, shaders, VaEx internals
 type: feedback
 scope: global
 ---

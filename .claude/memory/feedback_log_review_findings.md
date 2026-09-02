@@ -1,6 +1,6 @@
 ---
 name: A review is not finished until its findings are in the store
-description: Every settled review (internal, subagent, CodeRabbit) logs surviving and skipped findings via hive_review_finding_add
+description: A review just settled? Not finished until surviving AND skipped findings are in the store via hive_review_finding_add
 type: feedback
 scope: global
 ---

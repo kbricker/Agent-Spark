@@ -1,6 +1,6 @@
 ---
 name: Docs for Kyle are scannable bullet lists — no ASCII diagrams, no walls of prose
-description: Compressing a deliverable doc is a correctness pass, not style — bullets over prose, never ASCII diagrams
+description: Writing or compressing a doc for Kyle? It's a correctness pass, not style — bullets over prose, never ASCII diagrams
 type: feedback
 scope: global
 ---

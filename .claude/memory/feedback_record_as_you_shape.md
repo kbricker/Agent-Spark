@@ -1,6 +1,6 @@
 ---
 name: Record shaping-log entries as they happen, never batched
-description: hive_plan_log_add every entry as it happens (shaping AND dev/review) — the WHY record; entry types in shaping-log skill
+description: A question, answer, or decision just happened? hive_plan_log_add it now, not later — batching loses the WHY record
 type: feedback
 scope: global
 ---

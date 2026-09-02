@@ -1,6 +1,6 @@
 ---
 name: Don't auto-assign agents on plans worked interactively
-description: Never set assignedAgent when Kyle is doing the work directly — it can trigger that agent to start working the plan
+description: Setting assignedAgent on a plan Kyle is working himself? Don't — it can wake that agent to start working the plan
 type: feedback
 scope: global
 ---

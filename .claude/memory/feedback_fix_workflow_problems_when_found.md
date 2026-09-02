@@ -1,6 +1,6 @@
 ---
 name: Fix workflow problems when you hit them, or ticket them
-description: Fix a workflow or process defect the moment you hit it, or file a ticket to circle back — breaking context is worth it
+description: Hit a workflow or process defect mid-task? Fix it now or ticket it — breaking context is worth it; don't just note it
 type: feedback
 scope: global
 ---

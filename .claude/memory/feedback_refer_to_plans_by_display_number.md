@@ -1,6 +1,6 @@
 ---
 name: A parented plan's display number is its name
-description: Once a plan has a parent, call it by display number (664.1), not bare id (654); the bare id stays the API argument
+description: Naming a parented plan to a reader? Use its display number (664.1), not the bare id (654) — bare id stays the API arg
 type: feedback
 scope: global
 ---

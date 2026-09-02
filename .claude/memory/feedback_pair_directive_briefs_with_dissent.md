@@ -1,6 +1,6 @@
 ---
 name: Pair a directive brief with an explicit invitation to contradict it
-description: Every confident technical assertion in a subagent brief needs an explicit invitation to contradict it
+description: Writing a confident technical claim into a subagent brief? Pair it with an explicit invitation to contradict it
 type: feedback
 scope: global
 ---

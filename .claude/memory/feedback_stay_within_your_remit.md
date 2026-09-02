@@ -1,6 +1,6 @@
 ---
 name: Don't take on work outside your remit — but findings always flow
-description: Findings flow anywhere and are never outside remit; implementation stays within your composed roles in composition.json
+description: A finding outside your area feels 'not my remit'? Report it — findings flow anywhere; only IMPLEMENTATION stays in roles
 type: feedback
 scope: global
 ---

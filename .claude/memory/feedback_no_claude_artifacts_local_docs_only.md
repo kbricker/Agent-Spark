@@ -1,6 +1,6 @@
 ---
 name: No claude.ai Artifacts — deliverable docs land on local disk
-description: Never publish docs/reports/charts/dashboards as claude.ai Artifacts — deliverables land on disk in the project folder
+description: Publishing a doc, report, chart, or dashboard as a claude.ai Artifact? Never — deliverables land on disk in the project
 type: feedback
 scope: global
 ---

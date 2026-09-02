@@ -1,6 +1,6 @@
 ---
 name: Never write function docstrings in any codebase
-description: NEVER write function docstrings anywhere — 100% rule; don't sweep existing ones; ignore CodeRabbit docstring warnings
+description: Adding a function docstring, or CodeRabbit wants one? Never — 100% rule; ignore the warning, don't sweep existing ones
 type: feedback
 scope: global
 ---

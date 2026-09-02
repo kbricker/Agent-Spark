@@ -1,6 +1,6 @@
 ---
 name: Verify Edit success before committing and claiming cleanup landed
-description: A failed Edit (string-not-found) leaves the file unchanged — run git diff before you claim a cleanup/removal landed
+description: Claiming a cleanup or removal landed? git diff first — a failed Edit (string-not-found) leaves the file unchanged
 type: feedback
 scope: global
 ---

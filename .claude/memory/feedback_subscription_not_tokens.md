@@ -1,6 +1,6 @@
 ---
 name: Never design for per-token API billing while subscriptions exist
-description: Never propose moving fleet work onto per-token API billing — rule those options out early rather than costing them
+description: Weighing an option that bills per-token API? Rule it out early — fleet work stays on the subscription, don't cost it
 type: feedback
 scope: global
 ---

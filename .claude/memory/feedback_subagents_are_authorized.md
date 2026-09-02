@@ -1,6 +1,6 @@
 ---
 name: Subagents are authorized, and required for internal review
-description: Adversarial review before any PR/CR is EXPECTED, not optional — EVERY agent may spawn subagents, no permission needed
+description: Need permission to spawn a reviewer, or the diff too small? No — adversarial review before any PR/CR is expected
 type: feedback
 scope: global
 ---

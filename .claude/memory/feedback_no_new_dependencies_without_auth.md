@@ -1,6 +1,6 @@
 ---
 name: Never add new dependencies without express authorization
-description: Add a dependency only with a damn-good reason and Kyle's explicit yes — no surprises; propose via the no-new-deps skill
+description: Adding a package or dependency? Only with a damn-good reason and Kyle's explicit yes — propose via the no-new-deps skill
 type: feedback
 scope: global
 ---

@@ -1,6 +1,6 @@
 ---
 name: Research it yourself before asking Kyle to go look
-description: Exhaust your own research before asking Kyle to gather info — never use him as a sensor for what's publicly documented
+description: Think 'only Kyle can know this'? Usually wrong — a model or version number means it's documented. Search before you ask
 type: feedback
 scope: global
 ---

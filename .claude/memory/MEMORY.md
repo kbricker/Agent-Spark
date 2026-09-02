@@ -26,74 +26,74 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 <!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
 ## Global (managed by propagate-shared-config — copies of `wfa2/orchestrator-shared/memory/`; edit canonical, never these, the next sync reverts local edits silently)
-- feedback_always_plan.md — Research and write a formal plan before building — never skip to code; only a true one-line obvious fix skips planning
-- feedback_anchor_propagation_checks_on_the_commit.md — Verify a propagation landed with git log against the commit you knew — a clean tree is the SUCCESS state, not absence
-- feedback_brief_subagents_with_recall.md — Brief a subagent to hive_recall its domain pack before it builds — prefab YAML, shaders and VaEx internals
+- feedback_always_plan.md — Reaching for the editor before a plan exists? Only a true one-line obvious fix skips planning — write the plan first
+- feedback_anchor_propagation_checks_on_the_commit.md — Checking a propagation landed? A clean tree is success, not absence — verify with git log against the commit you knew
+- feedback_brief_subagents_with_recall.md — Spawning a subagent on domain work? Tell it to hive_recall its pack first — prefab YAML, shaders, VaEx internals
 - feedback_build_straight_through.md — Design locked, Kyle says build/proceed — run the whole plan end-to-end, don't stop to checkpoint after the foundation
-- feedback_can_kill_processes.md — Kill only processes you started, by PID — the kill-guard hook denies image-name kills; provenance is still on you
+- feedback_can_kill_processes.md — Reaching for taskkill? Kill only what you started, by PID — image-name kills are denied and provenance is still on you
 - feedback_check_docs_on_harness_friction.md — Read Claude Code docs when shaping any ticket about agent behaviour — docs first, before measuring, not just on friction
 - feedback_check_for_an_existing_ticket_before_growing_scope.md — If Kyle has no context for the question you're about to ask, the scope is yours not his — search for an existing ticket
-- feedback_check_what_overrides_the_file.md — The file you are about to edit is often not the authority — check for a generated block, fence comment, or .d/ drop-in
-- feedback_checklist_items_phase_with_gates.md — Phase checklist items by status gate — anything at-or-after merge is VALIDATION; unchecked TASK items block CodeReview
-- feedback_concise_docs_no_ascii.md — Compressing a deliverable doc is a correctness pass, not style — bullets over prose, never ASCII diagrams
-- feedback_correct_the_assertions_not_just_the_log.md — A plan's description and checklist are assertions a reader acts on — a shaping-log entry does not update them
-- feedback_credentials_radioactive.md — Credentials are radioactive — only forge handles them; never touch a credential yourself, route credential work to forge
-- feedback_define_done_by_user_visible_behavior.md — Done means the user can do the thing the plan promised — a correct on-disk shape with no working UI is NOT done
+- feedback_check_what_overrides_the_file.md — About to edit a config/memory/index file? Ask what ASSEMBLES it first — a generated block or .d/ drop-in silently wins
+- feedback_checklist_items_phase_with_gates.md — Writing a plan's checklist? Phase by status gate — at-or-after-merge is VALIDATION; unchecked TASKs block CodeReview
+- feedback_concise_docs_no_ascii.md — Writing or compressing a doc for Kyle? It's a correctness pass, not style — bullets over prose, never ASCII diagrams
+- feedback_correct_the_assertions_not_just_the_log.md — Logged a change to a plan? A reader acts on its description and checklist — a log entry does not update those
+- feedback_credentials_radioactive.md — Task would have you read, paste, or handle a key or token? Stop — credentials are radioactive, route it to forge
+- feedback_define_done_by_user_visible_behavior.md — Marking done because the on-disk shape is right? Not done until the user can actually do the thing the plan promised
 - feedback_delegation_boundary.md — Handing work off or spawning an agent? Inline for tight loops, subagent by default, named agent only if it earns it
-- feedback_dont_assume_staged_scope.md — Don't assume which staged/modified files belong in a commit/PR — if scope is ambiguous, ask Kyle
-- feedback_dont_gate_on_manual_validation.md — Don't gate closure on Kyle-only manual or impossible checks — ship non-breaking work to real use, new ticket if wrong
+- feedback_dont_assume_staged_scope.md — About to commit the staged/modified files? Don't assume they're all yours — if the scope is ambiguous, ask Kyle
+- feedback_dont_gate_on_manual_validation.md — Closure blocked on a check only Kyle can run, or that can't happen? Ship non-breaking work to use; new ticket if wrong
 - feedback_enforce_user_tech_choices.md — When user specifies a technology stack, agents MUST follow it exactly — don't let agents substitute frameworks
-- feedback_fast_track_is_default.md — Fast-track is THE orchestration path on every plan for every agent — play dev + review inline, fan out to subagents
-- feedback_fix_workflow_problems_when_found.md — Fix a workflow or process defect the moment you hit it, or file a ticket to circle back — breaking context is worth it
-- feedback_kyle_reads_and_directs.md — Kyle reads and directs, never hands-on — CodeRabbit reviews PRs, agents edit tickets; don't build him hands-on controls
-- feedback_kyle_sets_start_and_stop.md — Never suggest stopping/wrapping up, and never start work he hasn't greenlit — Kyle signals both go and stop explicitly
-- feedback_log_review_findings.md — Every settled review (internal, subagent, CodeRabbit) logs surviving and skipped findings via hive_review_finding_add
-- feedback_move_tickets_with_work.md — Ticket status tracks reality — first edit→Development, PR opened→CodeReview, merged+deployed→Completed; inline work too
-- feedback_never_defer_scope.md — Do the scope Kyle named, exactly — never substitute, shift, or defer it; change scope only by convincing him first
-- feedback_never_force_push_agent.md — Never force-push a branch from an agent-owned clone others commit to — cherry-pick or rebase instead
-- feedback_never_kill_chrome.md — NEVER kill Chrome by ANY means, PID included — the kill-guard hook stops name kills; scoped CDP Browser.close only
-- feedback_no_assign_agent.md — Never set assignedAgent when Kyle is doing the work directly — it can trigger that agent to start working the plan
-- feedback_no_claude_artifacts_local_docs_only.md — Never publish docs/reports/charts/dashboards as claude.ai Artifacts — deliverables land on disk in the project folder
-- feedback_no_commits_in_agents_working_tree.md — Never commit in a repo checkout an agent is actively working in — check current branch first
-- feedback_no_docstrings.md — NEVER write function docstrings anywhere — 100% rule; don't sweep existing ones; ignore CodeRabbit docstring warnings
-- feedback_no_new_abstractions_over_canonical_primitives.md — Use the canonical primitive already in the codebase, compose inline — don't invent a parallel abstraction to satisfy DRY
-- feedback_no_new_dependencies_without_auth.md — Add a dependency only with a damn-good reason and Kyle's explicit yes — no surprises; propose via the no-new-deps skill
-- feedback_no_shims.md — Never leave a forwarder stub behind — delete the old location and update every caller in the same change
-- feedback_no_shortcuts.md — No shortcuts — build Hive right the first time; sloppy architecture means endless upkeep that steals game-dev time
-- feedback_no_unrequested_ux.md — Plan descriptions and checklists list only behaviors Kyle named — never ship an inferred UX affordance as authorized
-- feedback_output_reaches_nobody.md — Primary agents' terminal output goes only to Kyle's screen — reach any agent via hive_send_message / hive_respond
-- feedback_pair_directive_briefs_with_dissent.md — Every confident technical assertion in a subagent brief needs an explicit invitation to contradict it
-- feedback_plan_preconditions.md — Before dev, plans name each stateful surface's lifecycle and async flow's staleness/single-flight guard, or none touched
-- feedback_plans_default_planning.md — On any new discovery — SEARCH for a home FIRST; a new ticket is the LAST resort; status = Planning, never Backlog
-- feedback_prose_reference_is_not_a_link.md — Prose isn't a link — set questionId/index markers in the same edit; review reads prose only, missing links fail silently
-- feedback_prove_the_check_ran.md — Prove the check ran before believing what it says — a verification that never applied is as green as correct code
-- feedback_read_the_assembled_artifact.md — Read the assembled file in place — correct text goes false by adjacency and no diff shows it; worst when drafted blind
-- feedback_record_as_you_shape.md — hive_plan_log_add every entry as it happens (shaping AND dev/review) — the WHY record; entry types in shaping-log skill
-- feedback_refer_to_plans_by_display_number.md — Once a plan has a parent, call it by display number (664.1), not bare id (654); the bare id stays the API argument
-- feedback_research_before_asking.md — Exhaust your own research before asking Kyle to gather info — never use him as a sensor for what's publicly documented
-- feedback_review_vs_done.md — Review agents must not check off checklist items during review — checked means code is done, not validated
-- feedback_solve_the_actual_problem.md — Implementations must address the root problem — trace all affected paths, not just the obvious one
-- feedback_spawn_tools_retired.md — Never call hive_spawn_agent — the pipeline is retired though the tool still advertises it; fan out subagents instead
-- feedback_stay_within_your_remit.md — Findings flow anywhere and are never outside remit; implementation stays within your composed roles in composition.json
-- feedback_subagents_are_authorized.md — Adversarial review before any PR/CR is EXPECTED, not optional — EVERY agent may spawn subagents, no permission needed
-- feedback_subscription_not_tokens.md — Never propose moving fleet work onto per-token API billing — rule those options out early rather than costing them
-- feedback_test_everything_mechanically_testable.md — Kyle's time is for eye, flow, UX and gameplay judgement only — run every machine-runnable check yourself first
-- feedback_verify_against_production_before_merging.md — If a change transforms data or adds an invariant, verify the RESULT against production BEFORE merging, not after
-- feedback_verify_before_asserting.md — Verify claims against actual state before asserting — never assume; agreement or your own past words aren't verification
-- feedback_verify_edit_before_commit.md — A failed Edit (string-not-found) leaves the file unchanged — run git diff before you claim a cleanup/removal landed
-- feedback_verify_your_own_harness_state.md — Check the tool in question before accepting any claim about your own session — schema, restart, gating — as a gate
-- reference_gh_cli_is_wonderforge_account.md — gh CLI is authenticated as kyle-wf (WonderForge) — it cannot create PRs on kbricker personal repos (Spark projects)
+- feedback_fast_track_is_default.md — Starting any plan? Fast-track is the path — play dev + review inline, fan out to subagents; there is no other pipeline
+- feedback_fix_workflow_problems_when_found.md — Hit a workflow or process defect mid-task? Fix it now or ticket it — breaking context is worth it; don't just note it
+- feedback_kyle_reads_and_directs.md — About to build Kyle a button or hands-on control? Don't — he reads and directs; CodeRabbit reviews, agents edit tickets
+- feedback_kyle_sets_start_and_stop.md — About to suggest wrapping up, or start the next thing unprompted? Kyle signals go and stop explicitly — wait for both
+- feedback_log_review_findings.md — A review just settled? Not finished until surviving AND skipped findings are in the store via hive_review_finding_add
+- feedback_move_tickets_with_work.md — Started editing, opened a PR, or merged+deployed? Move the ticket — Development/CodeReview/Completed, inline work too
+- feedback_never_defer_scope.md — About to trim, shift, or defer what Kyle named? Don't — do the scope exactly; change it only by convincing him first
+- feedback_never_force_push_agent.md — About to force-push from an agent-owned clone others commit to? Don't — cherry-pick or rebase instead
+- feedback_never_kill_chrome.md — Reaching to kill Chrome — even by PID, even a wedged tab? Never; only scoped CDP Browser.close (kill-guard blocks names)
+- feedback_no_assign_agent.md — Setting assignedAgent on a plan Kyle is working himself? Don't — it can wake that agent to start working the plan
+- feedback_no_claude_artifacts_local_docs_only.md — Publishing a doc, report, chart, or dashboard as a claude.ai Artifact? Never — deliverables land on disk in the project
+- feedback_no_commits_in_agents_working_tree.md — About to commit in a clone an agent works in? Check the current branch first — never commit into its working tree
+- feedback_no_docstrings.md — Adding a function docstring, or CodeRabbit wants one? Never — 100% rule; ignore the warning, don't sweep existing ones
+- feedback_no_new_abstractions_over_canonical_primitives.md — Tempted to wrap repetition in a new helper for DRY? Use the canonical primitive already there, compose inline instead
+- feedback_no_new_dependencies_without_auth.md — Adding a package or dependency? Only with a damn-good reason and Kyle's explicit yes — propose via the no-new-deps skill
+- feedback_no_shims.md — Moving or renaming code? Delete the old location and update every caller in the same change — no forwarder stub
+- feedback_no_shortcuts.md — The quick way tempting? Build Hive right the first time — sloppy architecture means upkeep that steals game-dev time
+- feedback_no_unrequested_ux.md — An obvious UX nicety feels implied? Not authorized — plans list only behaviors Kyle named; never ship inferred ones
+- feedback_output_reaches_nobody.md — Reply meant for another agent? From a primary session it reaches only Kyle — use hive_send_message / hive_respond
+- feedback_pair_directive_briefs_with_dissent.md — Writing a confident technical claim into a subagent brief? Pair it with an explicit invitation to contradict it
+- feedback_plan_preconditions.md — Moving a plan past Planning? Name each stateful surface's lifecycle and each async flow's staleness/single-flight guard
+- feedback_plans_default_planning.md — New discovery or finding? SEARCH for a home first — a new ticket is the last resort; status Planning, never Backlog
+- feedback_prose_reference_is_not_a_link.md — Wrote 'see the X above'? Prose isn't a link — set the questionId/index marker in the same edit or it fails silently
+- feedback_prove_the_check_ran.md — A check came back green? Prove it actually ran — a verification that never applied looks identical to correct code
+- feedback_read_the_assembled_artifact.md — Your diff looks right? Read the assembled file in place — correct text goes false by adjacency and no diff shows it
+- feedback_record_as_you_shape.md — A question, answer, or decision just happened? hive_plan_log_add it now, not later — batching loses the WHY record
+- feedback_refer_to_plans_by_display_number.md — Naming a parented plan to a reader? Use its display number (664.1), not the bare id (654) — bare id stays the API arg
+- feedback_research_before_asking.md — Think 'only Kyle can know this'? Usually wrong — a model or version number means it's documented. Search before you ask
+- feedback_review_vs_done.md — Reviewing and tempted to tick checklist items? Don't — checked means the code is done, not that review validated it
+- feedback_solve_the_actual_problem.md — Fixing the obvious path? Trace every affected path first — address the root problem, not just the literal ask
+- feedback_spawn_tools_retired.md — hive_spawn_agent still shows in the tool list? It's retired — never call it; fan out subagents instead
+- feedback_stay_within_your_remit.md — A finding outside your area feels 'not my remit'? Report it — findings flow anywhere; only IMPLEMENTATION stays in roles
+- feedback_subagents_are_authorized.md — Need permission to spawn a reviewer, or the diff too small? No — adversarial review before any PR/CR is expected
+- feedback_subscription_not_tokens.md — Weighing an option that bills per-token API? Rule it out early — fleet work stays on the subscription, don't cost it
+- feedback_test_everything_mechanically_testable.md — Handing Kyle something to try? Run every machine-runnable check yourself first — his time is for eye/flow/UX/gameplay
+- feedback_verify_against_production_before_merging.md — Change transforms data or adds an invariant? Verify the RESULT against production BEFORE merging, not after
+- feedback_verify_before_asserting.md — Stating as fact something unchecked this turn? Verify — another agent agreeing, or your own past words, isn't proof
+- feedback_verify_edit_before_commit.md — Claiming a cleanup or removal landed? git diff first — a failed Edit (string-not-found) leaves the file unchanged
+- feedback_verify_your_own_harness_state.md — A claim about your own session — restarted, gated, schema changed? Check the tool itself before you accept it
+- reference_gh_cli_is_wonderforge_account.md — Using gh on a kbricker personal repo (Spark)? It's authed as kyle-wf (WonderForge) and can't create PRs there
 - reference_untrusted_dir_drops_permissions.md — Allow rules inert? Read hasTrustDialogAccepted in ~/.claude.json first — untrusted dirs void .claude/settings.json
 <!-- END GLOBAL SECTION -->
 
 <!-- BEGIN ROLE SECTION: orchestrator (managed by propagate-shared-config — do not edit by hand) -->
 ## Role: orchestrator (managed — byte-identical copies of `wfa2/orchestrator-shared/roles/orchestrator/memory/`; edit canonical, never these)
 - feedback_agent_branch.md — Before any agent does work, first instruct it to checkout the correct branch — step 1 for all agents
-- feedback_channel_handoff_continuity.md — Kyle's mid-stream switch between desk and Hive channel is the same conversation on a new transport, not a new request
-- feedback_channel_rewatch_after_spawn.md — Check hive_channel_watching before calling silent agents stuck — process boundaries clear the process-local watch list
-- feedback_hold_message_explicit_scope.md — Standing an agent down must name every forbidden surface — they still edit plan checklists and descriptions
+- feedback_channel_handoff_continuity.md — Kyle messages from the Hive channel mid-task? Same conversation on a new transport — not a new request, don't restart
+- feedback_channel_rewatch_after_spawn.md — An agent gone silent — stuck, or unwatched? Check hive_channel_watching first; any process boundary clears that list
+- feedback_hold_message_explicit_scope.md — Standing an agent down? Name every forbidden surface — a plain HOLD still lets it edit plan checklists and descriptions
 - feedback_orchestrate_proactively.md — After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
-- feedback_use_channel_events.md — Watch for agent_idle/agent_working events from hive-channel instead of blind sleeps when waiting for agent responses
+- feedback_use_channel_events.md — Waiting on an agent's response? Watch for agent_idle/agent_working channel events — never a blind sleep
 - reference_channel_launch.md — Five PRIMARY agents: .lnk launchers, plugin channel; 3dpp is RemoteAgent-hosted; read for claudeArgs or deaf agents
 <!-- END ROLE SECTION: orchestrator -->
 

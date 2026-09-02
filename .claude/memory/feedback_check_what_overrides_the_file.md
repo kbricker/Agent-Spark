@@ -1,6 +1,6 @@
 ---
 name: Check which config layer wins before you edit
-description: The file you are about to edit is often not the authority — check for a generated block, fence comment, or .d/ drop-in
+description: About to edit a config/memory/index file? Ask what ASSEMBLES it first — a generated block or .d/ drop-in silently wins
 type: feedback
 scope: global
 ---

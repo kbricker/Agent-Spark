@@ -1,6 +1,6 @@
 ---
 name: A plan is done when the user can use the feature, not when the format change is on disk
-description: Done means the user can do the thing the plan promised — a correct on-disk shape with no working UI is NOT done
+description: Marking done because the on-disk shape is right? Not done until the user can actually do the thing the plan promised
 type: feedback
 scope: global
 ---

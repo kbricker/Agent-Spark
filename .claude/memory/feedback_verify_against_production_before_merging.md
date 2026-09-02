@@ -1,6 +1,6 @@
 ---
 name: Verify against production before merging
-description: If a change transforms data or adds an invariant, verify the RESULT against production BEFORE merging, not after
+description: Change transforms data or adds an invariant? Verify the RESULT against production BEFORE merging, not after
 type: feedback
 scope: global
 ---

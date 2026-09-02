@@ -1,6 +1,6 @@
 ---
 name: The gh CLI only holds the kyle-wf WonderForge account
-description: gh CLI is authenticated as kyle-wf (WonderForge) — it cannot create PRs on kbricker personal repos (Spark projects)
+description: Using gh on a kbricker personal repo (Spark)? It's authed as kyle-wf (WonderForge) and can't create PRs there
 type: reference
 scope: global
 ---

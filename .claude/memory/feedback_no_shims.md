@@ -1,6 +1,6 @@
 ---
 name: Never leave shims when moving code
-description: Never leave a forwarder stub behind — delete the old location and update every caller in the same change
+description: Moving or renaming code? Delete the old location and update every caller in the same change — no forwarder stub
 type: feedback
 scope: global
 ---

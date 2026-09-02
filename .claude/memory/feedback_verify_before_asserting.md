@@ -1,6 +1,6 @@
 ---
 name: Verify before asserting
-description: Verify claims against actual state before asserting — never assume; agreement or your own past words aren't verification
+description: Stating as fact something unchecked this turn? Verify — another agent agreeing, or your own past words, isn't proof
 type: feedback
 scope: global
 ---
