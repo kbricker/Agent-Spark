@@ -1,6 +1,6 @@
 ---
 name: feedback_bench_task_lists_are_dated
-description: "TendWright bench task lists are dated files — docs/bench-tasks-YYYY-MM-DD.md, one per session, never one rolling document"
+description: Writing a TendWright bench task list? Dated file docs/bench-tasks-YYYY-MM-DD.md, one per session — never one rolling doc
 metadata:
   node_type: memory
   type: feedback

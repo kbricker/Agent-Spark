@@ -1,6 +1,6 @@
 ---
 name: user_printing_tree-supports
-description: "Kyle always 3D-prints with tree supports — prefers wasting material over failed prints; don't contort CAD designs toward support-free geometry"
+description: Designing a part for 3D print? Kyle always uses tree supports — don't contort CAD toward support-free geometry
 metadata: 
   node_type: memory
   type: user

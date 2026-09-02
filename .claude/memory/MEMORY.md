@@ -6,8 +6,8 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 ## Shared conventions (Spark-local — apply to every small project)
 
-- feedback_personal_repo_git_identity.md — Spark's projects are Kyle's PERSONAL repos — commit as Kyle Bricker <kyle.bricker@gmail.com>, never the WonderForge …
-- user_printing_tree_supports.md — Kyle always 3D-prints with tree supports (PLA+ default) — prefers wasted material over failed prints; design CAD for …
+- feedback_personal_repo_git_identity.md — Committing in a Spark project? Kyle's PERSONAL repo — commit as Kyle Bricker <kyle.bricker@gmail.com>, never WonderForge
+- user_printing_tree_supports.md — Designing a part for 3D print? Kyle always uses tree supports — don't contort CAD toward support-free geometry
 
 ## Orbital
 
@@ -16,7 +16,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 ## TendWright
 
 - project_tendwright.md — TendWright — robotic CNC machine-tending cell (Hive app 8, epic #612, rungs #604–#610 in order); MuJoCo+mink+uv stack …
-- feedback_bench_task_lists_are_dated.md — Bench task lists are DATED files — `docs/bench-tasks-YYYY-MM-DD.md`, one per session, never one rolling document that …
+- feedback_bench_task_lists_are_dated.md — Writing a TendWright bench task list? Dated file docs/bench-tasks-YYYY-MM-DD.md, one per session — never one rolling doc
 - reference_lab_control_authority.md — spark may actuate ONLY: cell1 wake (WoL from desk) + shutdown, mains, bench light, ARM POWER (default OFF, per-task; ON anywhere, OFF only from cell1) — powering the arm is mine, MOVING it unattended never is; check each gate first; topology: TendWright/docs/lab-inventory.md
 - reference_cell1_operations.md — cell1 (TendWright hardware runtime, Minisforum UM350) — hardware identity, no BIOS update exists, MUJOCO_GL=egl …
 

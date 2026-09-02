@@ -1,6 +1,6 @@
 ---
 name: feedback_personal_repo_git_identity
-description: Spark's projects are Kyle's PERSONAL repos — commit as Kyle Bricker <kyle.bricker@gmail.com>, never the WonderForge identity
+description: Committing in a Spark project? Kyle's PERSONAL repo — commit as Kyle Bricker <kyle.bricker@gmail.com>, never WonderForge
 type: feedback
 ---
 
