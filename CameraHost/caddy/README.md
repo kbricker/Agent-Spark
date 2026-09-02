@@ -38,6 +38,56 @@ Drive is a SkyHawk ST4000VX016, **101.85 × 146.99 × 20.20 mm**, so 1.08 mm per
 The left move buys 1.00 mm of outboard room for the screw head, where stock had none.
 Holes at 5.00 clear the 4.53 mm screw shoulder by 0.47 mm — dremel if they want more.
 
+## How this was built, original -> final
+
+Five steps. `build-caddy.py` does 3-5; steps 1-2 are measurement you only redo if the
+base model changes.
+
+**1. Find each tab member's real Y footprint.** Not the boss — the whole member,
+including the ramps, which flare outward as they sweep down to the floor. Section the
+part at z=2.6 (just above the 2.00 mm floor, where the members are widest) and read off
+the contiguous runs of side material:
+
+    left   Y 19.2-64.5   and  Y 120.8-147.5
+    right  Y 59.5-87.5   and  Y 121.2-145.5
+
+**2. Put the patch boundaries in the gaps between those runs.** This is the whole trick.
+A boundary that lands in empty space cuts nothing; one that lands mid-member slices a
+ramp and leaves a step. The chosen boxes:
+
+    L-A  Y  15.0-70.0    x  -6.0 to  6.0    shift +1.0   (inboard)
+    L-B  Y 115.0-149.9   x  -1.0 to  6.0    shift +1.0   (inboard)
+    R-A  Y  57.0-90.0    x 103.0 to 112.0   shift +2.5   (outboard)
+    R-B  Y 119.0-149.9   x 103.0 to 112.0   shift +2.5   (outboard)
+
+All four span z 2.0 to 17.6 — from the floor top up. That keeps the floor plate out of
+the move, so the members shift and the tray they stand on does not. R-B starts at
+Y=119.0 specifically to clear the latch arm that ends at Y=117.1.
+
+**3. Move each member.** Duplicate the whole part, translate the copy in X by the shift,
+INTERSECT the copy with the patch box (that yields just the shifted member), DIFFERENCE
+the same box out of the original, then UNION the shifted member back in. Four times.
+
+**4. Cut the four holes**, Ø5.00, at the moved wall centres — left x=3.00, right
+x=109.00, both at Z=8.50, Y unchanged at 32.25 / 133.75 / 73.75 / 133.75.
+
+> Cut them with the cylinder rotated ~1.7 degrees and an odd vertex count (97). Cutting
+> a bore concentric with an existing one produces coplanar facets that the boolean
+> mishandles — a straight cut left 34 open edges clustered at one hole. Breaking the
+> facet alignment fixes it. This is not cosmetic; it is the difference between a
+> watertight mesh and a broken one.
+
+**5. Clean and export** — merge by distance (1e-4), recalculate normals outward.
+
+Then verify, and verify these four specifically:
+
+- watertight, 0 open edges, and **one connected body** (a shift larger than the wall
+  thickness can leave a member floating, joined only through the floor);
+- envelope still -4.00…120.50 in X;
+- floor-level structure Y-extents identical to the source on both sides — this is what
+  proves no ramp was cut;
+- hole diameters and the tab gap, by true section.
+
 ## Two things that will bite anyone editing this
 
 **Tab members are much wider in Y than the holes suggest.** The ramps flare outward as
