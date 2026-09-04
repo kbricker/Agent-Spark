@@ -8,6 +8,8 @@ scope: global
 
 This skill is a **hard procedural gate**. You must run through it in order before any new dependency lands in any project. Do not skip steps. Do not silently bypass this skill because "it's a small one-liner helper" — those are the worst offenders because they justify themselves on the margin, and over years they become the accumulated framework creep Kyle is closing the gate on right now.
 
+How widely a package is used is not an exemption, and neither is the standard library lacking an equivalent — "everyone uses this one" and "there's no built-in for it" are the two most common reasons a dep is genuinely wanted, so they are arguments to make inside the proposal at Step 3, never reasons to skip it.
+
 ## When to invoke this skill
 
 **Every single time you are about to add a new dependency, or recommend one, or scope one into a plan.** Specifically:
@@ -107,12 +109,6 @@ If you are a subagent working a piece of a plan and you hit a "I need library X 
 2. **Stop and return.** Your final output is the report — give it the Step 3 proposal shape. Include: the plan ID, the checklist item you're working on, and a concrete "write it ourselves vs. install" tradeoff.
 3. **The agent that spawned you relays to Kyle and comes back with an explicit yes/no.** Do NOT assume the implementation path requires the dep — if Kyle says no, the approach gets reworked.
 4. **Default to writing it yourself** if any ambiguity exists in whether you're authorized. The cost of hand-rolling a small utility is lower than the cost of accumulated framework debt.
-
-## Escape hatches
-
-**There are none.** No "tiny one-liner helper" exemption. No "everyone uses this one" exemption. No "it's just a dev dep" exemption. No "the standard library doesn't have X so we need Y" exemption without running through the proposal ritual.
-
-If you find yourself wanting to skip this skill because "surely this one is fine," that's precisely the moment the skill exists for. Run it.
 
 ## What this skill implies for existing state
 

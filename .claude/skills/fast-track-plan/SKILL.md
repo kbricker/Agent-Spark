@@ -88,7 +88,7 @@ hive_plan_update({id, assignedAgent: "overwatch", reviewAgent: "overwatch"})
 >
 > So the intended rhythm is **shape → planning-review → Ready → stop**, with starting the build as a separate later act. Almost every plan begins as a rough goal that needs shaping (see `feedback_plans_default_planning`), which makes Planning→Review→Ready the most informative stretch of the board: it separates "still being figured out" from "gap-checked and buildable." Set each when it is true, not when you happen to reach this step.
 >
-> Batch all four calls together **only** when the plan arrived already shaped, has genuinely been gap-checked, and you are starting work immediately. That is the rare case, not the default — and this gate previously instructed the batch unconditionally, which is why no plan ever rests in Ready today.
+> Batch all four calls together **only** when the plan arrived already shaped, has genuinely been gap-checked, and you are starting work immediately. That is the rare case, not the default: batching by habit is why no plan rests in Ready today.
 >
 > This gate is here, not in step 8, on purpose. Step 8 lists the whole state machine including "before starting work" — but by the time you read step 8 you have already done the work, so that line arrives too late to act on. Measured 2026-07-30: 16 plans sat in Planning with checklist items already checked, 2 of them fully checked; 5 more had a branch or PR while still pre-Development.
 

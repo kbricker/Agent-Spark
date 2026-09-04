@@ -6,13 +6,13 @@ scope: global
 
 # No Deferred Work Without Express Auth
 
-This skill is a **hard procedural gate** on deferral. Run through it in order before you defer, postpone, push-out, or "follow-up-plan" any piece of scoped work. Do not skip steps. Do not silently bypass this skill because "it's a small detail" or "the test agent will catch it later" — those are exactly the deferrals that turn into invisible platform failures three weeks later.
+This skill is a **hard procedural gate** on deferral. Run through it in order before you defer, postpone, push-out, or "follow-up-plan" any piece of scoped work. Do not skip steps. Do not silently bypass this skill because "it's a small detail" or "review will catch it later" — those are exactly the deferrals that turn into invisible platform failures three weeks later. How small the piece is, and how confident you are that someone downstream will notice, are not exemptions.
 
 ## Why this skill exists
 
-**The #280 incident (2026-05-02 → discovered 2026-05-22). Historical — the agent names below are NOT today's roster.** Plan #280 renamed the then-current persistent dev roster (D1→vaexdev2, D2→vaexdev3, dev-backend→vaexserverdev) and shipped the wake/sleep lifecycle. Those three were retired on 2026-08-07, and **the `vaexdev2` key was later reused for an unrelated agent** — today's vaexdev2 is a virtual orchestrator created 2026-08-04, not the renamed D1. Read this section for the failure shape only; do not take any identity claim in it as current. The plan was marked Completed with all 23 checklist items green. But the renamed home folders were left with only old D1/D2/dev-backend CLAUDE.md content carried over by the rename, and were never given `.mcp.json` or `.claude/settings.json`. The deferral was noted in `deploy-persistent-agent-config` SKILL.md as *"templates for the renamed roster have not been authored yet — flagged in the README as a follow-up plan"* — and that was the only signal back to Kyle.
+A rename plan once shipped with all 23 checklist items green while the renamed agents were left unprovisioned — no `.mcp.json`, no `.claude/settings.json`. The gap was recorded in a skill README as *"flagged in the README as a follow-up plan"*, and that was the only signal back to Kyle. The follow-up was never filed. Three weeks later those agents booted with zero Hive MCP servers registered — un-orchestrable — and the plan had read Completed the whole time.
 
-Three weeks later, when vaexdev tried to dispatch real plan work to vaexdev2 and vaexdev3, both agents booted with **zero Hive MCP servers registered**. Effectively un-orchestrable. The "follow-up plan" was never filed, never planned, never executed. The deferral was invisible from the dashboard, the plan was Completed on paper, and the failure surfaced as a confusing "the agents woke but didn't work" symptom that took targeted diagnosis to root-cause.
+The shape to recognise: a deferral that lives anywhere except the dashboard is invisible, and a plan claiming Completed while a piece of its promise is unmet is a lie the board tells for weeks.
 
 Kyle's response (2026-05-22): *"ok that was an error to leave this work undone with no indication to me haha … file the hive plan, and create a skill for this, it should be 100% of the time that work is completed, never deferred without discussion and explicit direction to move tasks to other tickets"*.
 
@@ -32,7 +32,7 @@ This skill is the gate that closes that loop.
 - Any moment a review agent flags something and you're about to respond with "valid finding, but out of scope — file a follow-up"
 - Any moment a CodeRabbit finding gets dismissed as "not in this PR's scope"
 
-If you're not sure whether what you're about to do counts as deferral, invoke this skill anyway. Cost of running it: 60 seconds. Cost of missing it: the #280 incident.
+If you're not sure whether what you're about to do counts as deferral, invoke this skill anyway. Cost of running it: 60 seconds. Cost of missing it: the failure above.
 
 ## What counts as "deferring scoped work"
 
@@ -89,7 +89,7 @@ Produce the following as a single chat message to Kyle, in this exact shape:
 **What breaks if we defer:**
 - User-facing impact: what can the user not do until the deferred piece lands?
 - Platform impact: what other agents / systems are subtly broken by the deferral?
-- Discoverability of the gap: how would Kyle notice if I deferred and never came back to it? (If the answer is "he wouldn't unless I tell him" — that is the #280 trap; flag it loudly.)
+- Discoverability of the gap: how would Kyle notice if I deferred and never came back to it? (If the answer is "he wouldn't unless I tell him" — that is exactly the trap described at the top of this skill; flag it loudly.)
 
 **Proposed disposition:**
 1. **File new plan** — what plan ID/name, when does it get prioritized
@@ -154,12 +154,6 @@ If you are a subagent working a piece of a plan and you hit a "let's defer this 
 4. **Default to landing it inline** if there is any ambiguity about whether you are authorized to defer. An extra hour in the current change is cheaper than an invisible platform gap.
 
 **A subagent's deferral is the easiest one to miss, which is why this section exists.** It never reaches Kyle on its own: it arrives as one line inside a summary the spawning agent skims, and "I left X as a follow-up" reads like diligence rather than a decision that needed authorization. If you are the spawning agent, treat any deferral language in a subagent's report as an unanswered question addressed to Kyle — not as a note you may accept on his behalf.
-
-## Escape hatches
-
-**There are none.** No "tiny detail" exemption. No "the review agent will catch it" exemption. No "it's just a follow-up" exemption. No "we agreed in a different session" exemption.
-
-If you find yourself wanting to skip this skill because "surely this one is fine," that's precisely the moment the skill exists for. Run it.
 
 ## What this skill implies for plan-completion discipline
 
