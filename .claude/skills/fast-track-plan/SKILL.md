@@ -101,7 +101,7 @@ hive_plan_update({id, assignedAgent: "overwatch", reviewAgent: "overwatch"})
 
 **Fan out here when it helps.** See the "Fan-out pattern" section below.
 
-**Grok dev lane (plans #984/984.1 — flag-gated: agents with `grokLane: true` on their composition.json entry; overwatch and vaexdev today).** One machine-level grok install + Kyle's SuperGrok login serves every flagged primary on this box, and your settings.json carries the dispatcher allow rule only if you are flagged — not flagged means this lane is not yours; implementation goes to your dev subagent as before. Implementation pieces that would go to your dev subagent can instead run on Grok (flat subscription fee — zero Claude context/quota consumed):
+**Grok dev lane (plans #984/984.1 — flag-gated: agents with `grokLane: true` on their composition.json entry; overwatch, vaexdev and vaexdev2 today).** One machine-level grok install + Kyle's SuperGrok login serves every flagged primary on this box, and your settings.json carries the dispatcher allow rule only if you are flagged — not flagged means this lane is not yours; implementation goes to your dev subagent as before. Implementation pieces that would go to your dev subagent can instead run on Grok (flat subscription fee — zero Claude context/quota consumed):
 
 ```
 git -C <repo> worktree add -b plan<id>/<slug> C:/Projects/grok-worktrees/<repo>-<id> <default>
