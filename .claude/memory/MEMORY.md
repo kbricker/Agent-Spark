@@ -48,7 +48,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_kyle_reads_and_directs.md — About to build Kyle a button or hands-on control? Don't — he reads and directs; CodeRabbit reviews, agents edit tickets
 - feedback_kyle_sets_start_and_stop.md — About to suggest wrapping up, or start the next thing unprompted? Kyle signals go and stop explicitly — wait for both
 - feedback_log_review_findings.md — A review just settled? Not finished until surviving AND skipped findings are in the store via hive_review_finding_add
-- feedback_move_tickets_with_work.md — Started editing, opened a PR, or merged+deployed? Move the ticket — Development/CodeReview/Completed, inline work too
+- feedback_move_tickets_with_work.md — Started or stopped a ticket? Move it (Development/CodeReview/Completed) and declare it: hive_set_status planId or ""
 - feedback_never_defer_scope.md — About to trim, shift, or defer what Kyle named? Don't — do the scope exactly; change it only by convincing him first
 - feedback_never_force_push_agent.md — About to force-push from an agent-owned clone others commit to? Don't — cherry-pick or rebase instead
 - feedback_never_kill_chrome.md — Reaching to kill Chrome — even by PID, even a wedged tab? Never; only scoped CDP Browser.close (kill-guard blocks names)

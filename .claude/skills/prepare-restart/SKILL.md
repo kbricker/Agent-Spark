@@ -26,6 +26,7 @@ Write for a cold reader — the fresh session has zero session-local context. No
 - **Header:** agent key, date, and why this restart is happening (what change is being absorbed).
 - **Post-restart verification first:** any check that proves the new config/binary actually landed (e.g. "your hive_send_message description must read X" after a McpBridge change; `/health` version after a dashboard deploy). The fresh session runs these before resuming work.
 - **In-flight work, in priority order:** for each item — plan number + current status, the exact next step, and the event/gate it's waiting on (PR number, CR state, validation item, a message from another agent).
+- **Declared plan to re-declare:** the plan id this session had declared with `hive_set_status(planId)`, if any. The restart clears it server-side (#937 — a new session id expires the declaration), so the fresh session re-declares it as its first act after the claim when that work continues, and declares nothing when it does not.
 - **Watch-list to re-establish:** `hive_channel_watch` state is process-local and a restart clears it — list the agent keys the fresh session must re-watch (and why). Note in the handoff: after re-watching, the fresh session must poll each listed agent's current chat/status once — channel events that fired during the restart window are lost, and a gate may already have opened.
 - **Loose ends and dormant items** with their wake conditions (e.g. "plan #N waits on Kyle's bench validation — do not nag").
 
