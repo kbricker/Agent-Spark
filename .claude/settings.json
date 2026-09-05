@@ -44,6 +44,16 @@
     ],
     "PostToolUse": [
       {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/memory-origin-guard.mjs",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "hooks": [
           {
             "type": "command",
