@@ -26,7 +26,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 <!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
 ## Global (managed by propagate-shared-config — copies of `wfa2/orchestrator-shared/memory/`; edit canonical, never these, the next sync reverts local edits silently)
-- feedback_always_plan.md — Plan at the gate — about to PR, merge, push shared, propagate, deploy, or told plan / ship? Then plan first. Before …
+- feedback_always_plan.md — No ticket before the gate: about to PR, merge, push shared, propagate or deploy, or told plan/ship — plan first
 - feedback_anchor_propagation_checks_on_the_commit.md — Checking a propagation landed? A clean tree is success, not absence — verify with git log against the commit you knew
 - feedback_brief_subagents_with_recall.md — Spawning a subagent on domain work? Tell it to hive_recall its pack first — prefab YAML, shaders, VaEx internals
 - feedback_build_straight_through.md — Design locked, Kyle says build/proceed — run the whole plan end-to-end, don't stop to checkpoint after the foundation
@@ -43,7 +43,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_dont_assume_staged_scope.md — About to commit the staged/modified files? Don't assume they're all yours — if the scope is ambiguous, ask Kyle
 - feedback_dont_gate_on_manual_validation.md — Closure blocked on a check only Kyle can run, or that can't happen? Ship non-breaking work to use; new ticket if wrong
 - feedback_enforce_user_tech_choices.md — When user specifies a technology stack, agents MUST follow it exactly — don't let agents substitute frameworks
-- feedback_fast_track_is_default.md — Working a plan? Fast-track is the path — dev + review inline, fan out to subagents; no other pipeline. It governs …
+- feedback_fast_track_is_default.md — Working a plan? Fast-track: dev + review inline, fan out to subagents, no other pipeline. Governs plans, not asks
 - feedback_fix_workflow_problems_when_found.md — Hit a workflow or process defect mid-task? Fix it now or ticket it — breaking context is worth it; don't just note it
 - feedback_harness_index_size_nag_is_advisory.md — 'Compact MEMORY.md to under 17.1KB' after an edit? Harness 70% warning; the fleet limit is 25,000 bytes — do not compact
 - feedback_kyle_reads_and_directs.md — About to build Kyle a button or hands-on control? Don't — he reads and directs; CodeRabbit reviews, agents edit tickets

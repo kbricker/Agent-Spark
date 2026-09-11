@@ -1,6 +1,6 @@
 ---
 name: Fast-track is the default workflow
-description: Working a plan? Fast-track is the path — dev + review inline, fan out to subagents; no other pipeline. It governs plans, not every ask
+description: Working a plan? Fast-track: dev + review inline, fan out to subagents, no other pipeline. Governs plans, not asks
 type: feedback
 scope: global
 ---

@@ -1,6 +1,6 @@
 ---
 name: Always plan before building
-description: Plan at the gate — about to PR, merge, push shared, propagate, deploy, or told plan / ship? Then plan first. Before that gate there is no ticket
+description: No ticket before the gate: about to PR, merge, push shared, propagate or deploy, or told plan/ship — plan first
 type: feedback
 scope: global
 ---
