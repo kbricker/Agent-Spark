@@ -83,6 +83,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_verify_before_asserting.md — Stating as fact something unchecked this turn? Verify — another agent agreeing, or your own past words, isn't proof
 - feedback_verify_edit_before_commit.md — Claiming a cleanup or removal landed? git diff first — a failed Edit (string-not-found) leaves the file unchanged
 - feedback_verify_your_own_harness_state.md — A claim about your own session — restarted, gated, schema changed? Check the tool itself before you accept it
+- reference_bash_tool_escapes.md — Writing a script or long file through the Bash tool? Backslash pairs arrive halved, >8 KB heredocs fail — use Write
 - reference_gh_cli_is_wonderforge_account.md — Using gh on a kbricker personal repo (Spark)? It's authed as kyle-wf (WonderForge) and can't create PRs there
 - reference_untrusted_dir_drops_permissions.md — Allow rules inert? Read hasTrustDialogAccepted in ~/.claude.json first — untrusted dirs void .claude/settings.json
 <!-- END GLOBAL SECTION -->
