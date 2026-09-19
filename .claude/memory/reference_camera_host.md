@@ -10,7 +10,7 @@ The camera host is the Frigate NVR for the house security cameras. `ssh camhost`
 
 ## Identity (measured 2026-08-20)
 
-- **Dell OptiPlex 7070 SFF**, i5-9500 (6 cores; UHD 630 iGPU does decode + OpenVINO detection), 14 GiB usable, 468 GB NVMe (WDC PC SN730 SDBQNTY-512G-1001).
+- **Dell OptiPlex 7070 SFF**, i5-9500 (6 cores; UHD 630 iGPU does decode + OpenVINO detection), 14 GiB usable, 468 GB NVMe (WDC PC SN730 SDBQNTY-512G-1001), **plus a 4 TB Seagate SkyHawk ST4000VX016 (`/dev/sda`, serial ZW64F2NA, 5400 rpm) in the 3.5-inch bay since 2026-09-18** — recordings live there, see Running state.
 - Hostname **GarageBox**, user **kyle**, **Ubuntu 26.04 LTS Desktop**, `America/Los_Angeles`.
 - NIC **`eno1`**, MAC **`a4:bb:6d:aa:6e:ed`**, **192.168.86.142** (DHCP, no reservation yet).
 - **Desktop, not Server — deliberate.** Kyle had already installed it and would not rebuild. Compensated: `openssh-server` added by hand, and all four sleep/suspend targets masked so it cannot suspend mid-recording. The setup doc still says Server; it has not been corrected.
@@ -18,6 +18,7 @@ The camera host is the Frigate NVR for the house security cameras. `ssh camhost`
 ## Running state
 
 - **Frigate 0.17.2** lives in **`~/frigate`**, not `/opt` — deliberate, so nothing needs root. `docker compose` as `kyle` (in the `docker` group). UI on **https://192.168.86.142:8971** (self-signed).
+- **Recordings live on the 4 TB HDD since 2026-09-18:** `/dev/sda1`, ext4 label `frigate`, mounted AT `~/frigate/storage` from fstab by UUID (`64a0abcf-b151-46ab-825b-d70196e231f9`, `noatime,nofail,x-systemd.device-timeout=15`), so compose, the doc and every `du` command are unchanged. The empty mount-point directory underneath is `chattr +i` — a missing HDD makes Frigate fail loudly instead of silently filling the NVMe. OS, `config/` and `frigate.db` stay on the NVMe. Drive health: `sudo smartctl -a /dev/sda` (smartmontools installed 2026-09-18, `smartd` active; factory baseline on plan #951 — Seagate raw values on attributes 1/7/195 are counters, not errors). Bulk copy speed measured at ~90-95 MB/s.
 - OpenVINO detection on the iGPU **works**, ~10 ms inference. `preset-vaapi` decode.
 - Secrets are in `~/frigate/.env`, referenced from config as `{FRIGATE_...}`. **Frigate substitutes `{VAR}` even inside the `go2rtc:` block — do NOT write `${VAR}` there**, it substitutes the inner braces and leaves a stray `$` on the front of the password. And `docker compose restart` does not reload `.env`; only `up -d --force-recreate` does.
 - Harmless recurring log line: `Unable to poll intel GPU stats: Failed to initialize PMU`. That is the UI's GPU meter wanting elevated caps; decode and detection are unaffected. Not worth privileging the container.
@@ -57,17 +58,17 @@ The camera host is the Frigate NVR for the house security cameras. `ssh camhost`
 
 ## State as of 2026-08-29 — tracked on plan #951 (TendWright/Hardware)
 
-Both ethernet cameras are live in Frigate and clean (5 fps each, 0 skipped, detector ~12 ms). Recording motion-only, retention configured at 30 days.
+Both ethernet cameras are live in Frigate and clean (5 fps each, 0 skipped, detector ~12 ms). Recording motion-only, retention 60 days since 2026-09-18 (was 30, and a lie until the HDD).
 
 **History was wiped clean on 2026-08-29** at Kyle's instruction, after the fixes below went in: all `recordings/` and `clips/` deleted from inside the container (everything is root-owned and there is no sudo here, so `docker exec` is the route). 414 GB freed — disk went 98% -> 5%, 425 GB available. The DB was NOT deleted: Frigate 0.17 keeps the UI login in `frigate.db`, so removing it would reset the admin password and lock Kyle out. Consistent backup at `~/frigate/config/frigate.db.bak-20260829` (taken with sqlite3's `.backup()` against the live DB). Frigate restarted healthy and is recording fresh from 2026-08-29 12:12.
 
-**Before the wipe, retention was fiction:** disk 98% full, 12 GB free, only 9 days held against a configured 30, burning ~46 GB/day. Frigate self-protects by evicting the oldest hour, so the failure mode is silently short retention, never a crash or a warning. Whether that is fixed is now an open measurement — the clock restarted 2026-08-29.
+**Before the wipe, retention was fiction:** disk 98% full, 12 GB free, only 9 days held against a configured 30, burning ~46 GB/day. Frigate self-protects by evicting the oldest hour, so the failure mode is silently short retention, never a crash or a warning. Measured 2026-09-08: combined burn is ~26 GB/day, down from 46, so the disk holds ~16 days — still not 30.
 
 **The 2026-08-20 diagnosis of that was wrong on both counts — do not repeat it.** It blamed the Sunba's 4K main stream and proposed dropping to 1440p.
 - Wrong camera. Hourly `du` for 2026-08-28: `side` wrote ~1.2 GB EVERY hour, 03:00 and noon alike (~28 GB/day), while `outdoor` tracked real street traffic (450 MB at midday, 1.6 GB at 18:00, ~18 GB/day). The indoor camera was the bigger consumer and the only continuous one.
 - Wrong lever. Both streams are VBR with a bitrate CAP, so bytes = bitrate x hours recorded. Resolution does not enter it — 4K to 1440p at an unchanged 2560 kbps cap would have saved nothing and merely raised quality per pixel.
 
-**Root cause of `side`: it is in an unlit garage, so it sits in IR/night mode around the clock even at noon.** `improve_contrast: true` stretches that dark, grainy IR frame until sensor noise reads as motion, and it recorded a solid empty garage 24/7. Set to **`improve_contrast: false` on 2026-08-29** (config line 97; `outdoor` deliberately left at `true`). Backups at `~/frigate/config/config.yml.bak-20260829` and `.bak2-20260829`. **Effect not yet measured — needs a full day, then a week.**
+**Root cause of `side`: it is in an unlit garage, so it sits in IR/night mode around the clock even at noon.** `improve_contrast: true` stretches that dark, grainy IR frame until sensor noise reads as motion, and it recorded a solid empty garage 24/7. Set to **`improve_contrast: false` on 2026-08-29** (config line 97; `outdoor` deliberately left at `true`). Backups at `~/frigate/config/config.yml.bak-20260829` and `.bak2-20260829`. **Effect measured 2026-09-08 over 8 full days: it worked.** `side` fell from ~28 GB/day to ~7.5 GB/day.
 
 **Do not try to validate either fix by counting segment files.** Frigate's recorder writes segments continuously and a later retention pass prunes the ones with no motion, so a file count taken minutes after a restart measures writing, not keeping. The only valid measure is hourly `du` on `storage/recordings/<date>/<hour>/<camera>` after the pruning pass has run.
 
@@ -78,9 +79,9 @@ Still open:
 - **This camera's ONVIF does not authenticate at all.** Measured 2026-08-29: `GetDeviceInformation` on port 8899 was ACCEPTED with the blank password, the new password, and two deliberately wrong passwords. So ONVIF reads are open to anyone on the LAN regardless of credentials — a firmware property, not something the password change caused or can fix. What the password *does* protect is the DVRIP control channel on 34567, which is the one that can reconfigure the camera or re-enable the P2P tunnel. Frigate's `onvif:` block carries the real password for correctness, not protection.
 - **`outdoor` mask is a first pass.** Applied 2026-08-29 covering the FAR SIDE of the street only — neighbour's garage, buildings opposite, far-kerb parked cars — per Kyle; the road itself is deliberately unmasked so passing traffic still records. Polygon `0.33,0,1,0,1,0.26,0.47,0.27,0.33,0.14`, verified by rendering it over a live detect frame, not by trusting the numbers. Not yet masked and the next suspects if `outdoor` still records flat around the clock: the near foliage top-left (~x 0-0.37, y 0-0.30) and the street tree on the right, both of which move in wind.
 - ~~DHCP reservations~~ **done.** All three reserved in Google Wifi as of 2026-08-29: host `.142` (`a4:bb:6d:aa:6e:ed`), `side` Amcrest `.48` (`9c:8e:cd:09:b9:95`), `outdoor` Sunba `.139` (`00:12:34:cf:64:c9`). Table is in section 2 of the setup doc.
-- Retention must be set to a number that is TRUE once a real week has been measured from the 2026-08-29 restart. Do not leave 30 if the disk cannot hold 30. With 425 GB free, 30 days needs the two cameras to average under ~14 GB/day combined; they were at 46.
+- **Retention 30 was fiction on the NVMe — measured 2026-09-08**, 11 days in: 275 GB of recordings, 147 GB free (67% used), ~26 GB/day. `side` is fixed at ~7.5 GB/day; **`outdoor` is now the hog at ~18 GB/day and the contrast fix did not touch it** (it was deliberately left `improve_contrast: true`). 30 days needs ~780 GB against ~440 usable, so the ceiling on this disk is ~16 days. Nothing breaks — Frigate evicts the oldest hour — so the failure mode stays silent short retention. **Resolved 2026-09-18: the 4 TB HDD is in and all recordings moved to it** (the NVMe had hit 100% holding exactly the predicted 16 days). Retention set to **60 days** on 2026-09-18 (record.motion, alerts, detections and snapshots together; backup `config.yml.bak-20260918`) — true at last: ~1.6 TB for 60 days at today’s burn against 3.3 TB free.
 
-Next session: final physical placement of the host, then the first USB camera — which is the step that needs the udev pinning in section 5 of the doc, and the first thing here that will actually need sudo.
+Next: the USB cameras (one or two ELPs, mounts being printed; udev pinning per section 5 of the doc), rename `side` to a real name when they land, wire `side` (WiFi today, 15 ms avg / 66 ms spikes on the link — the laggy live view), and the BIOS flash on a keyboard-and-monitor trip.
 
 ## Sudo — NOPASSWD grant added 2026-08-31
 

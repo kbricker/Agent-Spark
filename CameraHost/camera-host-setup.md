@@ -14,7 +14,7 @@ Software is **Frigate** — MIT licensed, free, no per-camera fees, no cloud acc
 
 | Part | What | Notes |
 |---|---|---|
-| Host | Dell OptiPlex 7070 SFF — i5-9500, 16 GB, 512 GB SSD | Renewed. i5-9500 **not** the "F" variant — the UHD 630 iGPU does the video decoding and the object detection |
+| Host | Dell OptiPlex 7070 SFF — i5-9500, 16 GB, 512 GB NVMe + 4 TB Seagate SkyHawk ST4000VX016 (added 2026-09-18) | Renewed. i5-9500 **not** the "F" variant — the UHD 630 iGPU does the video decoding and the object detection |
 | Outdoor camera | EmpireTech IPC-T54IR-ZE-S3 | 4 MP on a 1/1.8" sensor, 2.7–12 mm motorized, 12 V DC or PoE, IP67 |
 | Ethernet camera 2 | existing camera | any ONVIF/RTSP camera works |
 | USB cameras ×2 | ELP-USBFHD01M-L36 | already owned; MJPEG only, re-encoded on the iGPU |
@@ -24,7 +24,7 @@ Buy links:
 - Camera: https://www.amazon.com/EmpireTech-IPC-T5442T-ZE-Vari-Focal-Eyeball-Starlight/dp/B08C77TNY9 · direct: https://empiretech01.com/products/empiretech-ipc-t54ir-ze-s3-1-1-8-cmos-4mp-ir-starlight-vari-focal-turret-security-camera
 - Barrel plugs (if the old power cord was cut): search "5.5 x 2.1 mm screw terminal DC barrel plug"
 
-**No second drive.** Motion-only recording across 4 cameras runs 150–450 GB for 30 days. The 512 GB SSD in the host is the storage. Frigate deletes the oldest hour automatically if it ever fills.
+**Second drive, added 2026-09-18.** The original estimate — motion-only across 4 cameras in 150–450 GB for 30 days — was wrong by about 2x: the two ethernet cameras alone measured 20–26 GB/day after the false-motion fixes, so the 512 GB NVMe held 16 days at best. Recordings now live on a 4 TB Seagate SkyHawk ST4000VX016 in the 3.5-inch bay (printed caddy, plan 951.2), mounted at `~/frigate/storage` — see section 6. OS, config and `frigate.db` stay on the NVMe. Frigate still deletes the oldest hour automatically if the disk ever fills.
 
 ### Power — outdoor camera
 
@@ -183,7 +183,7 @@ The ELP boards do MJPEG at 1920×1080, 1280×720 and 640×480. Use **1280×720**
 
 ## 6. Frigate — docker-compose.yml
 
-Everything lives in **`~/frigate/`** (`/home/kyle/frigate`), not `/opt`. That is deliberate: the whole stack then runs as `kyle` — who is in the `docker` group — so no day-to-day operation on this box needs root. There is no NOPASSWD grant here, so a `/opt` layout would have meant an interactive sudo for routine work.
+Everything lives in **`~/frigate/`** (`/home/kyle/frigate`), not `/opt`. That is deliberate: the whole stack then runs as `kyle` — who is in the `docker` group — so no day-to-day operation on this box needs root. A NOPASSWD sudo grant was added 2026-08-31 (`/etc/sudoers.d/kyle-nopasswd`); the layout predates it and stays.
 
 Put this in `~/frigate/docker-compose.yml`:
 
@@ -229,6 +229,16 @@ Create the directories:
 ```bash
 mkdir -p ~/frigate/config ~/frigate/storage
 ```
+
+### Storage lives on the HDD (since 2026-09-18)
+
+`~/frigate/storage` is the mount point of the 4 TB SkyHawk (`/dev/sda1`, ext4, label `frigate`), not a plain directory. In `/etc/fstab`:
+
+```
+UUID=64a0abcf-b151-46ab-825b-d70196e231f9 /home/kyle/frigate/storage ext4 noatime,nofail,x-systemd.device-timeout=15 0 2
+```
+
+`nofail` keeps a dead drive from hanging a headless boot. The empty mount-point directory underneath is `chattr +i`, so if the drive is ever missing the writes by Frigate fail loudly instead of quietly filling the NVMe. Drive health: `sudo smartctl -a /dev/sda` — smartmontools was installed 2026-09-18 and `smartd` logs problems to the journal. The Seagate raw values on attributes 1, 7 and 195 are operation counters, not error counts; read the normalised column.
 
 ---
 
