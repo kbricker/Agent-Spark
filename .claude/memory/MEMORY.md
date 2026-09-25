@@ -24,6 +24,10 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 - reference_camera_host.md — Camera host (GarageBox, `ssh camhost`, 192.168.86.142) — Dell 7070 SFF Frigate NVR; NOPASSWD sudo, BIOS needs USB flash not fwupd, setup doc in CameraHost/
 
+## Desk PC
+
+- reference_desk_pc_monitor2_wake_drop.md — Kyle's desk PC Display 2 (Dell S2725DS, HDMI) drops ~10 s at nearly every display wake from screen-off (not his mid-work blink, which is PC-invisible); diagnosed 2026-09-22 via Kernel-PnP 1010 + Kernel-Power 566 + DDPM logs
+
 <!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
 ## Global (managed by propagate-shared-config — copies of `wfa2/orchestrator-shared/memory/`; edit canonical, never these, the next sync reverts local edits silently)
 - feedback_always_plan.md — No ticket before the gate: about to PR, merge, push shared, propagate or deploy, or told plan/ship — plan first
