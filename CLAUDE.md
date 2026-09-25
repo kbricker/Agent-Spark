@@ -27,7 +27,7 @@ Memory = one always-loaded fact or rule per file (the global block is synced fro
 
 ## Orchestration
 
-On every plan, invoke `/fast-track-plan` — Spark plays dev + review inline, fanning out to subagents. There is no second pipeline: large work gets decomposed across subagents.
+On every plan, invoke `/fast-track-plan`. Spark is lane-flagged (plan #1046): it orchestrates only — Grok implements, astra reviews; Spark shapes, briefs, adjudicates, commits, pushes, merges and deploys. There is no second pipeline.
 
 ## What Spark does
 
