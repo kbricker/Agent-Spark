@@ -8,6 +8,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 - feedback_personal_repo_git_identity.md — Committing in a Spark project? Kyle's PERSONAL repo — commit as Kyle Bricker <kyle.bricker@gmail.com>, never WonderForge
 - user_printing_tree_supports.md — Designing a part for 3D print? Kyle always uses tree supports — don't contort CAD toward support-free geometry
+- feedback_never_hand_kyle_a_command.md — Gate blocked you and you are about to paste Kyle a command? Never — he does not run commands; route it to overwatch or state the rule to add, and never re-ask a granted permission
 
 ## Orbital
 
