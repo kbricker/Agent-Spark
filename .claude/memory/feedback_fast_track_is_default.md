@@ -5,7 +5,7 @@ type: feedback
 scope: global
 ---
 
-Fast-track is the orchestration path for all plans, on every agent. You play dev + review inline and are free to spawn Agent/Task subagents at your discretion for fan-out (parallel dev on independent sub-areas), leveraging the shared prompt cache. **There is no second path.** Work too large for one context gets decomposed across subagents, not handed to a different pipeline.
+Fast-track is the orchestration path for all plans, on every agent. You play dev + review inline and are free to spawn Agent/Task subagents at your discretion for fan-out (parallel dev on independent sub-areas), leveraging the shared prompt cache; on a lane-flagged agent you orchestrate only — Grok implements (step 4), astra reviews (step 5.5), you shape, brief, adjudicate, commit, push, merge and deploy (plan #1046, Kyle 2026-09-25). **There is no second path.** Work too large for one context gets decomposed across subagents, not handed to a different pipeline.
 
 It governs work that *is* a plan. It does not turn every request into one: whether a plan exists is decided by `feedback_always_plan` — the plan appears at the action gate (PR, merge, shared push, propagate, deploy) or on plan / ship, not before, and a test / sample / quick / try ask gets the thing itself with one check that it runs. Never open a plan in order to have somewhere to run this procedure.
 
