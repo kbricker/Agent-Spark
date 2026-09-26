@@ -194,6 +194,8 @@ class Run:
         self.baseline_cameras = None
         self.baseline_detectors = None
         self.cache_seen = None
+        self.cache_history = []
+        self.backup_created = None
 
 
 RUN = Run()
@@ -486,23 +488,39 @@ def cache_observation_ok(entries, cameras, not_before):
     return ""
 
 
-def recording_advance(before, after, cameras):
-    # A segment that is not the newest for its camera has been closed.
-    # The recheck has to see a strictly later name-timestamp than the first check.
-    before_grouped = _grouped_segments(before)
-    after_grouped = _grouped_segments(after)
+def _saw_bytes(entries, camera):
+    return any(cam == camera and size > 0 for cam, _stamp, size in entries)
+
+
+def recording_window(listings, cameras, first=None):
+    # Positive evidence only. A window of nothing but the empty file still
+    # being written has no finished segment to reject, and is still not recording.
+    if not listings:
+        return "recording window is empty"
+    last = listings[-1]
+    if first is None:
+        if len(listings) < 2:
+            return "recording window has no recheck"
+        first = listings[0]
+    first_grouped = _grouped_segments(first)
+    last_grouped = _grouped_segments(last)
     for camera in cameras:
-        if finished_segment_empty(before, camera) or finished_segment_empty(after, camera):
-            return f"camera {camera} has an empty finished segment"
-        old = before_grouped.get(camera, [])
-        new = after_grouped.get(camera, [])
+        for entries in listings:
+            if finished_segment_empty(entries, camera):
+                return f"camera {camera} has an empty finished segment"
+        old = first_grouped.get(camera, [])
+        new = last_grouped.get(camera, [])
         if not old:
             return f"camera {camera} had no cache segment"
-        if not new:
+        if not new or max(stamp for stamp, _size in new) <= max(stamp for stamp, _size in old):
             return f"camera {camera} made no newer cache segment"
-        if max(stamp for stamp, _size in new) <= max(stamp for stamp, _size in old):
-            return f"camera {camera} made no newer cache segment"
+        if not any(_saw_bytes(entries, camera) for entries in listings):
+            return f"camera {camera} never wrote a non-empty segment"
     return ""
+
+
+def recording_advance(before, after, cameras):
+    return recording_window([before, after], cameras)
 
 
 def line_change_count(before, after):
@@ -818,6 +836,8 @@ def assert_cmd_allowed(argv):
 
 def run_cmd(argv, cap, use_reserve, check=True):
     assert_cmd_allowed(argv)
+    if len(argv) >= 2 and argv[0] == DOCKER and argv[1] == "run" and "--pull=never" not in argv:
+        raise Fail("error", "docker run without --pull=never")
     for arg in argv:
         if not isinstance(arg, str) or "\n" in arg or "\x00" in arg:
             raise Fail("error", "refusing a command argument that is not a single line")
@@ -850,6 +870,12 @@ def run_cmd(argv, cap, use_reserve, check=True):
 
 
 def finish(kind, detail):
+    if RUN.backup_created and not RUN.dry_run:
+        try:
+            prune_backups()
+        except Exception as exc:
+            log(f"backup prune failed: {short(exc)}")
+        RUN.backup_created = None
     if kind not in EXIT_CODES:
         kind = "broken"
         detail = "internal: unknown outcome"
@@ -905,7 +931,8 @@ def image_version(ref, use_reserve):
     if not valid_ref(ref):
         raise Fail("error", "image ref is not a plain reference")
     proc = run_cmd(
-        [DOCKER, "run", "--rm", "--entrypoint", "cat", ref, VERSION_PATH],
+        # --pull=never: a missing image must fail, not be fetched.
+        [DOCKER, "run", "--pull=never", "--rm", "--entrypoint", "cat", ref, VERSION_PATH],
         RUN_CAT_CAP_S,
         use_reserve,
     )
@@ -1285,6 +1312,7 @@ def health_snapshot(target_version, up_at, require_cache, use_reserve, strict, b
         if strict:
             raise Fail("error", str(exc))
         return "cache listing is malformed"
+    RUN.cache_history.append(entries)
     reason = cache_observation_ok(entries, cameras, up_at)
     if reason:
         return reason
@@ -1305,6 +1333,9 @@ def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast
     restarts = None
     captured = baseline
     seen = None
+    if require_cache:
+        RUN.cache_history = []
+        RUN.cache_seen = None
     while True:
         if time.monotonic() >= deadline:
             return last
@@ -1318,6 +1349,8 @@ def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast
             restarts = RUN.restart_count
             break
         if captured is None and last in ("no enabled cameras", "no detectors"):
+            return last
+        if "empty finished segment" in last:
             return last
         if fast_version and last.startswith("running ") and " != target " in last:
             return last
@@ -1345,7 +1378,11 @@ def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast
         except ValueError:
             return "cache listing is malformed"
         cameras = captured[0] if captured else []
-        reason = recording_advance(seen or [], current, cameras)
+        if seen is None:
+            return "recording window has no passing check"
+        history = list(RUN.cache_history)
+        history.append(current)
+        reason = recording_window(history, cameras, first=seen)
         if reason:
             return reason
     return ""
@@ -1415,7 +1452,21 @@ def pull(ref):
         raise Fail("error", f"no time left to pull {ref}")
 
 
+def require_local_image(ref, use_reserve):
+    # Inspect only. docker run would pull a missing image on its own.
+    if not valid_ref(ref):
+        raise Fail("error", "candidate ref is not a plain reference")
+    try:
+        image_id(ref, use_reserve)
+    except (CmdFailed, CmdTimeout):
+        raise Fail("error", "candidate not local")
+    except BudgetExhausted:
+        raise Fail("error", "no time left to inspect the candidate")
+
+
 def evaluate(candidate):
+    if candidate is not None:
+        require_local_image(candidate, use_reserve=False)
     from_ref = read_compose_image()
     try:
         from_version = image_version(from_ref, use_reserve=False)
@@ -1484,6 +1535,7 @@ def make_backup(backup_dir, from_ref):
     started = time.monotonic()
     ensure_dir(BACKUP_ROOT)
     ensure_dir(backup_dir)
+    RUN.backup_created = backup_dir
     assert_contained_backup(backup_dir)
     names = list(BACKUP_FILES)
     for name in OPTIONAL_DB_FILES:
@@ -1552,9 +1604,23 @@ def restore_backup(state):
         raise OSError("compose ref after restore is not the from-ref")
 
 
+def state_backup_name():
+    if not os.path.exists(STATE_PATH):
+        return None
+    try:
+        state = decode_state(read_text(STATE_PATH))
+    except (OSError, ValueError):
+        return None
+    backup = state.get("backup_dir")
+    if not _backup_dir_ok(backup):
+        return None
+    return backup[len(BACKUP_ROOT) + 1:]
+
+
 def prune_backups():
     if not os.path.isdir(BACKUP_ROOT):
         return
+    protect = state_backup_name()
     rows = []
     for name in os.listdir(BACKUP_ROOT):
         path = os.path.join(BACKUP_ROOT, name)
@@ -1565,12 +1631,15 @@ def prune_backups():
         complete = os.path.isfile(os.path.join(path, COMPLETE_NAME))
         rows.append((name, path, complete))
     rows.sort()
-    complete_paths = [path for _, path, complete in rows if complete]
-    keep = set(complete_paths[-KEEP_BACKUPS:])
-    for _, path, _complete in rows:
-        if path in keep:
+    complete_names = [name for name, _path, complete in rows if complete]
+    keep = set(complete_names[-KEEP_BACKUPS:])
+    # A live run still names its backup. That directory stays even when it
+    # is older than the seven newest, so recovery can still read it.
+    if protect:
+        keep.add(protect)
+    for name, path, _complete in rows:
+        if name in keep:
             continue
-        # Incomplete directories are not among the seven kept.
         shutil.rmtree(path)
     fsync_dir(BACKUP_ROOT)
 
@@ -1615,10 +1684,6 @@ def config_change_detail(backup_dir):
 
 def finalize_success(state):
     clear_state()
-    try:
-        prune_backups()
-    except Exception as exc:
-        log(f"backup prune failed: {short(exc)}")
     try:
         prune_images({state["from_version"], state["to_version"]})
     except Exception as exc:
