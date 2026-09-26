@@ -4,6 +4,7 @@ description: "Camera host (GarageBox) — Frigate NVR box: ssh alias, hardware i
 metadata:
   node_type: memory
   type: reference
+  modified: 2026-09-26T04:53:13.338Z
 ---
 
 The camera host is the Frigate NVR for the house security cameras. `ssh camhost` from the desk. Build/config reference is the doc at `C:\Projects\spark\CameraHost\camera-host-setup.md` — detail belongs there, this memory only carries what I need to reconnect and not re-derive.
@@ -17,10 +18,12 @@ The camera host is the Frigate NVR for the house security cameras. `ssh camhost`
 
 ## Running state
 
-- **Frigate 0.17.2** lives in **`~/frigate`**, not `/opt` — deliberate, so nothing needs root. `docker compose` as `kyle` (in the `docker` group). UI on **https://192.168.86.142:8971** (self-signed).
+- **Frigate 0.18.0** since 2026-09-25 (hand upgrade from 0.17.2, plan 951.1) lives in **`~/frigate`**, not `/opt` — deliberate, so nothing needs root. `docker compose` as `kyle` (in the `docker` group). **UI on https://view.kylebricker.com — internet-facing since 2026-09-25, WAN 443 only** (real Let's Encrypt cert, forge renews it via `frigate-cert-renew.timer`); on the LAN also https://192.168.86.142:8971 (same container port and cert, so the browser warns about the IP name). **The compose image is PINNED to an exact version (`:0.18.0`), not `:stable`** — the nightly update job (951.1) moves the pin; never hand-edit it back to `stable`. Frigate only patches its newest release, so falling a version behind means no security fixes. Pre-upgrade backups: `config/*.bak-20260925-pre018`, old image tagged `frigate-rollback:0.17.2`.
+- **Upgrades: the migrator rewrites `config.yml` and can silently DROP comments** (0.18 dropped the outdoor ONVIF-auth note; restored by hand). After any upgrade, diff `config.yml` against its backup.
+- **Recording folders are UTC-dated** (`storage/recordings/<UTC date>/<UTC hour>/<camera>/`) — a local-date `find` misses current segments. Retention is motion-only, so a quiet camera keeps nothing for minutes; the proof a camera is recording is a fresh `<camera>@<ts>.mp4` in the container's `/tmp/cache`.
 - **Recordings live on the 4 TB HDD since 2026-09-18:** `/dev/sda1`, ext4 label `frigate`, mounted AT `~/frigate/storage` from fstab by UUID (`64a0abcf-b151-46ab-825b-d70196e231f9`, `noatime,nofail,x-systemd.device-timeout=15`), so compose, the doc and every `du` command are unchanged. The empty mount-point directory underneath is `chattr +i` — a missing HDD makes Frigate fail loudly instead of silently filling the NVMe. OS, `config/` and `frigate.db` stay on the NVMe. Drive health: `sudo smartctl -a /dev/sda` (smartmontools installed 2026-09-18, `smartd` active; factory baseline on plan #951 — Seagate raw values on attributes 1/7/195 are counters, not errors). Bulk copy speed measured at ~90-95 MB/s.
 - OpenVINO detection on the iGPU **works**, ~10 ms inference. `preset-vaapi` decode.
-- Secrets are in `~/frigate/.env`, referenced from config as `{FRIGATE_...}`. **Frigate substitutes `{VAR}` even inside the `go2rtc:` block — do NOT write `${VAR}` there**, it substitutes the inner braces and leaves a stray `$` on the front of the password. And `docker compose restart` does not reload `.env`; only `up -d --force-recreate` does.
+- Frigate's camera secrets are in `~/frigate/.env`, referenced from config as `{FRIGATE_...}`. **Every other secret (Porkbun keys, healthchecks ping key) is in `~/frigate/host-secrets.env`, never `.env`** — compose injects all of `.env` into the internet-facing container. forge handles every secret; spark never reads either file. **Frigate substitutes `{VAR}` even inside the `go2rtc:` block — do NOT write `${VAR}` there**, it substitutes the inner braces and leaves a stray `$` on the front of the password. And `docker compose restart` does not reload `.env`; only `up -d --force-recreate` does.
 - Harmless recurring log line: `Unable to poll intel GPU stats: Failed to initialize PMU`. That is the UI's GPU meter wanting elevated caps; decode and detection are unaffected. Not worth privileging the container.
 
 ## Cameras
