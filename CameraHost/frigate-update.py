@@ -1003,7 +1003,12 @@ def notify(kind, detail):
         if json.loads(blob.decode("utf-8")) != want:
             raise OSError("status temp did not parse back")
 
-    atomic_write_text(STATUS_PATH, raw, verify=verify)
+    try:
+        atomic_write_text(STATUS_PATH, raw, verify=verify)
+    except Exception as exc:
+        # The alert is the point of this function. A full disk must not
+        # swallow it.
+        log(f"status file was not written: {short(exc)}")
     if RUN.dry_run or kind == "skipped":
         return
     success = {"current", "updated", "recovered"}

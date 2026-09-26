@@ -248,18 +248,26 @@ def _take_key(found, name, pattern, shape):
 
 def load_keys(text):
     found = parse_secrets(text)
+    ping_problem = ""
     try:
         api = _take_key(found, "PORKBUN_API_KEY", API_KEY_RE, "pk1_ key shape")
         secret = _take_key(found, "PORKBUN_SECRET_API_KEY", SECRET_KEY_RE, "sk1_ key shape")
         if "HEALTHCHECKS_PING_KEY" not in found:
             ping = None
         else:
-            ping = _take_key(
-                found, "HEALTHCHECKS_PING_KEY", PING_KEY_RE, "ping key shape"
-            )
+            # Optional. A bad value must not stop the DNS update.
+            value = found.pop("HEALTHCHECKS_PING_KEY")
+            if value == "":
+                ping_problem = "HEALTHCHECKS_PING_KEY is empty"
+                ping = None
+            elif PING_KEY_RE.fullmatch(value) is None:
+                ping_problem = "HEALTHCHECKS_PING_KEY does not have the ping key shape"
+                ping = None
+            else:
+                ping = value
     finally:
         found.clear()
-    return api, secret, ping
+    return api, secret, ping, ping_problem
 
 
 def stat_problem(is_link, is_reg, mode, uid, owner, size):
@@ -585,7 +593,10 @@ def get_checkin(ping):
         raise Fail(f"http {http_code}")
 
 
-def maybe_checkin(ping):
+def maybe_checkin(ping, ping_problem=""):
+    if ping_problem:
+        say("check-in failed: " + ping_problem)
+        return
     if not ping:
         return
     if remaining() < CHECKIN_NEED_S:
@@ -603,7 +614,7 @@ def run(argv):
     domain, name, dry = parse_args(argv)
     if not dry:
         hold_lock()
-    api, secret, ping = load_keys(read_secrets_file())
+    api, secret, ping, ping_problem = load_keys(read_secrets_file())
     remember_secret(api)
     remember_secret(secret)
     if ping:
@@ -617,13 +628,13 @@ def run(argv):
         say(f"DRY-RUN {action} {fqdn} A {shown} -> {ip}")
         return 0
     if action == "no-op":
-        maybe_checkin(ping)
+        maybe_checkin(ping, ping_problem)
         return 0
     say(f"updating {fqdn} A {shown} -> {ip}")
     write_record(action, domain, name, ip, api, secret)
     read_back(domain, name, ip, api, secret)
     say(f"verified {fqdn} A {ip}")
-    maybe_checkin(ping)
+    maybe_checkin(ping, ping_problem)
     return 0
 
 

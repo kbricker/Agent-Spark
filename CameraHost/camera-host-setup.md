@@ -71,7 +71,6 @@ That means isolation has to come from the camera itself. What actually works on 
 
 - **Turn off P2P / cloud / UPnP on each camera.** This is the one that matters — P2P is the feature that opens an outbound tunnel to the manufacturer so a phone app can reach the camera from anywhere. Off, the camera has no reason to talk to the internet at all. Section 9 covers how to set it without vendor software.
 - **Never create a manufacturer cloud account.** No account, nothing to sync to.
-- **Never port-forward** anything to a camera or to Frigate. Frigate is the only thing that should be reachable, and only from inside the house.
 - **Blank the gateway if you want it airtight.** Set the camera to a static address on the camera side with the gateway and DNS fields left empty. No default route means no internet, full stop, no firewall needed. Costs you the tidiness of a router reservation — pick one or the other, not both.
 - **Outside access is https://view.kylebricker.com**, since 2026-09-25 (plan 951.1). Kyle chose a port forward over a VPN or a tunnel, having declined a tunnel because it meant moving nameservers. The router forwards WAN 443 to 192.168.86.142:443 and nothing else, so only Frigate's authenticated UI is reachable, never a camera.
 
@@ -652,7 +651,7 @@ Testing:
 
 The house has a residential address that changes. Until the A record for `view.kylebricker.com` is updated, that name points at whoever received the old address.
 
-- `porkbun-ddns.py` runs from kyle's crontab every 10 minutes. It asks Porkbun's IPv4 ping for this house's public address, reads the one `view` A record, and edits or creates it only when the address differs. A record that already matches is left alone and prints nothing. More than one A record is an error and nothing is written. After a write it reads the record back and keeps the change only when that read shows the new address. A real run takes `.porkbun-ddns.lock`; if the lock is held, the run exits quietly and the next one is 10 minutes away.
+- `porkbun-ddns.py` runs from kyle's crontab every 10 minutes. It asks Porkbun's IPv4 ping for this house's public address, reads the one `view` A record, and edits or creates it only when the address differs. A record that already matches is left alone and prints nothing. More than one A record is an error and nothing is written. After a write it reads the record back. If that read does not show the new address, or the read fails, it logs `ERROR` and exits 1 and does not check in, so a day of that alarms. The record may already hold the new address. A real run takes `.porkbun-ddns.lock`; if the lock is held, the run exits quietly and the next one is 10 minutes away.
 - The Porkbun keys live in `/home/kyle/frigate/host-secrets.env`, mode 0600, owned by kyle. That file is not `.env`. Compose injects every `.env` variable into the Frigate container, which is on the internet, so these keys must not be there. Forge writes the file. Do not paste a key into an agent session.
 - `*/10 * * * * /usr/bin/python3 /home/kyle/frigate/porkbun-ddns.py --domain kylebricker.com --name view >> /home/kyle/frigate/ddns.log 2>&1`
 - The hostname is `view.kylebricker.com`. Kyle created its A record by hand on 2026-09-25.
