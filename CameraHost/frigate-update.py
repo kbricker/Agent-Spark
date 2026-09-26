@@ -87,10 +87,22 @@ APPLY_NEED_S = (
     + HEALTH_SETTLE_S
 )
 
-# curl is the verified client for the local API. /bin/ls is in the image.
-# GNU long-iso keeps the listing line stable enough to full-match.
+# curl is the verified client for the local API. GNU find 4.9.0 is in the
+# image. -type f -name selects segment files; sockets, preview files and
+# preview_frames are not part of the measurement.
 DOCKER = "docker"
-CACHE_LIST_ARGV_TAIL = ["/bin/ls", "-ln", "--time-style=long-iso", CACHE_DIR]
+CACHE_LIST_ARGV_TAIL = [
+    "find",
+    CACHE_DIR,
+    "-maxdepth",
+    "1",
+    "-type",
+    "f",
+    "-name",
+    "*@*.mp4",
+    "-printf",
+    "%s %f\\n",
+]
 
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
 VERSION_PY_RE = re.compile(r'^VERSION = "(\d+\.\d+\.\d+)(?:-[0-9a-f]{7,40})?"$')
@@ -107,13 +119,9 @@ DOCKER_TIME_RE = re.compile(
 IMAGE_ID_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
 RESTART_COUNT_RE = re.compile(r"^\d+$")
 HEALTH_RE = re.compile(r"^(healthy|unhealthy|starting)$")
-STATUS_RE = re.compile(r"^(created|restarting|running|removing|paused|exited|dead)$")
-LS_TOTAL_RE = re.compile(r"^total \d+$")
-LS_ENTRY_RE = re.compile(
-    r"^(-[-rwxsStT]{9}[.+@]?)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+"
-    r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\s+"
-    r"([A-Za-z0-9][A-Za-z0-9_.-]{0,128}@\d{14}[+-]\d{4}\.mp4)$"
-)
+STATUS_RE = re.compile(r"^(created|restarting|running|removing|paused|exited|dead|missing)$")
+DIGEST_REF_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]*@sha256:[0-9a-f]{64}$")
+FLOATING_TAGS = {"stable", "latest"}
 
 PHASES = {
     "applying",
@@ -167,6 +175,26 @@ class BudgetExhausted(Exception):
     pass
 
 
+class MissingContainer(Exception):
+    pass
+
+
+class DockerDown(Exception):
+    pass
+
+
+class StartRefused(Exception):
+    def __init__(self, detail):
+        super().__init__(detail)
+        self.detail = detail
+
+
+class OutOfTime(Exception):
+    def __init__(self, detail):
+        super().__init__(detail)
+        self.detail = detail
+
+
 class CmdTimeout(Exception):
     pass
 
@@ -196,6 +224,7 @@ class Run:
         self.cache_seen = None
         self.cache_history = []
         self.backup_created = None
+        self.from_id = None
 
 
 RUN = Run()
@@ -440,25 +469,64 @@ def parse_container_status(text):
 
 
 def parse_cache_listing(text):
+    # find -printf '%s %f\n' only. A socket, directory or preview line means
+    # the listing was not filtered, which is treated as corruption.
     if not isinstance(text, str):
         raise ValueError("cache listing is not text")
     entries = []
     for line in text.splitlines():
         if not line:
             continue
-        if LS_TOTAL_RE.fullmatch(line):
-            continue
-        match = LS_ENTRY_RE.fullmatch(line)
+        match = re.fullmatch(r"(\d+) (\S+)", line)
         if match is None:
             raise ValueError("cache listing line is malformed")
-        size = int(match.group(5))
-        name = match.group(7)
-        parsed = parse_cache_name(name)
+        size = int(match.group(1))
+        parsed = parse_cache_name(match.group(2))
         if parsed is None:
             raise ValueError("cache listing name is malformed")
         camera, stamp = parsed
         entries.append((camera, stamp, size))
     return entries
+
+
+def classify_inspect_error(stderr):
+    text = (stderr or "").lower()
+    if "no such container" in text:
+        return "missing"
+    return "down"
+
+
+def version_pin(ref):
+    prefix = REGISTRY + ":"
+    if not isinstance(ref, str) or not ref.startswith(prefix) or "@" in ref:
+        return None
+    tag = ref[len(prefix):]
+    if VERSION_RE.fullmatch(tag) is None:
+        return None
+    return tag
+
+
+def from_ref_refusal(ref, reported_version, candidate_mode):
+    # Rollback restarts this ref later. It has to keep meaning one image.
+    if not isinstance(ref, str) or not valid_ref(ref):
+        return "compose image ref is not a plain reference"
+    pinned = version_pin(ref)
+    if pinned is not None:
+        if reported_version != pinned:
+            return f"{ref} reports {reported_version}, not {pinned}"
+        return None
+    if isinstance(ref, str) and DIGEST_REF_RE.fullmatch(ref):
+        return None
+    tag = ""
+    if isinstance(ref, str) and "@" not in ref and ":" in ref:
+        tag = ref.rsplit(":", 1)[1]
+    if tag in FLOATING_TAGS:
+        return f"{ref} is a floating tag"
+    if ref.startswith(REGISTRY + ":") or ref.startswith(REGISTRY + "@"):
+        return f"{ref} is not a pinned version or digest"
+    if candidate_mode:
+        return None
+    return f"{ref} is not a pinned version or digest"
 
 
 def _grouped_segments(entries):
@@ -592,6 +660,7 @@ def encode_state(state):
         payload["up_at"] = state["up_at"]
     payload["cameras"] = list(state["cameras"])
     payload["detectors"] = list(state["detectors"])
+    payload["from_id"] = state["from_id"]
     return json.dumps(payload, indent=2, sort_keys=True) + "\n"
 
 
@@ -605,6 +674,7 @@ STATE_KEYS = {
     "up_at",
     "cameras",
     "detectors",
+    "from_id",
 }
 
 
@@ -640,6 +710,9 @@ def decode_state(text):
     detectors = _name_list(data.get("detectors"))
     if cameras is None or detectors is None:
         raise ValueError("state has no camera or detector baseline")
+    from_id = data.get("from_id")
+    if not isinstance(from_id, str) or IMAGE_ID_RE.fullmatch(from_id) is None:
+        raise ValueError("state from_id is malformed")
     return {
         "phase": phase,
         "from_ref": from_ref,
@@ -650,6 +723,7 @@ def decode_state(text):
         "up_at": up_at,
         "cameras": cameras,
         "detectors": detectors,
+        "from_id": from_id,
     }
 
 
@@ -965,8 +1039,12 @@ def inspect_format(template, use_reserve):
             INSPECT_CAP_S,
             use_reserve,
         )
-    except (CmdFailed, CmdTimeout, BudgetExhausted):
-        return None
+    except CmdFailed as exc:
+        if classify_inspect_error(exc.err) == "missing":
+            raise MissingContainer()
+        raise DockerDown(exc.err or "docker inspect failed")
+    except (CmdTimeout, BudgetExhausted):
+        raise
     try:
         value = command_line(proc.stdout)
     except ValueError:
@@ -977,7 +1055,10 @@ def inspect_format(template, use_reserve):
 
 
 def inspect_status(use_reserve):
-    raw = inspect_format("{{.State.Status}}", use_reserve)
+    try:
+        raw = inspect_format("{{.State.Status}}", use_reserve)
+    except MissingContainer:
+        return "missing"
     if raw is None:
         return None
     try:
@@ -987,7 +1068,10 @@ def inspect_status(use_reserve):
 
 
 def inspect_health(use_reserve):
-    raw = inspect_format("{{.State.Health.Status}}", use_reserve)
+    try:
+        raw = inspect_format("{{.State.Health.Status}}", use_reserve)
+    except MissingContainer:
+        return None
     if raw is None:
         return None
     try:
@@ -997,7 +1081,10 @@ def inspect_health(use_reserve):
 
 
 def inspect_restart_count(use_reserve):
-    raw = inspect_format("{{.RestartCount}}", use_reserve)
+    try:
+        raw = inspect_format("{{.RestartCount}}", use_reserve)
+    except MissingContainer:
+        return None
     if raw is None:
         return None
     try:
@@ -1007,7 +1094,10 @@ def inspect_restart_count(use_reserve):
 
 
 def inspect_started_at(use_reserve):
-    raw = inspect_format("{{.State.StartedAt}}", use_reserve)
+    try:
+        raw = inspect_format("{{.State.StartedAt}}", use_reserve)
+    except MissingContainer:
+        return None
     if raw is None:
         return None
     try:
@@ -1017,7 +1107,7 @@ def inspect_started_at(use_reserve):
 
 
 def stopped_status(status):
-    return status in {"exited", "dead", "created", "removing", "removed"}
+    return status in {"exited", "dead", "created", "removing", "removed", "missing"}
 
 
 def compose_stop(use_reserve):
@@ -1043,8 +1133,40 @@ def poll_stopped(use_reserve, seconds):
         if time.monotonic() >= deadline:
             return False
         pause = min(2.0, deadline - time.monotonic())
-        if pause <= 0 or not sleep_for(pause, use_reserve):
+        if pause <= 0:
             return stopped_status(inspect_status(use_reserve))
+        if not sleep_for(pause, use_reserve):
+            raise BudgetExhausted("stop")
+
+
+def run_unbudgeted(argv, cap):
+    # The last start after a restore is not allowed to die because the
+    # update clock already ran out.
+    assert_cmd_allowed(argv)
+    if len(argv) >= 2 and argv[0] == DOCKER and argv[1] == "run" and "--pull=never" not in argv:
+        raise Fail("error", "docker run without --pull=never")
+    for arg in argv:
+        if not isinstance(arg, str) or "\n" in arg or "\x00" in arg:
+            raise Fail("error", "refusing a command argument that is not a single line")
+    log(f"run {' '.join(argv)[:300]} (cap {cap}s)")
+    try:
+        proc = subprocess.run(
+            argv,
+            capture_output=True,
+            timeout=cap,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            shell=False,
+        )
+    except subprocess.TimeoutExpired:
+        log(f"timed out {argv[0]} {argv[1] if len(argv) > 1 else ''}")
+        raise CmdTimeout()
+    if proc.returncode != 0:
+        err = clip_err(proc.stderr)
+        log(f"rc={proc.returncode} {argv[0]} {argv[1] if len(argv) > 1 else ''}: {err}")
+        raise CmdFailed(proc.returncode, err, argv)
+    return proc
 
 
 def compose_up(use_reserve):
@@ -1057,6 +1179,34 @@ def compose_up(use_reserve):
     except CmdFailed:
         log("compose up returned non-zero; inspecting the container")
     return False
+
+
+def compose_up_unbudgeted():
+    refuse_write("compose up")
+    try:
+        run_unbudgeted(COMPOSE_UP, UP_CAP_S)
+        return True
+    except CmdTimeout:
+        log("compose up timed out; inspecting the container")
+    except CmdFailed:
+        log("compose up returned non-zero; inspecting the container")
+    return False
+
+
+def confirm_from_id(state):
+    want = state.get("from_id")
+    if not isinstance(want, str) or IMAGE_ID_RE.fullmatch(want) is None:
+        raise StartRefused("rollback has no recorded from image id")
+    try:
+        proc = run_unbudgeted(
+            [DOCKER, "image", "inspect", "-f", "{{.Id}}", state["from_ref"]],
+            INSPECT_CAP_S,
+        )
+        got = parse_image_id(proc.stdout)
+    except (CmdFailed, CmdTimeout, ValueError, Fail) as exc:
+        raise StartRefused(f"cannot confirm {state['from_ref']}: {short(exc)}")
+    if got != want:
+        raise StartRefused(f"{state['from_ref']} is {got}, not {want}")
 
 
 def ensure_stopped(use_reserve):
@@ -1130,6 +1280,9 @@ def clear_state():
 
 
 def persist_failed(state):
+    # Only a health check that finished and found the target unhealthy.
+    # A timeout, a signal, or a dead docker daemon leaves the phase alone
+    # so the next run can still start Frigate.
     failed = dict(state)
     failed["phase"] = "failed"
     try:
@@ -1261,8 +1414,32 @@ def list_cache(use_reserve):
     return parse_cache_listing(proc.stdout)
 
 
+def out_of_time_reason(reason):
+    # A check that never finished is not an unhealthy result.
+    text = (reason or "").lower()
+    return (
+        "budget" in text
+        or "out of time" in text
+        or "did not run" in text
+        or "ran out" in text
+    )
+
+
+def out_of_time(bringing_from, version):
+    # The exact resume line is only after the backup is already back on disk.
+    # An earlier timeout must not claim the restore happened.
+    if bringing_from and RUN.phase_restored:
+        raise OutOfTime("out of time after restore; the next run finishes it")
+    if bringing_from:
+        raise OutOfTime(f"out of time starting {version}; the next run finishes it")
+    raise OutOfTime(f"out of time checking {version}; the next run finishes it")
+
+
 def health_snapshot(target_version, up_at, require_cache, use_reserve, strict, baseline):
-    status = inspect_status(use_reserve)
+    try:
+        status = inspect_status(use_reserve)
+    except BudgetExhausted:
+        return "budget exhausted reading container status"
     if status != "running":
         return f"container status is {status}"
     health = inspect_health(use_reserve)
@@ -1270,7 +1447,9 @@ def health_snapshot(target_version, up_at, require_cache, use_reserve, strict, b
         return f"health is {health}"
     try:
         running = read_running_version(use_reserve)
-    except (CmdFailed, CmdTimeout, BudgetExhausted, ValueError) as exc:
+    except BudgetExhausted:
+        return "budget exhausted reading version.py"
+    except (CmdFailed, CmdTimeout, ValueError) as exc:
         if strict and isinstance(exc, ValueError):
             raise Fail("error", f"running version.py: {exc}")
         return "running version.py is unreadable"
@@ -1285,7 +1464,9 @@ def health_snapshot(target_version, up_at, require_cache, use_reserve, strict, b
         else:
             cameras, detectors = baseline
         reason = recording_gap(config, stats, cameras, detectors)
-    except (CmdFailed, CmdTimeout, BudgetExhausted) as exc:
+    except BudgetExhausted:
+        return "budget exhausted reading the api"
+    except (CmdFailed, CmdTimeout) as exc:
         return f"api unreachable ({exc.__class__.__name__})"
     except ValueError as exc:
         if strict:
@@ -1306,7 +1487,9 @@ def health_snapshot(target_version, up_at, require_cache, use_reserve, strict, b
         return "no start time for the cache check"
     try:
         entries = list_cache(use_reserve)
-    except (CmdFailed, CmdTimeout, BudgetExhausted, OSError):
+    except BudgetExhausted:
+        return "budget exhausted reading the cache"
+    except (CmdFailed, CmdTimeout, OSError):
         return "cache list failed"
     except ValueError as exc:
         if strict:
@@ -1373,7 +1556,9 @@ def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast
     if require_cache:
         try:
             current = list_cache(use_reserve)
-        except (CmdFailed, CmdTimeout, BudgetExhausted, OSError):
+        except BudgetExhausted:
+            return "budget exhausted reading the cache"
+        except (CmdFailed, CmdTimeout, OSError):
             return "cache list failed"
         except ValueError:
             return "cache listing is malformed"
@@ -1474,6 +1659,13 @@ def evaluate(candidate):
         raise Fail("error", f"cannot read the running image version: {short(exc)}")
     if not valid_version(from_version):
         raise Fail("error", f"running image version {from_version!r} is not X.Y.Z")
+    refusal = from_ref_refusal(from_ref, from_version, candidate is not None)
+    if refusal:
+        raise Fail("refused", refusal)
+    try:
+        RUN.from_id = image_id(from_ref, use_reserve=False)
+    except (CmdFailed, CmdTimeout, BudgetExhausted) as exc:
+        raise Fail("error", f"cannot read the from image id: {short(exc)}")
     require_already_healthy(from_version)
     held = load_hold()
     if candidate is not None:
@@ -1718,26 +1910,44 @@ def expected_ref(state, version):
     return None
 
 
+def _remember_up_at(state, before, after):
+    up_at = pick_up_at(state, before, after)
+    state["up_at"] = up_at.isoformat(timespec="seconds")
+    if state.get("phase") in PHASES and state["phase"] != "failed":
+        try:
+            persist(state)
+        except Exception as exc:
+            log(f"could not persist up_at: {short(exc)}")
+    return up_at
+
+
 def try_up_and_health(state, version, use_reserve):
     try:
         want = expected_ref(state, version)
         if want is None or read_compose_image() != want:
             log(f"compose ref is not the ref for {version}")
             return False
-        before = inspect_started_at(use_reserve)
-        compose_up(use_reserve)
-        after = inspect_started_at(use_reserve)
-        status = inspect_status(use_reserve)
-        if status != "running":
+        bringing_from = version == state.get("from_version")
+        if bringing_from:
+            # The from-image is checked, then started, even when the update
+            # clock is already spent. A moved tag must not be what starts.
+            confirm_from_id(state)
+            compose_up_unbudgeted()
+            before = inspect_started_at(True)
+            status = inspect_status(True)
+            after = before
+            if status != "running":
+                compose_up_unbudgeted()
+                after = inspect_started_at(True)
+        else:
+            before = inspect_started_at(use_reserve)
             compose_up(use_reserve)
             after = inspect_started_at(use_reserve)
-        up_at = pick_up_at(state, before, after)
-        state["up_at"] = up_at.isoformat(timespec="seconds")
-        if state.get("phase") in PHASES and state["phase"] != "failed":
-            try:
-                persist(state)
-            except Exception as exc:
-                log(f"could not persist up_at: {short(exc)}")
+            status = inspect_status(use_reserve)
+            if status != "running":
+                compose_up(use_reserve)
+                after = inspect_started_at(use_reserve)
+        up_at = _remember_up_at(state, before, after)
         reason = wait_healthy(
             version,
             up_at,
@@ -1749,8 +1959,14 @@ def try_up_and_health(state, version, use_reserve):
         )
         if reason:
             log(f"health failed for {version}: {reason}")
+            if out_of_time_reason(reason):
+                out_of_time(bringing_from, version)
             return False
         return True
+    except BudgetExhausted:
+        out_of_time(version == state.get("from_version"), version)
+    except (StartRefused, OutOfTime, DockerDown, Fail):
+        raise
     except Exception as exc:
         log(f"start of {version} failed: {short(exc)}")
         return False
@@ -1770,7 +1986,15 @@ def abort_back_to_from(state, detail):
         RUN.bringing_back = False
         rollback(state, detail + "; compose was already on the new ref")
         return
-    if try_up_and_health(state, state["from_version"], use_reserve=True):
+    try:
+        healthy = try_up_and_health(state, state["from_version"], use_reserve=True)
+    except StartRefused as exc:
+        finish("rollback-failed", exc.detail)
+    except OutOfTime as exc:
+        finish("rollback-failed", exc.detail)
+    except DockerDown as exc:
+        finish("error", f"docker unreachable: {short(exc)}")
+    if healthy:
         try:
             clear_state()
         except Exception as exc:
@@ -1797,7 +2021,13 @@ def rollback(state, detail):
     rolling["phase"] = "rolling-back"
     rolling["up_at"] = None
     persist(rolling)
-    if not ensure_stopped(use_reserve=True):
+    try:
+        stopped = ensure_stopped(use_reserve=True)
+    except DockerDown as exc:
+        finish("error", f"docker unreachable: {short(exc)}")
+    except BudgetExhausted:
+        finish("rollback-failed", detail + "; out of time stopping frigate; the next run resumes")
+    if not stopped:
         persist_failed(rolling)
         finish("rollback-failed", detail + "; could not stop frigate to restore")
     try:
@@ -1812,7 +2042,15 @@ def rollback(state, detail):
     restored = dict(rolling)
     restored["phase"] = "restored"
     persist(restored)
-    if not try_up_and_health(restored, restored["from_version"], use_reserve=True):
+    try:
+        healthy = try_up_and_health(restored, restored["from_version"], use_reserve=True)
+    except StartRefused as exc:
+        finish("rollback-failed", exc.detail)
+    except OutOfTime as exc:
+        finish("rollback-failed", exc.detail)
+    except DockerDown as exc:
+        finish("error", f"docker unreachable: {short(exc)}")
+    if not healthy:
         persist_failed(restored)
         finish(
             "rollback-failed",
@@ -1888,6 +2126,7 @@ def apply(from_ref, from_version, to_ref, to_version):
         "up_at": None,
         "cameras": list(RUN.baseline_cameras),
         "detectors": list(RUN.baseline_detectors),
+        "from_id": RUN.from_id,
     }
     # Phase hits disk before stop. A kill here leaves compose untouched.
     persist(state)
@@ -1941,7 +2180,15 @@ def recover_from_side(state):
             "broken",
             f"phase {state['phase']} but compose is {ref}, expected {state['from_ref']}",
         )
-    if try_up_and_health(state, state["from_version"], use_reserve=True):
+    try:
+        healthy = try_up_and_health(state, state["from_version"], use_reserve=True)
+    except StartRefused as exc:
+        finish("rollback-failed", exc.detail)
+    except OutOfTime as exc:
+        finish("rollback-failed", exc.detail)
+    except DockerDown as exc:
+        finish("error", f"docker unreachable: {short(exc)}")
+    if healthy:
         try:
             clear_state()
         except Exception as exc:
@@ -1955,7 +2202,16 @@ def recover_to_side(state):
     ref = read_compose_image()
     if ref != state["to_ref"] and state["phase"] == "switched":
         log(f"phase switched but compose is {ref}; health-check will decide")
-    if try_up_and_health(state, state["to_version"], use_reserve=False):
+    try:
+        healthy = try_up_and_health(state, state["to_version"], use_reserve=False)
+    except OutOfTime as exc:
+        rollback(state, exc.detail)
+        return
+    except DockerDown as exc:
+        finish("error", f"docker unreachable: {short(exc)}")
+    except StartRefused as exc:
+        finish("rollback-failed", exc.detail)
+    if healthy:
         RUN.target_healthy = True
         finalize_success(state)
         return
@@ -2006,7 +2262,15 @@ def recover(state):
                 "broken",
                 f"phase restored but compose is not {state['from_ref']}; not restoring again",
             )
-        if try_up_and_health(state, state["from_version"], use_reserve=True):
+        try:
+            healthy = try_up_and_health(state, state["from_version"], use_reserve=True)
+        except StartRefused as exc:
+            finish("rollback-failed", exc.detail)
+        except OutOfTime as exc:
+            finish("rollback-failed", exc.detail)
+        except DockerDown as exc:
+            finish("error", f"docker unreachable: {short(exc)}")
+        if healthy:
             finish_rollback_success(state)
             return
         persist_failed(state)
@@ -2132,6 +2396,43 @@ def run_nightly(candidate):
 def safety_net(exc):
     if isinstance(exc, (Interrupted, KeyboardInterrupt)):
         raise exc
+    if isinstance(exc, DockerDown):
+        finish("error", f"docker unreachable: {short(exc)}")
+    if isinstance(exc, StartRefused):
+        finish("rollback-failed", exc.detail)
+    if isinstance(exc, OutOfTime):
+        # Forward timeouts still roll back while the reserve remains.
+        # After a restore, the phase stays restored and the next run finishes.
+        if RUN.phase_restored or "after restore" in exc.detail:
+            finish("rollback-failed", exc.detail)
+        if RUN.switched and isinstance(RUN.state, dict):
+            rollback(RUN.state, exc.detail)
+            return
+        finish("error", exc.detail)
+    if isinstance(exc, BudgetExhausted):
+        if RUN.phase_restored and isinstance(RUN.state, dict):
+            try:
+                healthy = try_up_and_health(RUN.state, RUN.state["from_version"], True)
+            except OutOfTime as inner:
+                finish("rollback-failed", inner.detail)
+            except StartRefused as inner:
+                finish("rollback-failed", inner.detail)
+            except DockerDown as inner:
+                finish("error", f"docker unreachable: {short(inner)}")
+            if healthy:
+                finish_rollback_success(RUN.state)
+            persist_failed(RUN.state)
+            finish(
+                "rollback-failed",
+                f"{RUN.state['from_version']} did not come back healthy",
+            )
+        if RUN.switched and isinstance(RUN.state, dict):
+            rollback(RUN.state, f"out of time checking {RUN.state['to_version']}; the next run finishes it")
+            return
+        phase = "none"
+        if isinstance(RUN.state, dict) and RUN.state.get("phase") in PHASES:
+            phase = RUN.state["phase"]
+        finish("error", f"out of time during phase {phase}; the next run finishes it")
     detail = f"unexpected {exc.__class__.__name__}: {short(exc)}"
     log(detail)
     state = RUN.state
@@ -2150,7 +2451,15 @@ def safety_net(exc):
         finish("error", detail)
     if RUN.phase_restored:
         RUN.bringing_back = True
-        if try_up_and_health(state, state["from_version"], use_reserve=True):
+        try:
+            healthy = try_up_and_health(state, state["from_version"], use_reserve=True)
+        except StartRefused as inner:
+            finish("rollback-failed", inner.detail)
+        except OutOfTime as inner:
+            finish("rollback-failed", inner.detail)
+        except DockerDown as inner:
+            finish("error", f"docker unreachable: {short(inner)}")
+        if healthy:
             finish_rollback_success(state)
         persist_failed(state)
         finish("rollback-failed", detail + f"; {state['from_version']} did not come back healthy")

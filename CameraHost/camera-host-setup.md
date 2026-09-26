@@ -640,5 +640,5 @@ Rolling back or upgrading by hand, from a backup directory that contains `COMPLE
 
 Testing:
 
-- `--dry-run` does the reads, the pulls and the version check, then prints the `OUTCOME` the real run would reach with `(dry-run)` in the detail. It does not stop Frigate, does not write the state, status or hold files, and does not run a recovery. If a state file exists, the line names the phase and what a real run would do.
+- `--dry-run` may `docker pull` `ghcr.io/blakeblackshear/frigate:stable` and the matching `X.Y.Z` tag. That downloads those images and does not stop, start, or recreate the running Frigate. It does not write the state, status, or hold files, and it does not run a recovery. With `--candidate` it pulls nothing, because that image must already be local. It prints the `OUTCOME` the real run would reach with `(dry-run)` in the detail. If a state file exists, the line names the phase and what a real run would do.
 - `--candidate <local-image-ref>` skips the `stable` pull and treats that already-local image as the release under test. It still has to be newer, not held, backed up, health-checked, and rolled back if it does not record. That is how the apply and rollback paths get tested without waiting for a release. Combined with `--dry-run`, it stays read-only.
