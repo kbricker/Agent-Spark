@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # Nightly Frigate update for the camera box.
 #
-# Frigate publishes fixes only on its newest release, and this box is about
-# to be reachable from the internet, so the pinned image has to follow every
+# Frigate publishes fixes only on its newest release, and this box is
+# reachable from the internet, so the pinned image has to follow every
 # release. A big release migrates config.yml and frigate.db on startup and
 # can need a manual change; if that migration does not come up recording,
 # the box has stopped doing its only job. This job moves the pin forward,
@@ -10,6 +10,22 @@
 # compose file, config and database back and holds that version.
 #
 # kyle's crontab runs it. See camera-host-setup.md section 13.
+#
+# Scope. Findings outside this are not defects.
+# Inputs, all ours: the compose file, config.yml, frigate.db, the job's own
+# files, docker output, Frigate's in-container API, and ghcr stable and
+# X.Y.Z tags. None hostile. Out of scope: a malicious local user, a
+# compromised registry, a tampered state file.
+# Helpers and dependencies, trusted: docker and compose, GNU find, cat and
+# curl in the image, Python 3 stdlib.
+# Platform: GarageBox, run as kyle from cron and @reboot --recover, one at
+# a time.
+# Consumers: Kyle, through the log and the healthchecks alert; the job's
+# own next run.
+# Invariants: (1) never leaves Frigate stopped; every path after a stop
+# ends with a version started or an alert. (2) never keeps a version that
+# is not recording every baseline camera.
+# Anything outside these lines is not a defect.
 
 import datetime
 import difflib
@@ -968,8 +984,8 @@ def finish(kind, detail):
 
 
 def notify(kind, detail):
-    # Single alerting seam. A later monitoring ping belongs in this
-    # function; callers keep passing kind and detail only.
+    # Single alerting seam. Callers keep passing kind and detail only.
+    # The healthchecks ping is best-effort: it must not change the outcome.
     version = None
     try:
         version = read_running_version(use_reserve=True)
@@ -988,6 +1004,108 @@ def notify(kind, detail):
             raise OSError("status temp did not parse back")
 
     atomic_write_text(STATUS_PATH, raw, verify=verify)
+    if RUN.dry_run or kind == "skipped":
+        return
+    success = {"current", "updated", "recovered"}
+    failure = {"held", "rolled-back", "refused", "error", "rollback-failed", "broken"}
+    if kind in success:
+        slug = "frigate-update"
+    elif kind in failure:
+        slug = "frigate-update/fail"
+    else:
+        return
+    try:
+        import stat as statmod
+        import urllib.parse
+        import urllib.request
+
+        path = "/home/kyle/frigate/host-secrets.env"
+        try:
+            st = os.lstat(path)
+        except FileNotFoundError:
+            return
+        except OSError:
+            log("check-in failed: secrets file is unreadable")
+            return
+        if statmod.S_ISLNK(st.st_mode) or not statmod.S_ISREG(st.st_mode):
+            log("check-in failed: secrets file is not a regular file")
+            return
+        if st.st_uid != os.getuid() or (statmod.S_IMODE(st.st_mode) & 0o077):
+            log("check-in failed: secrets file is not private to the running user")
+            return
+        if st.st_size > 64 * 1024:
+            log("check-in failed: secrets file is larger than 64KB")
+            return
+        flags = os.O_RDONLY
+        if hasattr(os, "O_NOFOLLOW"):
+            flags |= os.O_NOFOLLOW
+        fd = os.open(path, flags)
+        try:
+            blob = b""
+            while len(blob) <= 64 * 1024:
+                chunk = os.read(fd, 64 * 1024 + 1 - len(blob))
+                if not chunk:
+                    break
+                blob += chunk
+        finally:
+            os.close(fd)
+        if len(blob) > 64 * 1024:
+            log("check-in failed: secrets file is larger than 64KB")
+            return
+        try:
+            text = blob.decode("utf-8")
+        except UnicodeDecodeError:
+            log("check-in failed: secrets file is not utf-8")
+            return
+        ping = None
+        for line in text.splitlines():
+            body = line.strip()
+            if not body or body.startswith("#") or "=" not in body:
+                continue
+            key, value = body.split("=", 1)
+            if key.strip() != "HEALTHCHECKS_PING_KEY":
+                continue
+            value = value.strip()
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+                value = value[1:-1]
+            ping = value
+        if ping is None:
+            return
+        if ping == "":
+            log("check-in failed: HEALTHCHECKS_PING_KEY is empty")
+            return
+        if re.fullmatch(r"[A-Za-z0-9_-]{16,}", ping) is None:
+            log("check-in failed: HEALTHCHECKS_PING_KEY does not have the ping key shape")
+            return
+        url = "https://hc-ping.com/" + ping + "/" + slug + "?create=1"
+        parsed = urllib.parse.urlsplit(url)
+        if parsed.scheme != "https" or parsed.hostname != "hc-ping.com" or parsed.username:
+            log("check-in failed: unpinned origin")
+            return
+
+        class _NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, req, fp, code, msg, headers, newurl):
+                raise RuntimeError("redirect")
+
+        # Empty proxy map, so the ping key in the URL is not sent elsewhere.
+        # 10s, and this may spend the rollback reserve. A failure stays here.
+        agent = urllib.request.build_opener(
+            urllib.request.ProxyHandler({}),
+            _NoRedirect(),
+        )
+        req = urllib.request.Request(url, method="GET")
+        try:
+            resp = agent.open(req, timeout=10)
+            try:
+                resp.read(1024)
+            finally:
+                resp.close()
+        except Exception:
+            log("check-in failed: request failed")
+            return
+        log("check-in sent")
+    except Exception:
+        log("check-in failed: request failed")
 
 
 def read_running_version(use_reserve):

@@ -73,7 +73,7 @@ That means isolation has to come from the camera itself. What actually works on 
 - **Never create a manufacturer cloud account.** No account, nothing to sync to.
 - **Never port-forward** anything to a camera or to Frigate. Frigate is the only thing that should be reachable, and only from inside the house.
 - **Blank the gateway if you want it airtight.** Set the camera to a static address on the camera side with the gateway and DNS fields left empty. No default route means no internet, full stop, no firewall needed. Costs you the tidiness of a router reservation — pick one or the other, not both.
-- **For access from outside the house later**, use a VPN (Tailscale or WireGuard) into the LAN rather than opening a port.
+- **Outside access is https://view.kylebricker.com**, since 2026-09-25 (plan 951.1). Kyle chose a port forward over a VPN or a tunnel, having declined a tunnel because it meant moving nameservers. The router forwards WAN 443 to 192.168.86.142:443 and nothing else, so only Frigate's authenticated UI is reachable, never a camera.
 
 Verify rather than assume — from the host, watch whether a camera is talking outbound:
 
@@ -210,12 +210,16 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - ./config:/config
       - ./storage:/media/frigate
+      # Real Let's Encrypt cert for view.kylebricker.com, issued and renewed by
+      # forge (acme.sh). Frigate hot-reloads it by fingerprint every minute.
+      - ./certs:/etc/letsencrypt/live/frigate:ro
       - type: tmpfs
         target: /tmp/cache
         tmpfs:
           size: 1000000000
     ports:
       - "8971:8971"      # authenticated web UI — this is the one you browse to
+      - "443:8971"       # same UI on 443 for https://view.kylebricker.com (plan 951.1)
       - "8554:8554"      # RTSP restream (optional, LAN only)
       - "8555:8555/tcp"  # WebRTC
       - "8555:8555/udp"
@@ -549,7 +553,7 @@ record:
 ## 11. Gotchas
 
 - **`/dev/videoN` shuffles across reboots.** Handled by the udev rule in step 5. Do it before you build the config, not after the first confusing reboot.
-- **Never publish port 5000** and never port-forward anything. 8971 is the authenticated port; use a VPN for outside access.
+- **Never publish port 5000** (the unauthenticated API), and never forward anything except 443 to the NVR. Host 443 and host 8971 are the same authenticated container port.
 - **The ELP cameras emit MJPEG only.** They must be encoded to H.264 to be recorded. `#video=h264#hardware` in the go2rtc line does this on the iGPU.
 - **Motion-only saves disk, not CPU.** Frigate decodes and analyzes every frame around the clock regardless of what it keeps.
 - **An unlit indoor camera is in IR mode at noon, and `improve_contrast` will fill your disk.** A dark scene keeps the camera in night mode permanently; contrast-stretching that grainy IR frame turns sensor noise into motion, and motion-only recording then records continuously. The tell is a camera whose hourly storage is flat across the whole day — the same at 03:00 as at 12:00. The garage camera here wrote 1.2 GB/hour of an empty garage until `improve_contrast: false` was set on it (2026-08-29, plan #951). Outdoor cameras that actually see daylight can keep it on.
@@ -592,7 +596,7 @@ record:
 
 ## 13. Updates — the nightly job
 
-Frigate publishes fixes only on its newest release, and this box is being made reachable from the internet (plan 951.1), so the pinned image has to follow every release. A large release migrates `config.yml` and `frigate.db` on startup and can need a manual change. `frigate-update.py` in this folder is the nightly job; copy it to `/home/kyle/frigate/frigate-update.py`. It moves the pin, and if the new version does not come up recording it puts the previous compose file, config and database back.
+Frigate publishes fixes only on its newest release, and this box is reachable from the internet at https://view.kylebricker.com (since 2026-09-25, plan 951.1), so the pinned image has to follow every release. A large release migrates `config.yml` and `frigate.db` on startup and can need a manual change. `frigate-update.py` in this folder is the nightly job; copy it to `/home/kyle/frigate/frigate-update.py`. It moves the pin, and if the new version does not come up recording it puts the previous compose file, config and database back.
 
 What a run does:
 
@@ -602,6 +606,7 @@ What a run does:
 - It requires enough free space on the Frigate disk for two full copies of the database, config and compose (the apply and the rollback), then stops Frigate and copies those files into `update-backups/`. The copy is after the stop so the database includes its own checkpoint.
 - It rewrites the one `image:` line, starts that version, and requires a healthy container, the new version, frames, a live detector, and a new segment under the container's `/tmp/cache` for every enabled camera. Sixty seconds later it checks that the container did not restart.
 - If that check fails, it restores the backup, starts the previous version, and appends the bad version to the hold file.
+- Once `HEALTHCHECKS_PING_KEY` is in `host-secrets.env`, it checks in to healthchecks.io under the slug `frigate-update`: a success ping for `current`, `updated`, and `recovered`, and `/fail` for every other kind except `skipped`. `skipped` still does not notify.
 
 Files it owns, all under `/home/kyle/frigate`:
 
@@ -642,3 +647,28 @@ Testing:
 
 - `--dry-run` may `docker pull` `ghcr.io/blakeblackshear/frigate:stable` and the matching `X.Y.Z` tag. That downloads those images and does not stop, start, or recreate the running Frigate. It does not write the state, status, or hold files, and it does not run a recovery. With `--candidate` it pulls nothing, because that image must already be local. It prints the `OUTCOME` the real run would reach with `(dry-run)` in the detail. If a state file exists, the line names the phase and what a real run would do.
 - `--candidate <local-image-ref>` skips the `stable` pull and treats that already-local image as the release under test. It still has to be newer, not held, backed up, health-checked, and rolled back if it does not record. That is how the apply and rollback paths get tested without waiting for a release. Combined with `--dry-run`, it stays read-only.
+
+## 14. Dynamic DNS — Porkbun
+
+The house has a residential address that changes. Until the A record for `view.kylebricker.com` is updated, that name points at whoever received the old address.
+
+- `porkbun-ddns.py` runs from kyle's crontab every 10 minutes. It asks Porkbun's IPv4 ping for this house's public address, reads the one `view` A record, and edits or creates it only when the address differs. A record that already matches is left alone and prints nothing. More than one A record is an error and nothing is written. After a write it reads the record back and keeps the change only when that read shows the new address. A real run takes `.porkbun-ddns.lock`; if the lock is held, the run exits quietly and the next one is 10 minutes away.
+- The Porkbun keys live in `/home/kyle/frigate/host-secrets.env`, mode 0600, owned by kyle. That file is not `.env`. Compose injects every `.env` variable into the Frigate container, which is on the internet, so these keys must not be there. Forge writes the file. Do not paste a key into an agent session.
+- `*/10 * * * * /usr/bin/python3 /home/kyle/frigate/porkbun-ddns.py --domain kylebricker.com --name view >> /home/kyle/frigate/ddns.log 2>&1`
+- The hostname is `view.kylebricker.com`. Kyle created its A record by hand on 2026-09-25.
+- Porkbun answers the API only after API Access is switched on for `kylebricker.com`.
+- Scope the key to that one domain in Porkbun's key settings. It should not be able to edit any other domain.
+- `--dry-run` does the reads and prints one line, `DRY-RUN no-op`, `DRY-RUN edit`, or `DRY-RUN create`, with the current address and the one it would write. It does not write the record, take the lock, or check in. An error is one `ERROR` line and exit 1.
+- After a no-op or a verified change, and only then, the script checks in to healthchecks.io, slug `ddns`. Errors do not ping, so a day of failures alarms and a blip does not. The check-in runs once `HEALTHCHECKS_PING_KEY` is in `host-secrets.env`.
+
+## 15. HTTPS certificate
+
+- Let's Encrypt certificate for `view.kylebricker.com`, issued by the official acme.sh container. It is pinned by digest (`neilpang/acme.sh@sha256:34d0c9a7…`, v3.1.6) and its self-upgrade is off.
+- DNS-01 through Porkbun, so port 80 is never opened.
+- The files in `~/frigate/certs/` are real files, not symlinks: `fullchain.pem` mode 644, `privkey.pem` mode 600, owner kyle.
+- Frigate mounts `certs/` and reloads nginx within a minute when the fingerprint changes. A forced renewal on 2026-09-25 was served about 25 seconds later with no restart.
+- Renewal is systemd `frigate-cert-renew.timer`: daily at 03:30, plus up to 30 minutes of random delay, `Persistent=true`. It starts the oneshot `frigate-cert-renew.service`, which runs `~/frigate/renew-cert.sh` as root. That calls `acme.sh --cron` and then re-asserts ownership and permissions. The log is `~/frigate/acme/renew.log`.
+- acme.sh keeps the Porkbun credentials in `~/frigate/acme/account.conf` (mode 600, owner root) so renewal works unattended.
+- Update acme.sh only on purpose, following the steps in the header of `renew-cert.sh`.
+- Keys, `host-secrets.env`, the private key, and `renew-cert.sh` are forge's. Spark and these docs never hold a value.
+- The renewal checks in with healthchecks.io once `HEALTHCHECKS_PING_KEY` is in `host-secrets.env`.
