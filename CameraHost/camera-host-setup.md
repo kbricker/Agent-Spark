@@ -191,7 +191,8 @@ Put this in `~/frigate/docker-compose.yml`:
 services:
   frigate:
     container_name: frigate
-    image: ghcr.io/blakeblackshear/frigate:stable
+    # Pinned. The nightly job moves this line; see section 13.
+    image: ghcr.io/blakeblackshear/frigate:0.18.0
     restart: unless-stopped
     stop_grace_period: 30s
     # Decoded frames live in shared memory. Sized for 4 cameras detecting
@@ -586,3 +587,58 @@ record:
 | ONVIF Device Manager | https://sourceforge.net/projects/onvifdm/ |
 | python-onvif-zeep | https://github.com/FalkTannhaeuser/python-onvif-zeep |
 | Dahua HTTP API spec | https://wiki.dno-it.ru/wp-content/uploads/2023/06/dahua_http_api_for_ipcsd-v1.40.pdf |
+
+---
+
+## 13. Updates — the nightly job
+
+Frigate publishes fixes only on its newest release, and this box is reachable from the internet (plan 951.1), so the pinned image has to follow every release. A large release migrates `config.yml` and `frigate.db` on startup and can need a manual change. `frigate-update.py` in this folder is the nightly job; copy it to `/home/kyle/frigate/frigate-update.py`. It moves the pin, and if the new version does not come up recording it puts the previous compose file, config and database back.
+
+What a run does:
+
+- If a run was interrupted, it finishes that run or undoes it, and does not start a second update in the same pass.
+- It leaves Frigate alone unless the running container is already healthy (container healthy, the pinned version, frames from every enabled camera, every detector reporting). That check waits 60 seconds and requires the restart count to stay still. It does not look for a fresh cache segment; those are wiped by the restart that an update itself causes.
+- It pulls `ghcr.io/blakeblackshear/frigate:stable` and continues only when that tag is a plain `X.Y.Z`, strictly newer than what is running, absent from the hold file, and the same image id as `ghcr.io/blakeblackshear/frigate:X.Y.Z`.
+- It requires enough free space on the Frigate disk for two full copies of the database, config and compose (the apply and the rollback), then stops Frigate and copies those files into `update-backups/`. The copy is after the stop so the database includes its own checkpoint.
+- It rewrites the one `image:` line, starts that version, and requires a healthy container, the new version, frames, a live detector, and a new segment under the container's `/tmp/cache` for every enabled camera. Sixty seconds later it checks that the container did not restart.
+- If that check fails, it restores the backup, starts the previous version, and appends the bad version to the hold file.
+
+Files it owns, all under `/home/kyle/frigate`:
+
+- `.frigate-update.lock` — one run at a time
+- `update-state.json` — phase of a run that has not finished
+- `update-hold.txt` — one skipped version per line; `#` comments and blank lines are allowed; the job only appends
+- `update-status.json` — last outcome (`time`, `kind`, `detail`, running `version`)
+- `update-backups/` — the newest 7 complete backups; a directory counts only after its `COMPLETE` file is written
+- stdout, which cron appends to `frigate-update.log`
+
+Crontab, as `kyle` (`crontab -e`; kyle is in the `docker` group, and the job does not use sudo):
+
+- `47 3 * * * /usr/bin/python3 /home/kyle/frigate/frigate-update.py >> /home/kyle/frigate/frigate-update.log 2>&1`
+- `@reboot /usr/bin/python3 /home/kyle/frigate/frigate-update.py --recover >> /home/kyle/frigate/frigate-update.log 2>&1`
+
+The `@reboot` line waits until Docker answers, then only finishes or undoes an interrupted run. With no `update-state.json` it exits `skipped`.
+
+Every run ends with one line, `OUTCOME <kind> <detail>`.
+
+- Exit 0: `current` (stable is not newer), `updated` (now on the new version), `recovered` (an interrupted run was closed with the previous version still in place), `skipped` (the lock was held, or `@reboot` found nothing to finish). `skipped` does not write `update-status.json`.
+- Exit 1: `held` (that version is in the hold file), `rolled-back` (the new version did not come up recording; the previous version is back and the new one is held), `refused` (Frigate was already unhealthy, or there is not enough disk or time to apply and roll back), `error` (bad input, or `stable` and the version tag are different images; the running container was not switched).
+- Exit 2: `rollback-failed` (the previous version did not come back healthy), `broken` (the saved phase cannot be made healthy, or a phase already marked `failed` was left alone and alerted again). Leave `update-state.json` in place. The backup directory named in it is the hand-restore source. The next night alerts again and does not repeat the restore.
+
+When an update migrates config, the `updated` detail says the config was rewritten, how many diff lines were added or removed against the backup, and the backup path. The backup's `config.yml` still has the comments Frigate drops. Copy those comments back by hand; copying the whole file back also reverts the migrated settings.
+
+Clearing a hold: fix whatever made that version fail, delete its line in `update-hold.txt`, and leave the rest of the file. The next nightly run retries it.
+
+Rolling back or upgrading by hand, from a backup directory that contains `COMPLETE`, and only while Frigate is stopped. Do not restore a backup over a database that has recorded since the copy was taken.
+
+- `docker compose --project-directory /home/kyle/frigate stop`
+- `cp update-backups/<dir>/docker-compose.yml /home/kyle/frigate/docker-compose.yml`
+- `cp update-backups/<dir>/config.yml /home/kyle/frigate/config/config.yml`
+- `frigate.db` is owned by root, so remove it and then copy. From `/home/kyle/frigate`: `rm -f config/frigate.db config/frigate.db-wal config/frigate.db-shm` and `cp update-backups/<dir>/frigate.db config/frigate.db`. Copy `frigate.db-wal` or `frigate.db-shm` only when that backup has the file.
+- To move forward by hand instead, set the compose `image:` line to the version you mean to run before `up`.
+- `docker compose --project-directory /home/kyle/frigate up -d`
+
+Testing:
+
+- `--dry-run` does the reads, the pulls and the version check, then prints the `OUTCOME` the real run would reach with `(dry-run)` in the detail. It does not stop Frigate, does not write the state, status or hold files, and does not run a recovery. If a state file exists, the line names the phase and what a real run would do.
+- `--candidate <local-image-ref>` skips the `stable` pull and treats that already-local image as the release under test. It still has to be newer, not held, backed up, health-checked, and rolled back if it does not record. That is how the apply and rollback paths get tested without waiting for a release. Combined with `--dry-run`, it stays read-only.
