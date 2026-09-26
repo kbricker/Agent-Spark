@@ -87,17 +87,33 @@ APPLY_NEED_S = (
     + HEALTH_SETTLE_S
 )
 
-# curl is the verified client for the local API. Listing /tmp/cache uses
-# /bin/ls in the image; that binary was not separately checked.
+# curl is the verified client for the local API. /bin/ls is in the image.
+# GNU long-iso keeps the listing line stable enough to full-match.
 DOCKER = "docker"
-CACHE_LIST_ARGV_TAIL = ["/bin/ls", "-1", CACHE_DIR]
+CACHE_LIST_ARGV_TAIL = ["/bin/ls", "-ln", "--time-style=long-iso", CACHE_DIR]
 
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
-VERSION_PY_RE = re.compile(r'^VERSION\s*=\s*"(\d+\.\d+\.\d+)(?:-[^"]*)?"$')
-EXACT_IMAGE_RE = re.compile(r"^    image: (\S+)\s*$")
-IMAGE_KEY_RE = re.compile(r"^image\s*:")
+VERSION_PY_RE = re.compile(r'^VERSION = "(\d+\.\d+\.\d+)(?:-[0-9a-f]{7,40})?"$')
+EXACT_IMAGE_RE = re.compile(r"^    image: ([A-Za-z0-9][A-Za-z0-9._:@/-]{0,255})$")
 REF_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:@/-]{0,255}$")
-CACHE_RE = re.compile(r"^(.+)@(\d{14})([+-])(\d{4})\.mp4$")
+CACHE_RE = re.compile(
+    r"^([A-Za-z0-9][A-Za-z0-9_.-]{0,128})@(\d{14})([+-])(\d{4})\.mp4$"
+)
+HOLD_LINE_RE = re.compile(r"^(\d+\.\d+\.\d+)(?:[ \t]+#.*)?$")
+HOLD_COMMENT_RE = re.compile(r"^#.*$")
+DOCKER_TIME_RE = re.compile(
+    r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(Z|[+-](\d{2}):(\d{2}))$"
+)
+IMAGE_ID_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
+RESTART_COUNT_RE = re.compile(r"^\d+$")
+HEALTH_RE = re.compile(r"^(healthy|unhealthy|starting)$")
+STATUS_RE = re.compile(r"^(created|restarting|running|removing|paused|exited|dead)$")
+LS_TOTAL_RE = re.compile(r"^total \d+$")
+LS_ENTRY_RE = re.compile(
+    r"^(-[-rwxsStT]{9}[.+@]?)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)\s+"
+    r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2})\s+"
+    r"([A-Za-z0-9][A-Za-z0-9_.-]{0,128}@\d{14}[+-]\d{4}\.mp4)$"
+)
 
 PHASES = {
     "applying",
@@ -177,6 +193,7 @@ class Run:
         self.restart_count = None
         self.baseline_cameras = None
         self.baseline_detectors = None
+        self.cache_seen = None
 
 
 RUN = Run()
@@ -236,12 +253,12 @@ def valid_ref(ref):
 
 
 def parse_version_py(text):
-    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    lines = [line for line in text.splitlines() if line.strip()]
     if not lines:
         raise ValueError("version.py is empty")
     match = VERSION_PY_RE.fullmatch(lines[-1])
     if match is None:
-        raise ValueError("version.py last line is not VERSION = \"X.Y.Z\"")
+        raise ValueError("version.py last line is not VERSION = \"X.Y.Z\" or a git hash")
     return match.group(1)
 
 
@@ -249,15 +266,14 @@ def parse_hold(text):
     found = set()
     for lineno, line in enumerate(text.splitlines(), 1):
         stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
+        if not stripped:
             continue
-        token = stripped.split()[0]
-        rest = stripped[len(token):].strip()
-        if rest and not rest.startswith("#"):
+        if HOLD_COMMENT_RE.fullmatch(stripped):
+            continue
+        match = HOLD_LINE_RE.fullmatch(stripped)
+        if match is None:
             raise ValueError(f"hold line {lineno} is not a version")
-        if not valid_version(token):
-            raise ValueError(f"hold line {lineno} is not a version")
-        found.add(token)
+        found.add(match.group(1))
     return found
 
 
@@ -272,9 +288,9 @@ def image_line_indexes(text):
         if body.endswith("\r"):
             body = body[:-1]
         stripped = body.strip()
-        if not stripped or stripped.startswith("#"):
+        if not stripped or HOLD_COMMENT_RE.fullmatch(stripped):
             continue
-        if IMAGE_KEY_RE.match(stripped):
+        if re.fullmatch(r"image\s*:.*", stripped):
             indexes.append(index)
     return indexes
 
@@ -357,30 +373,136 @@ def cache_segment_is_fresh(name, camera, not_before):
     return stamp >= threshold
 
 
+def command_line(text):
+    if not isinstance(text, str):
+        raise ValueError("command output is not text")
+    if text.endswith("\r\n"):
+        text = text[:-2]
+    elif text.endswith("\n"):
+        text = text[:-1]
+    if text != text.strip() or "\n" in text or "\r" in text:
+        raise ValueError("command output is not one strict line")
+    return text
+
+
 def parse_docker_time(value):
-    text = value.strip()
-    if not text or text == "<no value>":
-        raise ValueError("empty docker time")
-    if text.endswith("Z"):
-        text = text[:-1] + "+00:00"
-    if "." in text:
-        head, tail = text.split(".", 1)
-        split_at = None
-        for index, char in enumerate(tail):
-            if char in "+-":
-                split_at = index
-                break
-        if split_at is None:
-            frac = tail
-            tz = ""
-        else:
-            frac = tail[:split_at]
-            tz = tail[split_at:]
-        text = f"{head}.{(frac + '000000')[:6]}{tz}"
-    parsed = datetime.datetime.fromisoformat(text)
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=datetime.timezone.utc)
-    return parsed
+    if not isinstance(value, str):
+        raise ValueError("docker time is not text")
+    match = DOCKER_TIME_RE.fullmatch(value)
+    if match is None:
+        raise ValueError("docker time is malformed")
+    year, month, day, hour, minute, second, frac, tz, off_h, off_m = match.groups()
+    micro = int((frac + "000000")[:6]) if frac else 0
+    if tz == "Z":
+        tzinfo = datetime.timezone.utc
+    else:
+        hours = int(off_h)
+        minutes = int(off_m)
+        if hours > 23 or minutes > 59:
+            raise ValueError("docker time offset is malformed")
+        delta = datetime.timedelta(hours=hours, minutes=minutes)
+        if tz[0] == "-":
+            delta = -delta
+        tzinfo = datetime.timezone(delta)
+    return datetime.datetime(
+        int(year), int(month), int(day), int(hour), int(minute), int(second), micro, tzinfo
+    )
+
+
+def parse_image_id(text):
+    match = IMAGE_ID_RE.fullmatch(command_line(text))
+    if match is None:
+        raise ValueError("image id is malformed")
+    return match.group(0)
+
+
+def parse_restart_count(text):
+    line = command_line(text)
+    if RESTART_COUNT_RE.fullmatch(line) is None:
+        raise ValueError("restart count is malformed")
+    return int(line)
+
+
+def parse_health_status(text):
+    line = command_line(text)
+    if HEALTH_RE.fullmatch(line) is None:
+        raise ValueError("health status is malformed")
+    return line
+
+
+def parse_container_status(text):
+    line = command_line(text)
+    if STATUS_RE.fullmatch(line) is None:
+        raise ValueError("container status is malformed")
+    return line
+
+
+def parse_cache_listing(text):
+    if not isinstance(text, str):
+        raise ValueError("cache listing is not text")
+    entries = []
+    for line in text.splitlines():
+        if not line:
+            continue
+        if LS_TOTAL_RE.fullmatch(line):
+            continue
+        match = LS_ENTRY_RE.fullmatch(line)
+        if match is None:
+            raise ValueError("cache listing line is malformed")
+        size = int(match.group(5))
+        name = match.group(7)
+        parsed = parse_cache_name(name)
+        if parsed is None:
+            raise ValueError("cache listing name is malformed")
+        camera, stamp = parsed
+        entries.append((camera, stamp, size))
+    return entries
+
+
+def _grouped_segments(entries):
+    grouped = {}
+    for camera, stamp, size in entries:
+        grouped.setdefault(camera, []).append((stamp, size))
+    return grouped
+
+
+def finished_segment_empty(entries, camera):
+    segments = _grouped_segments(entries).get(camera, [])
+    if len(segments) < 2:
+        return False
+    newest = max(stamp for stamp, _size in segments)
+    return any(size <= 0 and stamp < newest for stamp, size in segments)
+
+
+def cache_observation_ok(entries, cameras, not_before):
+    threshold = not_before.astimezone().replace(microsecond=0)
+    grouped = _grouped_segments(entries)
+    for camera in cameras:
+        segments = grouped.get(camera, [])
+        if not any(stamp >= threshold for stamp, _size in segments):
+            return f"camera {camera} has no new cache segment"
+        if finished_segment_empty(entries, camera):
+            return f"camera {camera} has an empty finished segment"
+    return ""
+
+
+def recording_advance(before, after, cameras):
+    # A segment that is not the newest for its camera has been closed.
+    # The recheck has to see a strictly later name-timestamp than the first check.
+    before_grouped = _grouped_segments(before)
+    after_grouped = _grouped_segments(after)
+    for camera in cameras:
+        if finished_segment_empty(before, camera) or finished_segment_empty(after, camera):
+            return f"camera {camera} has an empty finished segment"
+        old = before_grouped.get(camera, [])
+        new = after_grouped.get(camera, [])
+        if not old:
+            return f"camera {camera} had no cache segment"
+        if not new:
+            return f"camera {camera} made no newer cache segment"
+        if max(stamp for stamp, _size in new) <= max(stamp for stamp, _size in old):
+            return f"camera {camera} made no newer cache segment"
+    return ""
 
 
 def line_change_count(before, after):
@@ -455,10 +577,26 @@ def encode_state(state):
     return json.dumps(payload, indent=2, sort_keys=True) + "\n"
 
 
+STATE_KEYS = {
+    "phase",
+    "from_ref",
+    "from_version",
+    "to_ref",
+    "to_version",
+    "backup_dir",
+    "up_at",
+    "cameras",
+    "detectors",
+}
+
+
 def decode_state(text):
     data = json.loads(text)
     if not isinstance(data, dict):
         raise ValueError("state is not an object")
+    unknown = set(data) - STATE_KEYS
+    if unknown:
+        raise ValueError("state has unknown fields")
     phase = data.get("phase")
     if phase not in PHASES:
         raise ValueError("state phase is unknown")
@@ -475,8 +613,10 @@ def decode_state(text):
         raise ValueError("state backup dir is outside update-backups")
     up_at = data.get("up_at")
     if up_at is not None:
-        if not isinstance(up_at, str):
-            raise ValueError("state up_at is not a string")
+        if not isinstance(up_at, str) or re.fullmatch(
+            r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}", up_at
+        ) is None:
+            raise ValueError("state up_at is malformed")
         datetime.datetime.fromisoformat(up_at)
     cameras = _name_list(data.get("cameras"))
     detectors = _name_list(data.get("detectors"))
@@ -511,18 +651,49 @@ def refuse_write(what):
         raise RuntimeError(f"dry-run tried to write {what}")
 
 
-def atomic_write(path, data, use_reserve=None):
+def write_all(fd, data, use_reserve=None):
+    view = memoryview(data)
+    while len(view):
+        if use_reserve is not None and remaining(use_reserve) <= 0:
+            raise BudgetExhausted("write")
+        wrote = os.write(fd, view)
+        if wrote is None or wrote <= 0:
+            raise OSError(errno.ENOSPC, "write returned no progress")
+        view = view[wrote:]
+
+
+def read_back(fd, size):
+    os.lseek(fd, 0, os.SEEK_SET)
+    got = bytearray()
+    while len(got) < size:
+        chunk = os.read(fd, size - len(got))
+        if not chunk:
+            break
+        got.extend(chunk)
+    if os.read(fd, 1) or len(got) != size:
+        raise OSError("temp file length does not match")
+    return bytes(got)
+
+
+def atomic_write(path, data, use_reserve=None, verify=None):
+    if not isinstance(data, (bytes, bytearray)):
+        raise TypeError("atomic_write expects bytes")
     refuse_write(path)
     directory = os.path.dirname(path)
     fd, tmp = tempfile.mkstemp(dir=directory, prefix=".frigate-update-", suffix=".tmp")
     tmp_left = tmp
     try:
-        if use_reserve is not None and remaining(use_reserve) <= 0:
-            raise BudgetExhausted("write")
-        os.write(fd, data)
+        write_all(fd, data, use_reserve)
         if use_reserve is not None and remaining(use_reserve) <= 0:
             raise BudgetExhausted("write")
         os.fsync(fd)
+        if os.fstat(fd).st_size != len(data):
+            raise OSError("temp file is short")
+        got = read_back(fd, len(data))
+        if got != bytes(data):
+            raise OSError("temp file does not match")
+        if verify is not None:
+            verify(got)
         os.close(fd)
         fd = -1
         os.chmod(tmp, 0o644)
@@ -539,8 +710,8 @@ def atomic_write(path, data, use_reserve=None):
                 pass
 
 
-def atomic_write_text(path, text, use_reserve=None):
-    atomic_write(path, text.encode("utf-8"), use_reserve=use_reserve)
+def atomic_write_text(path, text, use_reserve=None, verify=None):
+    atomic_write(path, text.encode("utf-8"), use_reserve=use_reserve, verify=verify)
 
 
 def durable_unlink(path):
@@ -581,10 +752,20 @@ def _copy_chunks(src_f, write_chunk, sync, use_reserve):
 def copy_durable(src, dst, use_reserve):
     refuse_write(dst)
     size = os.path.getsize(src)
-    with open(src, "rb") as src_f, open(dst, "wb") as dst_f:
-        _copy_chunks(src_f, dst_f.write, lambda: (dst_f.flush(), os.fsync(dst_f.fileno())), use_reserve)
-    if os.path.getsize(dst) != size or os.path.getsize(src) != size:
-        raise OSError(f"size changed while copying {os.path.basename(src)}")
+    fd = os.open(dst, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0), 0o644)
+    try:
+        with open(src, "rb") as src_f:
+            def write_chunk(chunk, dest=fd):
+                write_all(dest, chunk, use_reserve)
+
+            def sync(dest=fd):
+                os.fsync(dest)
+
+            _copy_chunks(src_f, write_chunk, sync, use_reserve)
+        if os.fstat(fd).st_size != size or os.path.getsize(src) != size:
+            raise OSError(f"backup copy of {os.path.basename(src)} is short")
+    finally:
+        os.close(fd)
     os.chmod(dst, 0o644)
 
 
@@ -600,12 +781,14 @@ def restore_durable(src, dst, use_reserve):
     try:
         with open(src, "rb") as src_f:
             def write_chunk(chunk, dest=fd):
-                os.write(dest, chunk)
+                write_all(dest, chunk, use_reserve)
 
             def sync(dest=fd):
                 os.fsync(dest)
 
             _copy_chunks(src_f, write_chunk, sync, use_reserve)
+        if os.fstat(fd).st_size != size:
+            raise OSError(f"restored temp of {os.path.basename(dst)} is short")
         os.close(fd)
         fd = -1
         os.chmod(tmp, 0o644)
@@ -698,7 +881,13 @@ def notify(kind, detail):
         "detail": detail,
         "version": version,
     }
-    atomic_write_text(STATUS_PATH, json.dumps(payload, indent=2, sort_keys=True) + "\n")
+    raw = json.dumps(payload, indent=2, sort_keys=True) + "\n"
+
+    def verify(blob, want=payload):
+        if json.loads(blob.decode("utf-8")) != want:
+            raise OSError("status temp did not parse back")
+
+    atomic_write_text(STATUS_PATH, raw, verify=verify)
 
 
 def read_running_version(use_reserve):
@@ -736,10 +925,10 @@ def image_id(ref, use_reserve):
         INSPECT_CAP_S,
         use_reserve,
     )
-    value = proc.stdout.strip()
-    if not value or "\n" in value:
-        raise Fail("error", f"no image id for {ref}")
-    return value
+    try:
+        return parse_image_id(proc.stdout)
+    except ValueError as exc:
+        raise Fail("error", f"image id for {ref} is malformed") from exc
 
 
 def inspect_format(template, use_reserve):
@@ -751,18 +940,33 @@ def inspect_format(template, use_reserve):
         )
     except (CmdFailed, CmdTimeout, BudgetExhausted):
         return None
-    value = proc.stdout.strip()
+    try:
+        value = command_line(proc.stdout)
+    except ValueError:
+        return None
     if not value or value == "<no value>":
         return None
     return value
 
 
 def inspect_status(use_reserve):
-    return inspect_format("{{.State.Status}}", use_reserve)
+    raw = inspect_format("{{.State.Status}}", use_reserve)
+    if raw is None:
+        return None
+    try:
+        return parse_container_status(raw)
+    except ValueError:
+        return None
 
 
 def inspect_health(use_reserve):
-    return inspect_format("{{.State.Health.Status}}", use_reserve)
+    raw = inspect_format("{{.State.Health.Status}}", use_reserve)
+    if raw is None:
+        return None
+    try:
+        return parse_health_status(raw)
+    except ValueError:
+        return None
 
 
 def inspect_restart_count(use_reserve):
@@ -770,7 +974,7 @@ def inspect_restart_count(use_reserve):
     if raw is None:
         return None
     try:
-        return int(raw)
+        return parse_restart_count(raw)
     except ValueError:
         return None
 
@@ -876,8 +1080,13 @@ def persist(state):
     if state["phase"] not in PHASES:
         raise Fail("broken", "refusing to persist an unknown phase")
     encoded = encode_state(state)
-    decode_state(encoded)
-    atomic_write_text(STATE_PATH, encoded)
+    expected = decode_state(encoded)
+
+    def verify(blob, want=expected):
+        if decode_state(blob.decode("utf-8")) != want:
+            raise OSError("state temp did not parse back")
+
+    atomic_write(STATE_PATH, encoded.encode("utf-8"), verify=verify)
     RUN.state = dict(state)
     if state["phase"] == "switched":
         RUN.switched = True
@@ -923,7 +1132,14 @@ def append_hold(version):
     updated = render_hold(text, version)
     if updated == text:
         return
-    atomic_write_text(HOLD_PATH, updated)
+    want = parse_hold(updated)
+
+    def verify(blob, expected=want, raw=updated):
+        got = blob.decode("utf-8")
+        if got != raw or parse_hold(got) != expected:
+            raise OSError("hold temp did not parse back")
+
+    atomic_write_text(HOLD_PATH, updated, verify=verify)
 
 
 def api_json(url, use_reserve):
@@ -1005,7 +1221,7 @@ def recording_gap(config, stats, cameras, detectors):
     return ""
 
 
-def cache_names(use_reserve):
+def list_cache(use_reserve):
     proc = run_cmd(
         [DOCKER, "exec", CONTAINER, *CACHE_LIST_ARGV_TAIL],
         EXEC_CAP_S,
@@ -1014,8 +1230,8 @@ def cache_names(use_reserve):
     )
     if proc.returncode != 0:
         log(f"cache list rc={proc.returncode}: {clip_err(proc.stderr)}")
-        return []
-    return [line for line in proc.stdout.splitlines() if line]
+        raise OSError("cache list failed")
+    return parse_cache_listing(proc.stdout)
 
 
 def health_snapshot(target_version, up_at, require_cache, use_reserve, strict, baseline):
@@ -1062,12 +1278,17 @@ def health_snapshot(target_version, up_at, require_cache, use_reserve, strict, b
     if up_at is None:
         return "no start time for the cache check"
     try:
-        names = cache_names(use_reserve)
-    except (CmdFailed, CmdTimeout, BudgetExhausted):
+        entries = list_cache(use_reserve)
+    except (CmdFailed, CmdTimeout, BudgetExhausted, OSError):
         return "cache list failed"
-    for camera in cameras:
-        if not any(cache_segment_is_fresh(name, camera, up_at) for name in names):
-            return f"camera {camera} has no new cache segment"
+    except ValueError as exc:
+        if strict:
+            raise Fail("error", str(exc))
+        return "cache listing is malformed"
+    reason = cache_observation_ok(entries, cameras, up_at)
+    if reason:
+        return reason
+    RUN.cache_seen = entries
     return ""
 
 
@@ -1083,6 +1304,7 @@ def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast
     last = "health check did not run"
     restarts = None
     captured = baseline
+    seen = None
     while True:
         if time.monotonic() >= deadline:
             return last
@@ -1092,6 +1314,7 @@ def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast
         if last == "":
             if captured is None:
                 captured = (list(RUN.baseline_cameras), list(RUN.baseline_detectors))
+            seen = RUN.cache_seen
             restarts = RUN.restart_count
             break
         if captured is None and last in ("no enabled cameras", "no detectors"):
@@ -1114,6 +1337,17 @@ def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast
         return f"settle re-check failed: {last}"
     if RUN.restart_count != restarts:
         return f"restart count changed from {restarts} to {RUN.restart_count}"
+    if require_cache:
+        try:
+            current = list_cache(use_reserve)
+        except (CmdFailed, CmdTimeout, BudgetExhausted, OSError):
+            return "cache list failed"
+        except ValueError:
+            return "cache listing is malformed"
+        cameras = captured[0] if captured else []
+        reason = recording_advance(seen or [], current, cameras)
+        if reason:
+            return reason
     return ""
 
 
@@ -1266,7 +1500,13 @@ def make_backup(backup_dir, from_ref):
         raise OSError("backup compose does not hold the from-ref")
     # COMPLETE is the last directory entry. A crash before it leaves a
     # backup that recovery will not restore from.
-    atomic_write_text(os.path.join(backup_dir, COMPLETE_NAME), "ok\n")
+    marker = b"ok\n"
+
+    def verify(blob, want=marker):
+        if blob != want:
+            raise OSError("complete marker did not match")
+
+    atomic_write(os.path.join(backup_dir, COMPLETE_NAME), marker, verify=verify)
     fsync_dir(backup_dir)
     fsync_dir(BACKUP_ROOT)
 
@@ -1345,15 +1585,14 @@ def prune_images(keep_versions):
     except (CmdFailed, CmdTimeout, BudgetExhausted) as exc:
         log(f"image list failed: {short(exc)}")
         return
-    prefix = REGISTRY + ":"
+    tag_line = re.compile("^" + re.escape(REGISTRY) + r":(\d+\.\d+\.\d+)$")
     for line in proc.stdout.splitlines():
-        ref = line.strip()
-        if not ref.startswith(prefix):
+        match = tag_line.fullmatch(line)
+        if match is None:
             continue
-        tag = ref[len(prefix):]
-        if not valid_version(tag) or tag in keep_versions:
-            continue
-        if not valid_ref(ref):
+        tag = match.group(1)
+        ref = REGISTRY + ":" + tag
+        if tag in keep_versions:
             continue
         try:
             run_cmd([DOCKER, "image", "rm", ref], IMAGE_RM_CAP_S, use_reserve=True)
@@ -1558,7 +1797,13 @@ def rewrite_to(ref):
         raise BudgetExhausted("compose rewrite")
     text = read_text(COMPOSE_PATH)
     rewritten = rewrite_compose_image(text, ref)
-    atomic_write_text(COMPOSE_PATH, rewritten, use_reserve=False)
+
+    def verify(blob, want=rewritten, image=ref):
+        got = blob.decode("utf-8")
+        if got != want or parse_compose_image(got) != image:
+            raise OSError("compose temp did not parse back")
+
+    atomic_write_text(COMPOSE_PATH, rewritten, use_reserve=False, verify=verify)
     RUN.switched = True
     if read_compose_image() != ref:
         raise OSError("compose image line did not update")
