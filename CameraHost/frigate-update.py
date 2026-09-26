@@ -78,6 +78,7 @@ UP_CAP_S = 60
 BACKUP_CAP_S = 90
 IMAGE_LS_CAP_S = 30
 IMAGE_RM_CAP_S = 60
+COPY_CHUNK_BYTES = 8 * 1024 * 1024
 APPLY_NEED_S = (
     2 * (STOP_CAP_S + STOP_POLL_S)
     + BACKUP_CAP_S
@@ -139,7 +140,10 @@ class Fail(Exception):
         self.detail = detail
 
 
-class Interrupted(Exception):
+# Not an Exception. A SIGTERM or SIGINT must not be caught by the
+# `except Exception` around stop, backup, rewrite, up, restore or persist
+# and then saved as phase "failed".
+class Interrupted(BaseException):
     pass
 
 
@@ -171,6 +175,8 @@ class Run:
         self.bringing_back = False
         self.state = None
         self.restart_count = None
+        self.baseline_cameras = None
+        self.baseline_detectors = None
 
 
 RUN = Run()
@@ -419,6 +425,20 @@ def assert_contained_backup(path):
         raise OSError("backup dir resolves outside update-backups")
 
 
+NAME_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,128}$")
+
+
+def _name_list(value):
+    if not isinstance(value, list) or not value:
+        return None
+    names = []
+    for item in value:
+        if not isinstance(item, str) or NAME_RE.fullmatch(item) is None:
+            return None
+        names.append(item)
+    return names
+
+
 def encode_state(state):
     payload = {
         "phase": state["phase"],
@@ -430,6 +450,8 @@ def encode_state(state):
     }
     if state.get("up_at"):
         payload["up_at"] = state["up_at"]
+    payload["cameras"] = list(state["cameras"])
+    payload["detectors"] = list(state["detectors"])
     return json.dumps(payload, indent=2, sort_keys=True) + "\n"
 
 
@@ -456,6 +478,10 @@ def decode_state(text):
         if not isinstance(up_at, str):
             raise ValueError("state up_at is not a string")
         datetime.datetime.fromisoformat(up_at)
+    cameras = _name_list(data.get("cameras"))
+    detectors = _name_list(data.get("detectors"))
+    if cameras is None or detectors is None:
+        raise ValueError("state has no camera or detector baseline")
     return {
         "phase": phase,
         "from_ref": from_ref,
@@ -464,6 +490,8 @@ def decode_state(text):
         "to_version": to_version,
         "backup_dir": backup_dir,
         "up_at": up_at,
+        "cameras": cameras,
+        "detectors": detectors,
     }
 
 
@@ -483,13 +511,17 @@ def refuse_write(what):
         raise RuntimeError(f"dry-run tried to write {what}")
 
 
-def atomic_write(path, data):
+def atomic_write(path, data, use_reserve=None):
     refuse_write(path)
     directory = os.path.dirname(path)
     fd, tmp = tempfile.mkstemp(dir=directory, prefix=".frigate-update-", suffix=".tmp")
     tmp_left = tmp
     try:
+        if use_reserve is not None and remaining(use_reserve) <= 0:
+            raise BudgetExhausted("write")
         os.write(fd, data)
+        if use_reserve is not None and remaining(use_reserve) <= 0:
+            raise BudgetExhausted("write")
         os.fsync(fd)
         os.close(fd)
         fd = -1
@@ -507,8 +539,8 @@ def atomic_write(path, data):
                 pass
 
 
-def atomic_write_text(path, text):
-    atomic_write(path, text.encode("utf-8"))
+def atomic_write_text(path, text, use_reserve=None):
+    atomic_write(path, text.encode("utf-8"), use_reserve=use_reserve)
 
 
 def durable_unlink(path):
@@ -527,19 +559,36 @@ def ensure_dir(path):
     fsync_dir(os.path.dirname(path))
 
 
-def copy_durable(src, dst):
+def _read_chunk(handle, size):
+    return handle.read(size)
+
+
+def _copy_chunks(src_f, write_chunk, sync, use_reserve):
+    # frigate.db is about 155 MB. One read of the whole file can run past
+    # the forward budget into the time reserved for starting Frigate again.
+    while True:
+        if remaining(use_reserve) <= 0:
+            raise BudgetExhausted("copy")
+        chunk = _read_chunk(src_f, COPY_CHUNK_BYTES)
+        if not chunk:
+            break
+        write_chunk(chunk)
+    if remaining(use_reserve) <= 0:
+        raise BudgetExhausted("copy")
+    sync()
+
+
+def copy_durable(src, dst, use_reserve):
     refuse_write(dst)
     size = os.path.getsize(src)
     with open(src, "rb") as src_f, open(dst, "wb") as dst_f:
-        shutil.copyfileobj(src_f, dst_f, length=1024 * 1024)
-        dst_f.flush()
-        os.fsync(dst_f.fileno())
+        _copy_chunks(src_f, dst_f.write, lambda: (dst_f.flush(), os.fsync(dst_f.fileno())), use_reserve)
     if os.path.getsize(dst) != size or os.path.getsize(src) != size:
         raise OSError(f"size changed while copying {os.path.basename(src)}")
     os.chmod(dst, 0o644)
 
 
-def restore_durable(src, dst):
+def restore_durable(src, dst, use_reserve):
     # Temp file in the destination directory, then replace. frigate.db is
     # root-owned and mode 0644, so kyle can unlink it but cannot write it
     # in place. A power cut leaves either the old file or the new one.
@@ -550,12 +599,13 @@ def restore_durable(src, dst):
     tmp_left = tmp
     try:
         with open(src, "rb") as src_f:
-            while True:
-                chunk = src_f.read(1024 * 1024)
-                if not chunk:
-                    break
-                os.write(fd, chunk)
-        os.fsync(fd)
+            def write_chunk(chunk, dest=fd):
+                os.write(dest, chunk)
+
+            def sync(dest=fd):
+                os.fsync(dest)
+
+            _copy_chunks(src_f, write_chunk, sync, use_reserve)
         os.close(fd)
         fd = -1
         os.chmod(tmp, 0o644)
@@ -907,21 +957,48 @@ def enabled_cameras(config):
     return names
 
 
-def stats_ok(stats, cameras):
-    cam_stats = stats.get("cameras")
+def detector_names(stats):
     detectors = stats.get("detectors")
-    if not isinstance(cam_stats, dict) or not isinstance(detectors, dict):
+    if not isinstance(detectors, dict):
+        raise ValueError("api stats is missing detectors")
+    names = []
+    for name, body in detectors.items():
+        if not isinstance(name, str) or not isinstance(body, dict):
+            raise ValueError("api stats detector entry is malformed")
+        names.append(name)
+    return names
+
+
+def recording_gap(config, stats, cameras, detectors):
+    # Healthy means the cameras and detectors that were recording before
+    # the update are still recording. An empty list is not a pass.
+    if not cameras:
+        return "no enabled cameras"
+    if not detectors:
+        return "no detectors"
+    configured = config.get("cameras")
+    if not isinstance(configured, dict):
+        raise ValueError("api config has no cameras object")
+    cam_stats = stats.get("cameras")
+    det_stats = stats.get("detectors")
+    if not isinstance(cam_stats, dict) or not isinstance(det_stats, dict):
         raise ValueError("api stats is missing cameras or detectors")
     for name in cameras:
+        cam = configured.get(name)
+        if not isinstance(cam, dict):
+            return f"camera {name} is missing from config"
+        if cam.get("enabled", True) is False:
+            return f"camera {name} is disabled"
         body = cam_stats.get(name)
         if not isinstance(body, dict):
             return f"camera {name} is missing from stats"
         fps = body.get("camera_fps")
         if isinstance(fps, bool) or not isinstance(fps, (int, float)) or fps <= 0:
             return f"camera {name} camera_fps is {fps}"
-    for name, body in detectors.items():
+    for name in detectors:
+        body = det_stats.get(name)
         if not isinstance(body, dict):
-            return f"detector {name} is malformed"
+            return f"detector {name} is missing"
         speed = body.get("inference_speed")
         if isinstance(speed, bool) or not isinstance(speed, (int, float)) or speed <= 0:
             return f"detector {name} inference_speed is {speed}"
@@ -941,7 +1018,7 @@ def cache_names(use_reserve):
     return [line for line in proc.stdout.splitlines() if line]
 
 
-def health_snapshot(target_version, up_at, require_cache, use_reserve, strict):
+def health_snapshot(target_version, up_at, require_cache, use_reserve, strict, baseline):
     status = inspect_status(use_reserve)
     if status != "running":
         return f"container status is {status}"
@@ -959,8 +1036,12 @@ def health_snapshot(target_version, up_at, require_cache, use_reserve, strict):
     try:
         config = api_json(API_CONFIG, use_reserve)
         stats = api_json(API_STATS, use_reserve)
-        cameras = enabled_cameras(config)
-        reason = stats_ok(stats, cameras)
+        if baseline is None:
+            cameras = enabled_cameras(config)
+            detectors = detector_names(stats)
+        else:
+            cameras, detectors = baseline
+        reason = recording_gap(config, stats, cameras, detectors)
     except (CmdFailed, CmdTimeout, BudgetExhausted) as exc:
         return f"api unreachable ({exc.__class__.__name__})"
     except ValueError as exc:
@@ -969,6 +1050,9 @@ def health_snapshot(target_version, up_at, require_cache, use_reserve, strict):
         return str(exc)
     if reason:
         return reason
+    if baseline is None:
+        RUN.baseline_cameras = list(cameras)
+        RUN.baseline_detectors = list(detectors)
     restarts = inspect_restart_count(use_reserve)
     if restarts is None:
         return "restart count is unreadable"
@@ -994,19 +1078,24 @@ def sleep_for(seconds, use_reserve):
     return remaining(use_reserve) >= 0
 
 
-def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast_version):
+def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast_version, baseline):
     deadline = time.monotonic() + min(HEALTH_TIMEOUT_S, max(0.0, remaining(use_reserve)))
     last = "health check did not run"
     restarts = None
+    captured = baseline
     while True:
         if time.monotonic() >= deadline:
             return last
         last = health_snapshot(
-            target_version, up_at, require_cache, use_reserve, strict
+            target_version, up_at, require_cache, use_reserve, strict, captured
         )
         if last == "":
+            if captured is None:
+                captured = (list(RUN.baseline_cameras), list(RUN.baseline_detectors))
             restarts = RUN.restart_count
             break
+        if captured is None and last in ("no enabled cameras", "no detectors"):
+            return last
         if fast_version and last.startswith("running ") and " != target " in last:
             return last
         log(f"health: {last}")
@@ -1018,7 +1107,8 @@ def wait_healthy(target_version, up_at, require_cache, use_reserve, strict, fast
     if not sleep_for(HEALTH_SETTLE_S, use_reserve):
         return "budget ran out before the 60s settle re-check"
     last = health_snapshot(
-        target_version, up_at, require_cache=False, use_reserve=use_reserve, strict=strict
+        target_version, up_at, require_cache=False, use_reserve=use_reserve, strict=strict,
+        baseline=captured,
     )
     if last:
         return f"settle re-check failed: {last}"
@@ -1038,9 +1128,12 @@ def require_already_healthy(version):
         use_reserve=False,
         strict=True,
         fast_version=True,
+        baseline=None,
     )
     if reason:
         raise Fail("refused", f"frigate is not healthy: {reason}")
+    if not RUN.baseline_cameras or not RUN.baseline_detectors:
+        raise Fail("refused", "frigate has no enabled cameras or detectors")
 
 
 def disk_need():
@@ -1165,7 +1258,7 @@ def make_backup(backup_dir, from_ref):
     for name in names:
         if time.monotonic() - started > BACKUP_CAP_S or remaining(False) <= 0:
             raise BudgetExhausted("backup")
-        copy_durable(source_for(name), os.path.join(backup_dir, name))
+        copy_durable(source_for(name), os.path.join(backup_dir, name), False)
         if os.path.getsize(os.path.join(backup_dir, name)) != os.path.getsize(source_for(name)):
             raise OSError(f"backup size mismatch for {name}")
         fsync_dir(backup_dir)
@@ -1210,11 +1303,11 @@ def restore_backup(state):
         if not os.path.isfile(backed) and os.path.lexists(live):
             durable_unlink(live)
     for name in BACKUP_FILES:
-        restore_durable(os.path.join(backup_dir, name), source_for(name))
+        restore_durable(os.path.join(backup_dir, name), source_for(name), True)
     for name in OPTIONAL_DB_FILES:
         backed = os.path.join(backup_dir, name)
         if os.path.isfile(backed):
-            restore_durable(backed, source_for(name))
+            restore_durable(backed, source_for(name), True)
     if read_compose_image() != state["from_ref"]:
         raise OSError("compose ref after restore is not the from-ref")
 
@@ -1348,6 +1441,7 @@ def try_up_and_health(state, version, use_reserve):
             use_reserve=use_reserve,
             strict=False,
             fast_version=False,
+            baseline=(state["cameras"], state["detectors"]),
         )
         if reason:
             log(f"health failed for {version}: {reason}")
@@ -1404,6 +1498,10 @@ def rollback(state, detail):
         finish("rollback-failed", detail + "; could not stop frigate to restore")
     try:
         restore_backup(rolling)
+    except BudgetExhausted as exc:
+        # Stay on rolling-back so the next run redoes the restore. Marking
+        # failed here would leave a half-copied database with no retry.
+        finish("rollback-failed", detail + f"; restore ran out of time ({short(exc)}); phase left rolling-back")
     except Exception as exc:
         persist_failed(rolling)
         finish("rollback-failed", detail + f"; restore failed: {short(exc)}")
@@ -1456,15 +1554,19 @@ def rewrite_to(ref):
     refuse_write("compose")
     if not valid_ref(ref):
         raise Fail("error", "candidate ref is not a plain reference")
+    if remaining(False) <= 0:
+        raise BudgetExhausted("compose rewrite")
     text = read_text(COMPOSE_PATH)
     rewritten = rewrite_compose_image(text, ref)
-    atomic_write_text(COMPOSE_PATH, rewritten)
+    atomic_write_text(COMPOSE_PATH, rewritten, use_reserve=False)
     RUN.switched = True
     if read_compose_image() != ref:
         raise OSError("compose image line did not update")
 
 
 def apply(from_ref, from_version, to_ref, to_version):
+    if not RUN.baseline_cameras or not RUN.baseline_detectors:
+        raise Fail("refused", "no enabled cameras or detectors were recorded")
     backup_dir = backup_name(from_version, to_version)
     state = {
         "phase": "applying",
@@ -1474,6 +1576,8 @@ def apply(from_ref, from_version, to_ref, to_version):
         "to_version": to_version,
         "backup_dir": backup_dir,
         "up_at": None,
+        "cameras": list(RUN.baseline_cameras),
+        "detectors": list(RUN.baseline_detectors),
     }
     # Phase hits disk before stop. A kill here leaves compose untouched.
     persist(state)
@@ -1515,7 +1619,7 @@ def apply(from_ref, from_version, to_ref, to_version):
         finalize_success(state)
     except (SystemExit, Fail):
         raise
-    except (Exception, KeyboardInterrupt) as exc:
+    except Exception as exc:
         safety_net(exc)
 
 
@@ -1716,10 +1820,9 @@ def run_nightly(candidate):
 
 
 def safety_net(exc):
-    if isinstance(exc, Interrupted):
-        detail = "received signal"
-    else:
-        detail = f"unexpected {exc.__class__.__name__}: {short(exc)}"
+    if isinstance(exc, (Interrupted, KeyboardInterrupt)):
+        raise exc
+    detail = f"unexpected {exc.__class__.__name__}: {short(exc)}"
     log(detail)
     state = RUN.state
     if RUN.bringing_back:
@@ -1786,6 +1889,23 @@ def install_signals():
         return
 
 
+def report_interrupted():
+    # Read the phase. Do not write it, and do not call notify: an
+    # interrupted run must not replace the last real status.
+    phase = None
+    try:
+        if os.path.exists(STATE_PATH):
+            phase = decode_state(read_text(STATE_PATH))["phase"]
+    except (OSError, ValueError):
+        phase = None
+    if phase is None and isinstance(RUN.state, dict) and RUN.state.get("phase") in PHASES:
+        phase = RUN.state["phase"]
+    if phase is None:
+        phase = "none"
+    print(f"OUTCOME error interrupted at phase {phase}; the next run resumes", flush=True)
+    raise SystemExit(EXIT_CODES["error"])
+
+
 def main(argv):
     start_clock()
     RUN.dry_run = "--dry-run" in argv
@@ -1798,13 +1918,13 @@ def main(argv):
         else:
             run_nightly(candidate)
         finish("error", "run ended without an outcome")
+    except (Interrupted, KeyboardInterrupt):
+        report_interrupted()
     except Fail as exc:
         finish(exc.kind, exc.detail)
-    except Interrupted:
-        safety_net(Interrupted("signal"))
     except SystemExit:
         raise
-    except (Exception, KeyboardInterrupt) as exc:
+    except Exception as exc:
         safety_net(exc)
 
 

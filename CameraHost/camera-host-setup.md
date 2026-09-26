@@ -592,7 +592,7 @@ record:
 
 ## 13. Updates — the nightly job
 
-Frigate publishes fixes only on its newest release, and this box is reachable from the internet (plan 951.1), so the pinned image has to follow every release. A large release migrates `config.yml` and `frigate.db` on startup and can need a manual change. `frigate-update.py` in this folder is the nightly job; copy it to `/home/kyle/frigate/frigate-update.py`. It moves the pin, and if the new version does not come up recording it puts the previous compose file, config and database back.
+Frigate publishes fixes only on its newest release, and this box is being made reachable from the internet (plan 951.1), so the pinned image has to follow every release. A large release migrates `config.yml` and `frigate.db` on startup and can need a manual change. `frigate-update.py` in this folder is the nightly job; copy it to `/home/kyle/frigate/frigate-update.py`. It moves the pin, and if the new version does not come up recording it puts the previous compose file, config and database back.
 
 What a run does:
 
