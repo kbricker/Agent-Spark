@@ -4,7 +4,7 @@ description: "Camera host (GarageBox) — Frigate NVR box: ssh alias, hardware i
 metadata:
   node_type: memory
   type: reference
-  modified: 2026-09-26T04:53:13.338Z
+  modified: 2026-09-26T05:11:34.170Z
 ---
 
 The camera host is the Frigate NVR for the house security cameras. `ssh camhost` from the desk. Build/config reference is the doc at `C:\Projects\spark\CameraHost\camera-host-setup.md` — detail belongs there, this memory only carries what I need to reconnect and not re-derive.
@@ -19,6 +19,7 @@ The camera host is the Frigate NVR for the house security cameras. `ssh camhost`
 ## Running state
 
 - **Frigate 0.18.0** since 2026-09-25 (hand upgrade from 0.17.2, plan 951.1) lives in **`~/frigate`**, not `/opt` — deliberate, so nothing needs root. `docker compose` as `kyle` (in the `docker` group). **UI on https://view.kylebricker.com — internet-facing since 2026-09-25, WAN 443 only** (real Let's Encrypt cert, forge renews it via `frigate-cert-renew.timer`); on the LAN also https://192.168.86.142:8971 (same container port and cert, so the browser warns about the IP name). **The compose image is PINNED to an exact version (`:0.18.0`), not `:stable`** — the nightly update job (951.1) moves the pin; never hand-edit it back to `stable`. Frigate only patches its newest release, so falling a version behind means no security fixes. Pre-upgrade backups: `config/*.bak-20260925-pre018`, old image tagged `frigate-rollback:0.17.2`.
+- **Automation (plan 951.1, 2026-09-25):** kyle's crontab runs `frigate-update.py` at 03:47 (+ `@reboot --recover`) and `porkbun-ddns.py` every 10 min; forge's `frigate-cert-renew.timer` renews the cert at 03:30. All three check in to healthchecks.io (slugs `frigate-update`, `ddns`, `cert-renew`), which emails Kyle on a failure or a missed check-in — alert path proven end to end. Sources in `CameraHost/`; hand upgrade/rollback and clearing a held release are in setup-doc §13.
 - **Upgrades: the migrator rewrites `config.yml` and can silently DROP comments** (0.18 dropped the outdoor ONVIF-auth note; restored by hand). After any upgrade, diff `config.yml` against its backup.
 - **Recording folders are UTC-dated** (`storage/recordings/<UTC date>/<UTC hour>/<camera>/`) — a local-date `find` misses current segments. Retention is motion-only, so a quiet camera keeps nothing for minutes; the proof a camera is recording is a fresh `<camera>@<ts>.mp4` in the container's `/tmp/cache`.
 - **Recordings live on the 4 TB HDD since 2026-09-18:** `/dev/sda1`, ext4 label `frigate`, mounted AT `~/frigate/storage` from fstab by UUID (`64a0abcf-b151-46ab-825b-d70196e231f9`, `noatime,nofail,x-systemd.device-timeout=15`), so compose, the doc and every `du` command are unchanged. The empty mount-point directory underneath is `chattr +i` — a missing HDD makes Frigate fail loudly instead of silently filling the NVMe. OS, `config/` and `frigate.db` stay on the NVMe. Drive health: `sudo smartctl -a /dev/sda` (smartmontools installed 2026-09-18, `smartd` active; factory baseline on plan #951 — Seagate raw values on attributes 1/7/195 are counters, not errors). Bulk copy speed measured at ~90-95 MB/s.
