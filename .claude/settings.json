@@ -29,6 +29,15 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/jev-prompt-router.mjs --agent spark",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "Stop": [
@@ -38,6 +47,15 @@
             "type": "command",
             "command": "node C:/Projects/wfa2/hooks/hive-status-idle.mjs --agent spark",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/jev-stop-gate.mjs --agent spark",
+            "timeout": 25
           }
         ]
       }
