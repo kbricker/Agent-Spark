@@ -51,7 +51,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_fast_track_is_default.md — Working a plan? Fast-track: dev + review inline, fan out to subagents, no other pipeline. Governs plans, not asks
 - feedback_fix_workflow_problems_when_found.md — Hit a workflow or process defect mid-task? Fix it now or ticket it — breaking context is worth it; don't just note it
 - feedback_harness_index_size_nag_is_advisory.md — 'Compact MEMORY.md to under 17.1KB' after an edit? Harness 70% warning; the fleet limit is 25,000 bytes — do not compact
-- feedback_kyle_reads_and_directs.md — About to build Kyle a button or hands-on control? Don't — he reads and directs; CodeRabbit reviews, agents edit tickets
+- feedback_kyle_reads_and_directs.md — About to build Kyle a button, or leave him a command to run? Don't — he reads and directs; agents edit tickets and do …
 - feedback_kyle_sets_start_and_stop.md — About to suggest wrapping up, or start the next thing unprompted? Kyle signals go and stop explicitly — wait for both
 - feedback_log_review_findings.md — A review just settled? Not finished until surviving AND skipped findings are in the store via hive_review_finding_add
 - feedback_move_tickets_with_work.md — Started or stopped a ticket? Move it (Development/CodeReview/Completed) and declare it: hive_set_status planId or ""
