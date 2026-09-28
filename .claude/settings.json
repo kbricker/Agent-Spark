@@ -84,6 +84,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "mcp__plugin_hive-channel_hive__hive_plan_update",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/jev-readiness-gate.mjs --agent spark",
+            "timeout": 90
+          }
+        ]
       }
     ]
   },
