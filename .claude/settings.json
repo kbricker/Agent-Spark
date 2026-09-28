@@ -11,11 +11,26 @@
       "WebSearch",
       "Write",
       "mcp__plugin_hive-channel_hive__*",
-      "Skill(fast-track-plan)"
+      "Skill(fast-track-plan)",
+      "Bash(git -C C:/Projects/TendWright branch -d:*)",
+      "Bash(git -C C:/Projects/TendWright push origin --delete:*)",
+      "Bash(git -C C:/Projects/TendWright worktree list)",
+      "Bash(git -C C:/Projects/TendWright worktree prune)",
+      "Bash(git -C C:/Projects/webstorm/orbital branch -d:*)",
+      "Bash(git -C C:/Projects/webstorm/orbital push origin --delete:*)",
+      "Bash(git -C C:/Projects/webstorm/orbital worktree list)",
+      "Bash(git -C C:/Projects/webstorm/orbital worktree prune)",
+      "Bash(git -C C:/Projects/TendWright worktree remove C:/Projects/grok-worktrees/*)",
+      "Bash(git -C C:/Projects/TendWright worktree remove --force C:/Projects/grok-worktrees/*)",
+      "Bash(git -C C:/Projects/webstorm/orbital worktree remove C:/Projects/grok-worktrees/*)",
+      "Bash(git -C C:/Projects/webstorm/orbital worktree remove --force C:/Projects/grok-worktrees/*)"
     ],
     "additionalDirectories": [
       "C:/Projects/webstorm/orbital",
       "C:/Projects/TendWright"
+    ],
+    "deny": [
+      "Bash(git * worktree remove *..*)"
     ]
   },
   "enableAllProjectMcpServers": true,
