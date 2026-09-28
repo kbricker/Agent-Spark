@@ -1,6 +1,6 @@
 ---
 name: Kyle reads and directs — never hands-on
-description: About to build Kyle a button, or leave him a command to run? Don't — he reads and directs; agents edit tickets and do every bit of housekeeping
+description: About to build Kyle a button, or leave him a command to run? Don't — he reads and directs; agents do all housekeeping
 type: feedback
 scope: global
 ---
