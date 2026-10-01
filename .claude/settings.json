@@ -51,6 +51,11 @@
             "type": "command",
             "command": "node C:/Projects/wfa2/hooks/jev-prompt-router.mjs --agent spark",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/jev-intake.mjs --agent spark",
+            "timeout": 5
           }
         ]
       }
