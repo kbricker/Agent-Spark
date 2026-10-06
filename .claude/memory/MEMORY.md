@@ -108,5 +108,5 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 <!-- BEGIN RETRIEVAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
 ## In retrieval — NOT loaded here; search with hive_recall
 These topics were moved out of always-loaded memory. The facts are intact and searchable; only the text left this index. Behavioural rules are never in here.
-- github ssh · plan state design intent · plan completion path · channels platform dependency · primary agents · 3dproppipeline agent · how to reach another agent · forge agent · bash permission matching
+- github ssh · plan state design intent · plan completion path · channels platform dependency · primary agents · 3dproppipeline agent · how to reach another agent · forge agent · bash permission matching · lane machinery · people vendors channels · camera host
 <!-- END RETRIEVAL SECTION -->
