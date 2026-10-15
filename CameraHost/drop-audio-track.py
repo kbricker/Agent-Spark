@@ -42,6 +42,11 @@ TYPE_MDIA = b"mdia"
 TYPE_HDLR = b"hdlr"
 HANDLER_VIDE = b"vide"
 HANDLER_SOUN = b"soun"
+# Standard containers whose children must be walked. Leaf boxes are
+# bounds-checked by their headers only.
+CONTAINERS = frozenset({
+    b"trak", b"edts", b"mdia", b"minf", b"dinf", b"stbl",
+})
 
 
 class ParseError(Exception):
@@ -140,27 +145,36 @@ def iter_top_level(handle, file_size):
         offset += size
 
 
-def track_handler(data, box_off, box_size, box_hdr):
-    start = box_off + box_hdr
-    end = box_off + box_size
-    mdia = None
+def walk_boxes(data, start, end):
+    # Children must exactly fill the parent: iter_boxes raises on overrun
+    # or a trailing gap smaller than a box header.
+    children = []
     for off, size, typ, hdr in iter_boxes(data, start, end):
-        if typ == TYPE_MDIA:
-            mdia = (off, size, hdr)
-            break
-    if mdia is None:
+        children.append((off, size, typ, hdr))
+        if typ in CONTAINERS:
+            walk_boxes(data, off + hdr, off + size)
+    return children
+
+
+def track_handler(data, box_off, box_size, box_hdr):
+    # Do not trust a prefix: a readable hdlr can be followed by a
+    # malformed minf. Walk the whole container tree first.
+    children = walk_boxes(data, box_off + box_hdr, box_off + box_size)
+    mdias = [c for c in children if c[2] == TYPE_MDIA]
+    if len(mdias) != 1:
         return None
-    m_off, m_size, m_hdr = mdia
-    for off, size, typ, hdr in iter_boxes(data, m_off + m_hdr, m_off + m_size):
-        if typ != TYPE_HDLR:
-            continue
-        # handler_type starts 8 bytes after the hdlr header
-        # (version+flags, pre_defined).
-        ht = off + hdr + 8
-        if ht + 4 > off + size:
-            return None
-        return data[ht:ht + 4]
-    return None
+    m_off, m_size, _typ, m_hdr = mdias[0]
+    mdia_kids = list(iter_boxes(data, m_off + m_hdr, m_off + m_size))
+    hdlrs = [c for c in mdia_kids if c[2] == TYPE_HDLR]
+    if len(hdlrs) != 1:
+        return None
+    h_off, h_size, _htyp, h_hdr = hdlrs[0]
+    # handler_type starts 8 bytes after the hdlr header
+    # (version+flags, pre_defined).
+    ht = h_off + h_hdr + 8
+    if ht + 4 > h_off + h_size:
+        return None
+    return data[ht:ht + 4]
 
 
 def classify_moov(data, moov_file_off, moov_size, moov_hdr):
@@ -451,6 +465,96 @@ def _straddle_chunk():
     return ftyp + moov + free + mdat
 
 
+def _chunk_with_traks(traks):
+    ftyp = _box(b"ftyp", b"isom" + b"\x00" * 4 + b"mp41")
+    mvhd = _box(b"mvhd", b"\x00" * 100)
+    udta = _box(b"udta", b"\x00" * 8)
+    moov = _box(b"moov", mvhd + b"".join(traks) + udta)
+    return ftyp + moov + _box(TYPE_FREE, b"") + _box(b"mdat", b"\x00" * 16)
+
+
+def _well_minf():
+    stbl = _box(
+        b"stbl",
+        _box(b"stsd", b"\x00" * 16)
+        + _box(b"stts", b"\x00" * 8)
+        + _box(b"stsz", b"\x00" * 8)
+        + _box(b"stco", b"\x00" * 8),
+    )
+    return _box(
+        b"minf",
+        _box(b"smhd", b"\x00" * 8)
+        + _box(b"dinf", _box(b"dref", b"\x00" * 8))
+        + stbl,
+    )
+
+
+def _well_mdia(handler, extra_hdlr=False):
+    parts = [_box(b"mdhd", b"\x00" * 24), _hdlr(handler)]
+    if extra_hdlr:
+        parts.append(_hdlr(handler))
+    parts.append(_well_minf())
+    return _box(b"mdia", b"".join(parts))
+
+
+def _well_trak(handler, extra_mdia=False):
+    parts = [
+        _box(b"tkhd", b"\x00" * 76),
+        _box(b"edts", _box(b"elst", b"\x00" * 20)),
+        _well_mdia(handler),
+    ]
+    if extra_mdia:
+        parts.append(_well_mdia(handler))
+    return _box(b"trak", b"".join(parts))
+
+
+def _trak_minf_overrun(handler):
+    mdhd = _box(b"mdhd", b"\x00" * 24)
+    hdlr = _hdlr(handler)
+    inner = _box(b"smhd", b"\x00" * 8)
+    claimed = 8 + len(inner) + 200
+    minf = claimed.to_bytes(4, "big") + b"minf" + inner
+    mdia = _box(b"mdia", mdhd + hdlr + minf)
+    return _box(
+        b"trak",
+        _box(b"tkhd", b"\x00" * 76)
+        + _box(b"edts", _box(b"elst", b"\x00" * 20))
+        + mdia,
+    )
+
+
+def _trak_stbl_overrun(handler):
+    stsd = _box(b"stsd", b"\x00" * 16)
+    bad = (100).to_bytes(4, "big") + b"stsz" + b"\x00" * 8
+    stbl = _box(b"stbl", stsd + bad)
+    minf = _box(
+        b"minf",
+        _box(b"smhd", b"\x00" * 8)
+        + _box(b"dinf", _box(b"dref", b"\x00" * 8))
+        + stbl,
+    )
+    mdia = _box(b"mdia", _box(b"mdhd", b"\x00" * 24) + _hdlr(handler) + minf)
+    return _box(
+        b"trak",
+        _box(b"tkhd", b"\x00" * 76)
+        + _box(b"edts", _box(b"elst", b"\x00" * 20))
+        + mdia,
+    )
+
+
+def _trak_two_hdlr(handler):
+    return _box(
+        b"trak",
+        _box(b"tkhd", b"\x00" * 76)
+        + _box(b"edts", _box(b"elst", b"\x00" * 20))
+        + _well_mdia(handler, extra_hdlr=True),
+    )
+
+
+def _prefix_defect_chunk(audio_trak):
+    return _chunk_with_traks([_trak(HANDLER_VIDE, 256), audio_trak])
+
+
 def _slurp(path):
     with open(path, "rb") as handle:
         return handle.read()
@@ -569,11 +673,27 @@ def _self_test():
         p_old = _put(outdoor, "01.10.mp4", _real_chunk())
         p_straddle = _put(outdoor, "01.20.mp4", straddle)
         p_recent = _put(outdoor, "01.30.mp4", _real_chunk())
+        p_minf = _put(
+            outdoor, "01.40.mp4",
+            _prefix_defect_chunk(_trak_minf_overrun(HANDLER_SOUN)),
+        )
+        p_stbl = _put(
+            outdoor, "01.50.mp4",
+            _prefix_defect_chunk(_trak_stbl_overrun(HANDLER_SOUN)),
+        )
+        p_hdlr2 = _put(
+            outdoor, "01.60.mp4",
+            _prefix_defect_chunk(_trak_two_hdlr(HANDLER_SOUN)),
+        )
+        p_mdia2 = _put(
+            outdoor, "01.70.mp4",
+            _prefix_defect_chunk(_well_trak(HANDLER_SOUN, extra_mdia=True)),
+        )
         p_in = _put(indoor, "00.00.mp4", _real_chunk())
         aged = 1_700_000_000
         for path in (
             p_conv, p_vo, p_trunc, p_over, p_two, p_nomoov, p_m64,
-            p_straddle, p_in,
+            p_straddle, p_minf, p_stbl, p_hdlr2, p_mdia2, p_in,
         ):
             os.utime(path, (aged, aged))
         os.utime(p_old, (1_600_000_000, 1_600_000_000))
@@ -589,9 +709,16 @@ def _self_test():
             p_old: _slurp(p_old),
             p_straddle: _slurp(p_straddle),
             p_recent: _slurp(p_recent),
+            p_minf: _slurp(p_minf),
+            p_stbl: _slurp(p_stbl),
+            p_hdlr2: _slurp(p_hdlr2),
+            p_mdia2: _slurp(p_mdia2),
             p_in: _slurp(p_in),
         }
-        bad = (p_trunc, p_over, p_two, p_nomoov, p_straddle)
+        bad = (
+            p_trunc, p_over, p_two, p_nomoov, p_straddle,
+            p_minf, p_stbl, p_hdlr2, p_mdia2,
+        )
 
         def same_as_original(*paths):
             return all(_slurp(p) == originals[p] for p in paths)
@@ -606,7 +733,7 @@ def _self_test():
                 "convertible": 3,
                 "converted": 0,
                 "video-only": 1,
-                "unexpected": 5,
+                "unexpected": 9,
                 "gone": 0,
                 "recent": 1,
                 "changed": 0,
@@ -614,10 +741,14 @@ def _self_test():
             repr(s),
         )
         check("dry-run-bytes", same_as_original(*originals))
+        check(
+            "tree-defects-dry",
+            same_as_original(p_minf, p_stbl, p_hdlr2, p_mdia2),
+        )
         unexp = [
             line for line in r.stderr.splitlines() if line.startswith("unexpected\t")
         ]
-        check("unexpected-report", len(unexp) == 5, str(len(unexp)))
+        check("unexpected-report", len(unexp) == 9, str(len(unexp)))
         check(
             "straddle-reason",
             any(line.endswith("\ttype bytes straddle a 4 KiB block") for line in unexp),
@@ -651,7 +782,7 @@ def _self_test():
                 "convertible": 2,
                 "converted": 0,
                 "video-only": 1,
-                "unexpected": 5,
+                "unexpected": 9,
                 "gone": 0,
                 "recent": 1,
                 "changed": 2,
@@ -686,7 +817,7 @@ def _self_test():
             and s["converted"] == 2
             and s["convertible"] == 0
             and s["recent"] == 1
-            and s["unexpected"] == 5,
+            and s["unexpected"] == 9,
             repr(s),
         )
         check(
@@ -705,7 +836,7 @@ def _self_test():
             and s["convertible"] == 1
             and s["converted"] == 2
             and s["recent"] == 1
-            and s["unexpected"] == 5
+            and s["unexpected"] == 9
             and rows is not None
             and len(rows) == 1
             and rows[0][0] == "changed"
@@ -720,6 +851,10 @@ def _self_test():
         check("indoor-untouched", _slurp(p_in) == originals[p_in])
         check("recent-bytes", _slurp(p_recent) == originals[p_recent])
         check("unexpected-bytes", same_as_original(*bad, p_vo))
+        check(
+            "tree-defects-apply",
+            same_as_original(p_minf, p_stbl, p_hdlr2, p_mdia2),
+        )
         check(
             "straddle-apply",
             any(
@@ -739,7 +874,7 @@ def _self_test():
             and s["changed"] == 0
             and s["converted"] == 3
             and s["recent"] == 1
-            and s["unexpected"] == 5,
+            and s["unexpected"] == 9,
             repr(s),
         )
         check(
@@ -757,7 +892,7 @@ def _self_test():
                 "convertible": 0,
                 "converted": 3,
                 "video-only": 1,
-                "unexpected": 5,
+                "unexpected": 9,
                 "gone": 0,
                 "recent": 1,
                 "changed": 3,
@@ -774,6 +909,10 @@ def _self_test():
         check(
             "bytes-revert",
             same_as_original(p_conv, p_m64, p_old, p_vo, p_in, p_recent, *bad),
+        )
+        check(
+            "tree-defects-revert",
+            same_as_original(p_minf, p_stbl, p_hdlr2, p_mdia2),
         )
         check(
             "straddle-revert",
@@ -794,7 +933,7 @@ def _self_test():
             and s["changed"] == 0
             and s["convertible"] == 3
             and s["recent"] == 1
-            and s["unexpected"] == 5,
+            and s["unexpected"] == 9,
             repr(s),
         )
         check(
