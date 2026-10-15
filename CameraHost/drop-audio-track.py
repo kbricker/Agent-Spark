@@ -9,15 +9,17 @@
 # already on disk by renaming the audio trak box to free, in place.
 #
 # Scope (plan 951.3). Findings outside this are not defects.
-# Inputs: Frigate 0.18.1 mp4 chunks and the operator's arguments. None hostile.
+# Inputs: Frigate 0.18.1 outdoor mp4 chunks and the operator's arguments.
+# None hostile. Other cameras are out of scope: they may carry real audio.
 # Helpers and dependencies: Python 3 stdlib.
 # Platform: ext4 on a 5400 rpm HDD; Frigate keeps writing, and nginx-vod may
 # read any chunk while this runs.
 # Consumers: nginx-vod, ffmpeg/ffprobe, Frigate retention and exports.
 # Invariants: (1) the only bytes changed are the 4 type bytes of one
-# moov-level box (trak→free on apply, free→trak on revert). (2) stopping at
-# any moment leaves every file either untouched or fully converted;
-# re-running finishes the job.
+# moov-level box (trak→free on apply, free→trak on revert), and those four
+# bytes lie in a single 4 KiB filesystem block. (2) stopping at any moment
+# leaves every file either untouched or fully converted; re-running finishes
+# the job.
 # Anything outside these lines is not a defect.
 
 import argparse
@@ -25,10 +27,14 @@ import os
 import subprocess
 import sys
 import tempfile
+import time
 
 MOOV_MAX = 4 * 1024 * 1024
 PROGRESS_EVERY = 10000
 UNEXPECTED_REPORT = 10
+BLOCK = 4096
+RECENT_S = 120
+CAMERA = "outdoor"
 TYPE_TRAK = b"trak"
 TYPE_FREE = b"free"
 TYPE_MOOV = b"moov"
@@ -52,10 +58,10 @@ def parse_epoch(text):
     return value
 
 
-def camera_name(text):
-    if not text or text in (".", "..") or "/" in text or "\\" in text:
-        raise argparse.ArgumentTypeError("invalid camera name")
-    return text
+def straddles_block(offset):
+    # A crash can persist only one of the two 4 KiB blocks, leaving a type
+    # (e.g. frak) that no later run recognises.
+    return offset // BLOCK != (offset + 3) // BLOCK
 
 
 def header_fields(size32, largesize, offset, end):
@@ -231,24 +237,43 @@ def process_file(path, mode):
         return "gone", "", None
     except OSError as exc:
         return "unexpected", exc.__class__.__name__, None
+    wrote = False
+    st = None
     try:
+        st = os.fstat(handle.fileno())
         try:
             kind, reason, patch_off = classify_open(handle)
         except ParseError as exc:
             return "unexpected", str(exc), None
+        if (
+            kind in ("convertible", "converted")
+            and patch_off is not None
+            and straddles_block(patch_off)
+        ):
+            return "unexpected", "type bytes straddle a 4 KiB block", None
         if writing and mode == "apply" and kind == "convertible":
             if not patch_type(handle, patch_off, TYPE_TRAK, TYPE_FREE):
                 return "unexpected", "type bytes were not trak", None
+            wrote = True
             return kind, reason, patch_off
         if writing and mode == "revert" and kind == "converted":
             if not patch_type(handle, patch_off, TYPE_FREE, TYPE_TRAK):
                 return "unexpected", "type bytes were not free", None
+            wrote = True
             return kind, reason, patch_off
         return kind, reason, None
     except OSError as exc:
         return "unexpected", exc.__class__.__name__, None
     finally:
         handle.close()
+        # A write bumps mtime, which would make this chunk look like one
+        # Frigate is still finishing. Restore after close so the close
+        # itself cannot leave a fresh mtime.
+        if wrote and st is not None:
+            try:
+                os.utime(path, ns=(st.st_atime_ns, st.st_mtime_ns))
+            except OSError:
+                pass
 
 
 def _plain_dir(entry):
@@ -271,14 +296,14 @@ def _sorted_entries(path):
         return []
 
 
-def iter_mp4s(root, camera):
+def iter_mp4s(root):
     for date_ent in _sorted_entries(root):
         if not _plain_dir(date_ent):
             continue
         for hour_ent in _sorted_entries(date_ent.path):
             if not _plain_dir(hour_ent):
                 continue
-            cam_path = os.path.join(hour_ent.path, camera)
+            cam_path = os.path.join(hour_ent.path, CAMERA)
             if os.path.islink(cam_path) or not os.path.isdir(cam_path):
                 continue
             for file_ent in _sorted_entries(cam_path):
@@ -287,32 +312,39 @@ def iter_mp4s(root, camera):
                 yield file_ent.path
 
 
-def process_tree(root, camera, mode, since, stdout, stderr):
+def process_tree(root, mode, since, stdout, stderr):
     counts = {
         "convertible": 0,
         "converted": 0,
         "video-only": 0,
         "unexpected": 0,
         "gone": 0,
+        "recent": 0,
     }
     changed = 0
     unexpected_list = []
     n = 0
-    for path in iter_mp4s(root, camera):
-        if since is not None:
-            try:
-                mtime = os.lstat(path).st_mtime
-            except FileNotFoundError:
-                n += 1
-                counts["gone"] += 1
-                if n % PROGRESS_EVERY == 0:
-                    print(f"progress {n}", file=stderr, flush=True)
-                continue
-            if mtime < since:
-                continue
+    started = time.time()
+    for path in iter_mp4s(root):
+        try:
+            mtime = os.lstat(path).st_mtime
+        except FileNotFoundError:
+            n += 1
+            counts["gone"] += 1
+            if n % PROGRESS_EVERY == 0:
+                print(f"progress {n}", file=stderr, flush=True)
+            continue
+        if since is not None and mtime < since:
+            continue
         n += 1
         if n % PROGRESS_EVERY == 0:
             print(f"progress {n}", file=stderr, flush=True)
+        # Frigate writes the chunk, then rewrites the front in place to
+        # move moov forward. Opening a file still in that window can put
+        # the 4 bytes in the wrong place.
+        if started - mtime < RECENT_S:
+            counts["recent"] += 1
+            continue
         try:
             kind, reason, patch_off = process_file(path, mode)
         except Exception as exc:
@@ -329,7 +361,7 @@ def process_tree(root, camera, mode, since, stdout, stderr):
     print(
         f"convertible={counts['convertible']} converted={counts['converted']} "
         f"video-only={counts['video-only']} unexpected={counts['unexpected']} "
-        f"gone={counts['gone']} changed={changed}",
+        f"gone={counts['gone']} recent={counts['recent']} changed={changed}",
         file=stderr,
         flush=True,
     )
@@ -403,6 +435,20 @@ def _overrun_chunk():
 
 def _no_moov_chunk():
     return _box(b"ftyp", b"isom" + b"\x00" * 4 + b"mp41") + _box(b"mdat", b"\x00" * 16)
+
+
+def _straddle_chunk():
+    # Pad the video trak so the audio trak starts at 4090 and its type
+    # occupies 4094..4097, across the 4 KiB block boundary.
+    ftyp = _box(b"ftyp", b"isom" + b"\x00" * 4 + b"isomiso2mp41mp42")
+    mvhd = _box(b"mvhd", b"\x00" * 100)
+    vide = _trak(HANDLER_VIDE, 3942)
+    soun = _trak(HANDLER_SOUN, 561)
+    udta = _box(b"udta", b"\x00" * 127)
+    moov = _box(b"moov", mvhd + vide + soun + udta)
+    free = _box(TYPE_FREE, b"")
+    mdat = _box(b"mdat", b"\x00" * 64)
+    return ftyp + moov + free + mdat
 
 
 def _slurp(path):
@@ -490,6 +536,12 @@ def _self_test():
         and int.from_bytes(chunk[1851:1855], "big") == 8
         and chunk[1855:1859] == TYPE_FREE,
     )
+    straddle = _straddle_chunk()
+    check(
+        "straddle-layout",
+        straddle[4094:4098] == TYPE_TRAK
+        and 4094 // BLOCK != (4094 + 3) // BLOCK,
+    )
 
     r = run_tool()
     check("args-root", r.returncode == 2)
@@ -497,6 +549,8 @@ def _self_test():
     check("args-mode", r.returncode == 2)
     r = run_tool(".", "--since", "nope")
     check("args-since", r.returncode == 2)
+    r = run_tool(".", "--camera", "outdoor")
+    check("args-camera", r.returncode == 2)
 
     with tempfile.TemporaryDirectory() as tmp:
         root = os.path.join(tmp, "rec")
@@ -513,8 +567,17 @@ def _self_test():
         p_nomoov = _put(outdoor, "00.50.mp4", _no_moov_chunk())
         p_m64 = _put(outdoor, "01.00.mp4", _real_chunk(mdat64=True))
         p_old = _put(outdoor, "01.10.mp4", _real_chunk())
+        p_straddle = _put(outdoor, "01.20.mp4", straddle)
+        p_recent = _put(outdoor, "01.30.mp4", _real_chunk())
         p_in = _put(indoor, "00.00.mp4", _real_chunk())
+        aged = 1_700_000_000
+        for path in (
+            p_conv, p_vo, p_trunc, p_over, p_two, p_nomoov, p_m64,
+            p_straddle, p_in,
+        ):
+            os.utime(path, (aged, aged))
         os.utime(p_old, (1_600_000_000, 1_600_000_000))
+        os.utime(p_recent, None)
         originals = {
             p_conv: _slurp(p_conv),
             p_vo: _slurp(p_vo),
@@ -524,9 +587,11 @@ def _self_test():
             p_nomoov: _slurp(p_nomoov),
             p_m64: _slurp(p_m64),
             p_old: _slurp(p_old),
+            p_straddle: _slurp(p_straddle),
+            p_recent: _slurp(p_recent),
             p_in: _slurp(p_in),
         }
-        bad = (p_trunc, p_over, p_two, p_nomoov)
+        bad = (p_trunc, p_over, p_two, p_nomoov, p_straddle)
 
         def same_as_original(*paths):
             return all(_slurp(p) == originals[p] for p in paths)
@@ -541,8 +606,9 @@ def _self_test():
                 "convertible": 3,
                 "converted": 0,
                 "video-only": 1,
-                "unexpected": 4,
+                "unexpected": 5,
                 "gone": 0,
+                "recent": 1,
                 "changed": 0,
             },
             repr(s),
@@ -551,23 +617,10 @@ def _self_test():
         unexp = [
             line for line in r.stderr.splitlines() if line.startswith("unexpected\t")
         ]
-        check("unexpected-report", len(unexp) == 4, str(len(unexp)))
-
-        r = run_tool(root, "--camera", "indoor")
-        s = _parse_summary(r.stderr)
-        check("exit-clean", r.returncode == 0)
-        check("exit-clean-stdout", r.stdout == "")
+        check("unexpected-report", len(unexp) == 5, str(len(unexp)))
         check(
-            "exit-clean-counts",
-            s == {
-                "convertible": 1,
-                "converted": 0,
-                "video-only": 0,
-                "unexpected": 0,
-                "gone": 0,
-                "changed": 0,
-            },
-            repr(s),
+            "straddle-reason",
+            any(line.endswith("\ttype bytes straddle a 4 KiB block") for line in unexp),
         )
 
         r = run_tool(root, "--since", "9999999999")
@@ -581,6 +634,7 @@ def _self_test():
                 "video-only": 0,
                 "unexpected": 0,
                 "gone": 0,
+                "recent": 0,
                 "changed": 0,
             },
             repr(s),
@@ -597,8 +651,9 @@ def _self_test():
                 "convertible": 2,
                 "converted": 0,
                 "video-only": 1,
-                "unexpected": 4,
+                "unexpected": 5,
                 "gone": 0,
+                "recent": 1,
                 "changed": 2,
             },
             repr(s),
@@ -617,7 +672,7 @@ def _self_test():
         )
         check(
             "input-untouched",
-            same_as_original(p_vo, p_old, p_in, *bad),
+            same_as_original(p_vo, p_old, p_in, p_recent, *bad),
         )
 
         after_since = {p: _slurp(p) for p in originals}
@@ -626,7 +681,12 @@ def _self_test():
         check("idempotent-apply-since-stdout", r.stdout == "")
         check(
             "idempotent-apply-since",
-            s is not None and s["changed"] == 0 and s["converted"] == 2 and s["convertible"] == 0,
+            s is not None
+            and s["changed"] == 0
+            and s["converted"] == 2
+            and s["convertible"] == 0
+            and s["recent"] == 1
+            and s["unexpected"] == 5,
             repr(s),
         )
         check(
@@ -644,6 +704,8 @@ def _self_test():
             and s["changed"] == 1
             and s["convertible"] == 1
             and s["converted"] == 2
+            and s["recent"] == 1
+            and s["unexpected"] == 5
             and rows is not None
             and len(rows) == 1
             and rows[0][0] == "changed"
@@ -656,7 +718,16 @@ def _self_test():
             _only_type_bytes(originals[p_old], _slurp(p_old), 1159, TYPE_TRAK, TYPE_FREE),
         )
         check("indoor-untouched", _slurp(p_in) == originals[p_in])
+        check("recent-bytes", _slurp(p_recent) == originals[p_recent])
         check("unexpected-bytes", same_as_original(*bad, p_vo))
+        check(
+            "straddle-apply",
+            any(
+                line.endswith("\ttype bytes straddle a 4 KiB block")
+                for line in r.stderr.splitlines()
+            )
+            and _slurp(p_straddle) == originals[p_straddle],
+        )
 
         after_apply = {p: _slurp(p) for p in originals}
         r = run_tool(root, "--apply")
@@ -664,7 +735,11 @@ def _self_test():
         check("idempotent-apply-stdout", r.stdout == "")
         check(
             "idempotent-apply",
-            s is not None and s["changed"] == 0 and s["converted"] == 3,
+            s is not None
+            and s["changed"] == 0
+            and s["converted"] == 3
+            and s["recent"] == 1
+            and s["unexpected"] == 5,
             repr(s),
         )
         check(
@@ -682,8 +757,9 @@ def _self_test():
                 "convertible": 0,
                 "converted": 3,
                 "video-only": 1,
-                "unexpected": 4,
+                "unexpected": 5,
                 "gone": 0,
+                "recent": 1,
                 "changed": 3,
             },
             repr(s),
@@ -697,7 +773,15 @@ def _self_test():
         )
         check(
             "bytes-revert",
-            same_as_original(p_conv, p_m64, p_old, p_vo, p_in, *bad),
+            same_as_original(p_conv, p_m64, p_old, p_vo, p_in, p_recent, *bad),
+        )
+        check(
+            "straddle-revert",
+            any(
+                line.endswith("\ttype bytes straddle a 4 KiB block")
+                for line in r.stderr.splitlines()
+            )
+            and _slurp(p_straddle) == originals[p_straddle],
         )
 
         after_revert = {p: _slurp(p) for p in originals}
@@ -706,7 +790,11 @@ def _self_test():
         check("idempotent-revert-stdout", r.stdout == "")
         check(
             "idempotent-revert",
-            s is not None and s["changed"] == 0 and s["convertible"] == 3,
+            s is not None
+            and s["changed"] == 0
+            and s["convertible"] == 3
+            and s["recent"] == 1
+            and s["unexpected"] == 5,
             repr(s),
         )
         check(
@@ -731,7 +819,6 @@ def self_test():
 def main(argv):
     parser = argparse.ArgumentParser(prog="drop-audio-track.py")
     parser.add_argument("root", nargs="?")
-    parser.add_argument("--camera", default="outdoor", type=camera_name)
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--apply", action="store_true")
     group.add_argument("--revert", action="store_true")
@@ -749,9 +836,7 @@ def main(argv):
         mode = "apply"
     elif args.revert:
         mode = "revert"
-    return process_tree(
-        args.root, args.camera, mode, args.since, sys.stdout, sys.stderr
-    )
+    return process_tree(args.root, mode, args.since, sys.stdout, sys.stderr)
 
 
 if __name__ == "__main__":
