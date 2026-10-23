@@ -8,7 +8,9 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 - feedback_personal_repo_git_identity.md — Committing in a Spark project? Kyle's PERSONAL repo — commit as Kyle Bricker <kyle.bricker@gmail.com>, never WonderForge
 - user_printing_tree_supports.md — Designing a part for 3D print? Kyle always uses tree supports — don't contort CAD toward support-free geometry
+- user_printing_tpu_by_object.md — Printing TPU for Kyle? Glue the plate as a release layer; several parts print by object — on the A1 tall parts go front to back, ~10 cm apart, 3 per plate
 - feedback_never_hand_kyle_a_command.md — Gate blocked you and you are about to paste Kyle a command? Never — he does not run commands; route it to overwatch or state the rule to add, and never re-ask a granted permission
+- feedback_memory_name_matches_filename.md — Writing a memory file? Its name: must equal the filename stem exactly — double-bracket links resolve by filename, a kebab-case slug dangles
 - feedback_name_printed_pieces_by_sight.md — Writing Kyle a bench or fit-check doc for printed parts? Name each piece by what he sees (tall plate, small block), never by CAD role or file name
 
 ## Orbital
