@@ -110,6 +110,15 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/jev-subagent-outcome.mjs --agent spark",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PreToolUse": [
@@ -132,8 +141,21 @@
             "timeout": 90
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/jev-subagent-router.mjs --agent spark --enforce",
+            "timeout": 10
+          }
+        ]
       }
     ]
   },
-  "autoMemoryDirectory": "C:/Projects/spark/.claude/memory"
+  "autoMemoryDirectory": "C:/Projects/spark/.claude/memory",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+  }
 }
