@@ -79,7 +79,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_read_the_assembled_artifact.md — Your diff looks right? Read the assembled file in place — correct text goes false by adjacency and no diff shows it
 - feedback_record_as_you_shape.md — A question, answer, or decision just happened? hive_plan_log_add it now, not later — batching loses the WHY record
 - feedback_refer_to_plans_by_display_number.md — Naming a parented plan to a reader? Use its display number (664.1), not the bare id (654) — bare id stays the API arg
-- feedback_research_before_asking.md — Think 'only Kyle can know this'? Usually wrong — a model or version number means it's documented. Search before you ask
+- feedback_research_before_asking.md — Asking Kyle to look, or experimenting to learn how an engine or library works? Usually it's documented — read first
 - feedback_review_vs_done.md — Reviewing and tempted to tick checklist items? Don't — checked means the code is done, not that review validated it
 - feedback_solve_the_actual_problem.md — Fixing the obvious path? Trace every affected path first — address the root problem, not just the literal ask
 - feedback_spawn_tools_retired.md — hive_spawn_agent still shows in the tool list? It's retired — never call it; fan out subagents instead

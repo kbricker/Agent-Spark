@@ -1,6 +1,6 @@
 ---
-name: Research it yourself before asking Kyle to go look
-description: Think 'only Kyle can know this'? Usually wrong — a model or version number means it's documented. Search before you ask
+name: Research it yourself before asking Kyle to go look, or building an experiment
+description: Asking Kyle to look, or experimenting to learn how an engine or library works? Usually it's documented — read first
 type: feedback
 scope: global
 ---
@@ -25,8 +25,9 @@ Three rounds of his time, and the resolving action was available at step 1.
 
 - **The retraction IS the trigger.** The moment you say "I wrote that from general knowledge and it was wrong," the next action is to go get specific knowledge — not to ask Kyle to supply it. Retracting and then delegating the correction is the exact anti-pattern.
 - **Identifiers are permission to search.** A model number, package name, driver, or version string means the thing is documented. "I don't know the specifics of this particular X" plus "X has a model number" equals *search*, not *ask*.
+- **Docs before experiments.** Before designing a switch, probe or measurement to learn how an engine or library is meant to be used, read its docs; that is what they document. Experiments are for what docs cannot say, such as our own numbers, and the agent takes those, never Kyle ([[feedback_test_everything_mechanically_testable]]). Kyle 2026-11-02, plan 1017.3, after an editor switch was built and he was asked to read FPS on three screens to learn whether per-element material instances break UI batching, which Unity's UI Profiler page states outright: *"Unity has tons of docs, surely we dont need to run expierements to see how to use the engine properly"*.
 - **Check what you were already given.** In step 3 the answer was on screen and went unconsulted, because the question of where it lived had already been decided. Having evidence is not the same as reading it.
 - **When you do ask him for something physical, say what you already ruled out.** If a search genuinely could not answer it, show that — so the request reads as the remaining gap rather than the first thing you tried.
 - Asking is right when the answer is *specific to his hardware, his room, or his preference* — what's plugged in, what the arm did, which option he wants. It is wrong for anything a vendor, package or driver documents.
 
-Related: [[feedback_verify_before_asserting]] is the local-state sibling — verify against the machine before asserting. This one is about the outside world: research before delegating the lookup to a human. Both failed the same day and for the same underlying reason, which is answering from recall when the real answer was cheaply obtainable.
+Related: [[feedback_verify_before_asserting]] is the local-state sibling — verify against the machine before asserting. This one is about the outside world: research before delegating the lookup to a human. Both failed the same day and for the same underlying reason, which is answering from recall when the real answer was cheaply obtainable. [[feedback_check_docs_on_harness_friction]] is the docs-first rule for the Claude Code harness.
