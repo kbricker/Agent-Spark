@@ -53,7 +53,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_enforce_user_tech_choices.md — When user specifies a technology stack, agents MUST follow it exactly — don't let agents substitute frameworks
 - feedback_fast_track_is_default.md — Working a plan? Fast-track: dev + review inline, fan out to subagents, no other pipeline. Governs plans, not asks
 - feedback_fix_workflow_problems_when_found.md — Hit a workflow or process defect mid-task? Fix it now or ticket it — breaking context is worth it; don't just note it
-- feedback_harness_index_size_nag_is_advisory.md — 'Compact MEMORY.md to under 17.1KB' after an edit? Harness 70% warning; the fleet limit is 25,000 bytes — do not compact
+- feedback_harness_index_size_nag_is_advisory.md — 'Compact MEMORY.md' nag, or at the 25,000 cap? Nag is harness noise; at the cap never drop a line and keep its file
 - feedback_kyle_reads_and_directs.md — About to build Kyle a button, or leave him a command to run? Don't — he reads and directs; agents do all housekeeping
 - feedback_kyle_sets_start_and_stop.md — About to suggest wrapping up, or start the next thing unprompted? Kyle signals go and stop explicitly — wait for both
 - feedback_log_review_findings.md — A review just settled? Not finished until surviving AND skipped findings are in the store via hive_review_finding_add
@@ -110,5 +110,5 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 <!-- BEGIN RETRIEVAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
 ## In retrieval — NOT loaded here; search with hive_recall
 These topics were moved out of always-loaded memory. The facts are intact and searchable; only the text left this index. Behavioural rules are never in here.
-- github ssh · plan state design intent · plan completion path · channels platform dependency · primary agents · 3dproppipeline agent · how to reach another agent · forge agent · bash permission matching · lane machinery · people vendors channels · camera host
+- github ssh · plan state design intent · plan completion path · channels platform dependency · primary agents · 3dproppipeline agent · how to reach another agent · forge agent · bash permission matching · lane machinery · people vendors channels · camera host · path scoped rules workspace only
 <!-- END RETRIEVAL SECTION -->
