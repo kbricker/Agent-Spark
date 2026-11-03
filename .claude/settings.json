@@ -54,7 +54,7 @@
           },
           {
             "type": "command",
-            "command": "node C:/Projects/wfa2/hooks/jev-intake.mjs --agent spark",
+            "command": "node C:/Projects/wfa2/hooks/jev-intake.mjs --agent spark --enforce",
             "timeout": 5
           }
         ]
