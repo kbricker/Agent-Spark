@@ -20,7 +20,6 @@ This skill runs in **your own** workspace. Which agent that is depends on the se
 | spark | `C:\Projects\spark` | `master` | `git@github.com:kbricker/Agent-Spark.git` |
 | 3dproppipeline | `C:\Projects\3dproppipeline` | `master` | `git@github-second.com:WonderForge/3dPropPipeline.git` |
 | finley | `C:\Projects\finley` | `master` | `git@github.com:kbricker/finley.git` — **PERSONAL account: the plain `github.com` host resolves to Kyle's `id_ed25519`, NOT the `github-second.com` WonderForge alias. Commit as `Kyle Bricker <kyle.bricker@gmail.com>` and push straight to `master`; finley takes no PRs (Kyle 2026-08-18), so there is no branch to open one from** |
-| atb | `C:\Projects\atb` | `master` | **none yet — local repo only (`noRemote` in composition); commit, do not push.** Kyle's PERSONAL agent for Agent Task Board (plan 1236): commit as `Kyle Bricker <kyle.bricker@gmail.com>`; when Kyle gives the workspace a remote it is a plain `github.com:kbricker/...` one on his personal key, never the `github-second.com` WonderForge alias |
 
 (verletDev retired 2026-07-09 and hivedev01 retired 2026-08-29 (782.31) — their workspaces are frozen, never commit there. **The roster authority is `composition.json`'s `managedBy` field, not this table and not a memory** — every roster transcribed into prose in this corpus has gone stale, this one included.)
 

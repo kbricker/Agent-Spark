@@ -104,7 +104,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_hold_message_explicit_scope.md — Standing an agent down? Name every forbidden surface — a plain HOLD still lets it edit plan checklists and descriptions
 - feedback_orchestrate_proactively.md — After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
 - feedback_use_channel_events.md — Waiting on an agent's response? Watch for agent_idle/agent_working channel events — never a blind sleep
-- reference_channel_launch.md — Six PRIMARY agents: .lnk launchers, plugin channel; 3dpp is RemoteAgent-hosted; read for claudeArgs or deaf agents
+- reference_channel_launch.md — Five PRIMARY agents: .lnk launchers, plugin channel; 3dpp is RemoteAgent-hosted; read for claudeArgs or deaf agents
 <!-- END ROLE SECTION: orchestrator -->
 
 <!-- BEGIN RETRIEVAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
