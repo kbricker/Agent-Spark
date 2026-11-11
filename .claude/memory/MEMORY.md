@@ -30,7 +30,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 ## Desk PC
 
-- reference_desk_pc_ultrawide_blink.md — Kyle's desk-PC screen blanks for a moment? It's the BIG screen (Dell S3425DW ultrawide), never the 27in; Windows logs nothing; next: native mini-DP→DP cable, then warranty
+- reference_desk_pc_ultrawide_blink.md — Kyle's desk-PC screen blanks for a moment? It's the BIG screen (Dell S3425DW ultrawide), never the 27in; Windows logs nothing, the monitor answers DDC/CI, no DP input; next: watch its signal at a blink, then adapter or warranty
 - reference_desk_pc_monitor2_wake_drop.md — Kyle's 27in (Dell S2725DS) drops ~10 s at most display wakes from screen-off — he never notices it, not his blink; diagnosed via Kernel-PnP 1010 + Kernel-Power 566 + DDPM logs
 
 <!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
