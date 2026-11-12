@@ -52,7 +52,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_dont_assume_staged_scope.md — About to commit the staged/modified files? Don't assume they're all yours — if the scope is ambiguous, ask Kyle
 - feedback_dont_gate_on_manual_validation.md — Closure blocked on a check only Kyle can run, or that can't happen? Ship non-breaking work to use; new ticket if wrong
 - feedback_enforce_user_tech_choices.md — When user specifies a technology stack, agents MUST follow it exactly — don't let agents substitute frameworks
-- feedback_fast_track_is_default.md — Working a plan? Fast-track: dev + review inline, fan out to subagents, no other pipeline. Governs plans, not asks
+- feedback_fast_track_is_default.md — Working a plan? Fast-track: Opus subagents implement, you orchestrate, no other pipeline. Governs plans, not asks
 - feedback_fix_workflow_problems_when_found.md — Hit a workflow or process defect mid-task? Fix it now or ticket it — breaking context is worth it; don't just note it
 - feedback_harness_index_size_nag_is_advisory.md — 'Compact MEMORY.md' nag, or at the 25,000 cap? Nag is harness noise; at the cap never drop a line and keep its file
 - feedback_kyle_reads_and_directs.md — About to build Kyle a button, or leave him a command to run? Don't — he reads and directs; agents do all housekeeping

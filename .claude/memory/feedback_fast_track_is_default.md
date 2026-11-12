@@ -1,11 +1,11 @@
 ---
 name: Fast-track is the default workflow
-description: Working a plan? Fast-track: dev + review inline, fan out to subagents, no other pipeline. Governs plans, not asks
+description: Working a plan? Fast-track: Opus subagents implement, you orchestrate, no other pipeline. Governs plans, not asks
 type: feedback
 scope: global
 ---
 
-Fast-track is the orchestration path for all plans, on every agent. You play dev + review inline and are free to spawn Agent/Task subagents at your discretion for fan-out (parallel dev on independent sub-areas), leveraging the shared prompt cache; on a lane-flagged agent you orchestrate only — Grok implements (step 4), astra reviews (step 5.5), you shape, brief, adjudicate, commit, push, merge and deploy (plan #1046, Kyle 2026-09-25). **There is no second path.** Work too large for one context gets decomposed across subagents, not handed to a different pipeline.
+Fast-track is the orchestration path for all plans, on every agent, and you orchestrate only — Opus subagents implement (step 4); the step 5.5 review is astra's on a `codexLane` agent and a Claude subagent pass elsewhere; you shape, brief, adjudicate, commit, push, merge and deploy (Kyle 2026-11-12) — spawning Agent/Task subagents at your discretion for the fan-out around that, leveraging the shared prompt cache. **There is no second path.** Work too large for one context gets decomposed across subagents, not handed to a different pipeline.
 
 It governs work that *is* a plan. It does not turn every request into one: whether a plan exists is decided by `feedback_always_plan` — the plan appears at the action gate (PR, merge, shared push, propagate, deploy) or on plan / ship, not before, and a test / sample / quick / try ask gets the thing itself with one check that it runs. Never open a plan in order to have somewhere to run this procedure.
 
