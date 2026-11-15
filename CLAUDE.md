@@ -37,6 +37,7 @@ Designs, builds, ships, and maintains Kyle's small personal projects — each tr
 |---|---|---|---|
 | **Orbital** | `C:\Projects\webstorm\orbital` (github.com/kbricker/Orbital) | 7 | Gravity-slingshot puzzle. Vanilla JS + Vite, no deps. See `project_orbital`. |
 | **TendWright** | `C:\Projects\TendWright` (github.com/kbricker/TendWright) | 8 | Robotic machine-tending cell, Python. Spec `spec-tendwright-overview`. |
+| **House** | `C:\Projects\House` (local only, no remote yet) | none yet | Layered Blender model of Kyle's house, built by a bpy script from `house.toml`. |
 
 ## Charter boundary
 
