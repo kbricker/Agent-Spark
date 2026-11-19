@@ -11,6 +11,7 @@
       "WebSearch",
       "Write",
       "mcp__plugin_hive-channel_hive__*",
+      "mcp__plugin_hive-channel_hive-local__*",
       "Skill(fast-track-plan)",
       "Bash(git -C C:/Projects/TendWright branch -d:*)",
       "Bash(git -C C:/Projects/TendWright push origin --delete:*)",
