@@ -96,7 +96,7 @@ Plan #276: sync global memories from canonical source
 Pulled 40 global memories from wfa2/orchestrator-shared/memory/ and
 updated MEMORY.md index accordingly.
 
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 EOF
 )"
 ```

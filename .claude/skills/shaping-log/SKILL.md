@@ -93,15 +93,13 @@ reasoning is the valuable part; the conclusion is already in the code.
   self-reference — and the two are **mutually exclusive**, refused at write time
   if both are set. Pick whichever is true.
 
-  **If `replaces` is rejected with `MCP error -32602`, your session predates it.**
-  MCP tool schemas load once, at session start, so a session that spawned its
-  bridge before the #842 deploy holds the old parameter list no matter what the
-  server accepts. A server restart does not fix it and neither does a SignalR
-  reconnect — only a fresh agent session does. **Do not downgrade to a plain
-  `supersedes` to get the write through.** That reintroduces exactly the
-  mislabelling this pointer exists to end, silently, while looking like
-  compliance. Write the entry without a pointer, say in its text which entry it
-  overtakes, and tell overwatch your session needs relaunching.
+  **If `replaces` is rejected with `MCP error -32602`, the server refused it.**
+  The `hive` server checks every call against its own current schema, so a
+  fresh session gets the same answer; read the issues the error lists. **Do not
+  downgrade to a plain `supersedes` to get the write through.** That
+  reintroduces exactly the mislabelling this pointer exists to end, silently,
+  while looking like compliance. Write the entry without a pointer, say in its
+  text which entry it overtakes, and tell overwatch what the error said.
 - **evidence** — a measurement that changed what was believed. Distinct from a
   decision, which is a choice about what to do; evidence is what moved the
   argument. Counts, benchmarks, a corpus you actually went and measured.

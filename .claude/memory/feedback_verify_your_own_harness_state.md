@@ -21,7 +21,7 @@ The same day, the same failure ran the other way: vaexdev2 reported plan #844 un
 
 - **Read the schema of the tool actually in question, or call it.** An empirical check beats a counter every time, and it is one call.
 - **Trust routes a message; it does not verify the content.** A claim from a credible sender with more context than you still has to survive a check. Both failures above came from senders who were right about everything else in the same message — which is exactly what makes the wrong part land unexamined.
-- **Refuse a gate that couples surfaces which do not touch.** A memory reload never depended on an MCP schema version: files are read from disk, the bridge is a separate surface. When the coupling in a gate is wrong, the gate is wrong even if its premise happens to be right.
+- **Refuse a gate that couples surfaces which do not touch.** A memory reload never depended on an MCP schema version: files are read from disk, tool schemas come from the MCP server. When the coupling in a gate is wrong, the gate is wrong even if its premise happens to be right.
 - **Check claims independently, not as a block.** After being right about the schema, vaexdev2's second claim was accepted on the strength of the first. Two claims, two checks.
 
 Related: [[feedback_verify_before_asserting]] covers what you SAY. This covers what you ACCEPT — the harder direction, because an inbound claim arrives well-formed from someone who sounds authoritative, while your own unverified assertion at least started as your own doubt.

@@ -168,7 +168,7 @@ Before the first push of any fast-track PR branch — the push that opens it to 
 
 ### 7. Deploy (if applicable)
 
-- If the plan touches anything `deploy-hive.ps1` ships or that runs beside it — `AgentStudio2/`, `McpBridge/src/`, `RemoteAgent/`, `hooks/`, `agent-templates/`, `orchestrator-shared/composition.json`, `vm-config/` — invoke `/deploy-hive` as a sub-step.
+- If the plan touches anything `deploy-hive.ps1` ships or that runs beside it — `AgentStudio2/`, `claude-plugins/`, `RemoteAgent/`, `hooks/`, `agent-templates/`, `orchestrator-shared/composition.json`, `vm-config/` — invoke `/deploy-hive` as a sub-step.
 - If the plan only touches orchestrator workspace config (`.claude/`): no deploy. The local `git pull` in each workspace (or you're already in it) picks up the change.
 - If it touches wfa2 hooks/scripts used by orchestrators: message affected orchestrators to `git pull` in `C:/Projects/wfa2`.
 

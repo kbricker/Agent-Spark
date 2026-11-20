@@ -6,7 +6,7 @@ scope: global
 
 # Prepare Restart
 
-During core-infra phases, agents restart often to absorb config/bridge/container changes. Kyle used to request a handoff blurb manually and paste it back in after the restart. This skill automates both halves (plan #652): Kyle triggers, the agent writes the handoff file, the fresh session consumes it exactly once.
+During core-infra phases, agents restart often to absorb config/plugin/container changes. Kyle used to request a handoff blurb manually and paste it back in after the restart. This skill automates both halves (plan #652): Kyle triggers, the agent writes the handoff file, the fresh session consumes it exactly once.
 
 ## Trigger
 
@@ -24,7 +24,7 @@ Kyle says "get ready for a restart", "prep for restart", "restart incoming", or 
 Write for a cold reader — the fresh session has zero session-local context. No shorthand that only this session understands.
 
 - **Header:** agent key, date, and why this restart is happening (what change is being absorbed).
-- **Post-restart verification first:** any check that proves the new config/binary actually landed (e.g. "your hive_send_message description must read X" after a McpBridge change; `/health` version after a dashboard deploy). The fresh session runs these before resuming work.
+- **Post-restart verification first:** any check that proves the new config/binary actually landed (e.g. "your hive_send_message description must read X" after an MCP tool change; `/health` version after a dashboard deploy). The fresh session runs these before resuming work.
 - **In-flight work, in priority order:** for each item — plan number + current status, the exact next step, and the event/gate it's waiting on (PR number, CR state, validation item, a message from another agent).
 - **Declared plan to re-declare:** the plan id this session had declared with `hive_set_status(planId)`, if any. The restart clears it server-side (#937 — a new session id expires the declaration), so the fresh session re-declares it as its first act after the claim when that work continues, and declares nothing when it does not.
 - **Watch-list to re-establish:** `hive_channel_watch` state is process-local and a restart clears it — list the agent keys the fresh session must re-watch (and why). Note in the handoff: after re-watching, the fresh session must poll each listed agent's current chat/status once — channel events that fired during the restart window are lost, and a gate may already have opened.

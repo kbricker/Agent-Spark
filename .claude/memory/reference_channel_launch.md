@@ -22,10 +22,10 @@ powershell -ExecutionPolicy Bypass -File C:\Projects\wfa2\primary-launcher\launc
 **Debug-only direct launch:**
 
 ```bash
-claude --dangerously-load-development-channels server:hive
+claude --dangerously-load-development-channels server:hive-local
 ```
 
-A bare session with no identity injection. Channel notifications (`agent_idle`, `agent_working`, `chat_message`) still flow, because they are handled inside the MCP server rather than by the launcher — but only if the `hive` server can see `HIVE_AGENT_KEY` in its env, which a direct launch relies on `.mcp.json` for.
+A bare session with no identity injection. Channel notifications (`agent_idle`, `agent_working`, `chat_message`) are handled inside the `hive-local` server, so they flow only if it sees `HIVE_AGENT_KEY`, which a direct launch relies on `.mcp.json` for, and `HIVE_API_KEY`, which must already be in the shell's env.
 
 ## Remote slash commands: use native Remote Control
 
@@ -47,27 +47,27 @@ Who resolves it how, and in what order:
 |---|---|
 | `launch.ps1` | Credential Manager only, read directly via the Win32 `CredReadW` API. No env fallback — a missing credential warns and launches unauthenticated. |
 | `hive-key` | The **writer**, via `keytar`. Byte-compatible with the `CredReadW` reader. |
-| Hooks | `hive-key get <agent>` (2s timeout). |
-| `McpBridge`, `wait-for-*` | `hive-key get <agent>` **first**; the injected `HIVE_API_KEY` env value is used **only if that lookup returns nothing** (`McpBridge/src/index.ts` `resolveApiKey`, and the same shape in `wait-for-idle.js` / `wait-for-message.js`). It logs "no local hive-key store" when it takes the env path. |
+| Hooks | `hive-key get <agent>` (2s timeout) **first**; the injected `HIVE_API_KEY` env value is used **only if that lookup returns nothing** (`hooks/hive-lib.mjs`). |
+| `hive`, `hive-local` | The injected `HIVE_API_KEY` env value only — the http server sends it as `X-Api-Key`, the helper reads it once at start. Neither looks in the store. |
 
-That precedence is the important part: on the Kyle box the store wins, so a stale env value cannot shadow a correctly-installed credential. The env path exists for agents spawned somewhere with no local store — both AgentStudio2 and RemoteAgent set it at spawn — so spawned children land on it by design, while local orchestrators never do.
+That precedence is the important part for the hooks: on the Kyle box the store wins, so a stale env value cannot shadow a correctly-installed credential. The MCP servers have no store path: the launcher puts the key on the env, AgentStudio2 and RemoteAgent set it at spawn, and a session started any other way has no tool identity unless its shell already carries one.
 
 **Gotcha if you ever hand-roll a credential reader:** keytar writes the secret as UTF-8 bytes while the Win32 `CREDENTIAL` struct is otherwise marshalled as Unicode. Decoding the blob with `Marshal.PtrToStringUni` yields mojibake at exactly half the true length — a 44-character key reads back as 22 garbage characters, which looks like a truncated key rather than a decoding fault. Copy the bytes and decode UTF-8 explicitly.
 
 ## Details
 
-- `server:hive` references the `hive` key in `.mcp.json` — the merged McpBridge server exposing both tools and the `claude/channel` capability.
-- Channel features arm only when the `hive` server sees `HIVE_AGENT_KEY` in its env. The launcher injects it; a direct launch relies on `.mcp.json`.
-- VM agents (NightWatch) don't set `HIVE_AGENT_KEY` and stay dormant on the channel.
+- `server:hive-local` references the `hive-local` key in `.mcp.json` — the stdio helper carrying the `claude/channel` capability and the five local tools (the three watch tools, `hive_plan_attachment_add`, `hive_chat_image`). Every other tool is the http `hive` server.
+- Channel features arm only when the `hive-local` server sees `HIVE_AGENT_KEY` in its env. The launcher injects it; a direct launch relies on `.mcp.json`.
+- VM agents (NightWatch) get the http `hive` server only: no channel and no local tools.
 - For unattended operation, add `--dangerously-skip-permissions` to the agent's `claudeArgs` in its config JSON.
-- `claudeArgs` is **all-or-nothing** — a config that sets it must restate every flag it wants, including whichever channel flag that agent is on (`--dangerously-load-development-channels server:hive` or `--channels plugin:hive-channel@wonderforge`). Dropping the channel flag detaches the agent from the entire inbound event pipeline; `launch.ps1` warns when the resolved arguments omit both. This bites hardest on a config that *already* had `claudeArgs` — migrating overwatch meant restating `--chrome` and `-n Overwatch` alongside the new flag, whereas 3dproppipeline had no `claudeArgs` at all so its migration was purely additive.
+- `claudeArgs` is **all-or-nothing** — a config that sets it must restate every flag it wants, including whichever channel flag that agent is on (`--dangerously-load-development-channels server:hive-local` or `--channels plugin:hive-channel@wonderforge`). Dropping the channel flag detaches the agent from the entire inbound event pipeline; `launch.ps1` warns when the resolved arguments omit both. This bites hardest on a config that *already* had `claudeArgs` — migrating overwatch meant restating `--chrome` and `-n Overwatch` alongside the new flag, whereas 3dproppipeline had no `claudeArgs` at all so its migration was purely additive.
 - That flag is a **preview-contract dependency on Claude Code itself**. Before upgrading Claude Code, and whenever an orchestrator has gone deaf while outbound still works, read [[recall:reference_channels_platform_dependency]] — it covers version pinning, the post-upgrade delivery test, the silent-inbound-drop symptom, and the route off the dev flag.
 
 ## The whole fleet is on the supported `--channels` path
 
 **Every active Primary agent launches with `--channels plugin:hive-channel@wonderforge` and no dev flag (since 2026-08-04, plan 754.2):** `overwatch`, `vaexdev`, `vaexdev2`, `spark`, and `finley`, which was BORN on that path 2026-08-18 (plan 929) rather than migrated — so it has no `_rollback` hive block in its workspace `.mcp.json` and no dev-flag state to revert to. 3dproppipeline was the pilot on 2026-08-03 (754.1), overwatch followed the same day, vaexdev and spark migrated on 2026-08-04, and vaexdev2 was born on it; 782.31 then moved 3dproppipeline off the launcher entirely (remote class, RemoteAgent-hosted, no channel). (verletDev is retired as of 2026-07-09 and codexhive is parked — neither launches, so neither is on either path.)
 
-**The dev flag still works and is NOT deprecated.** `launch.ps1`'s guard accepts either form and warns only if a config has neither (or confusingly, both). Keep the rollback path in mind: every migrated workspace's `.mcp.json` carries its original `hive` server definition in a `_rollback` key, and reverting means restoring that block into `mcpServers` **and** reverting `claudeArgs` in the launcher config. Both halves, or you get an agent with no channel at all.
+**The dev flag still works and is NOT deprecated.** `launch.ps1`'s guard accepts either form and warns only if a config has neither (or confusingly, both). Keep the rollback path in mind: every migrated workspace's `.mcp.json` carries the `hive` and `hive-local` server definitions in a `_rollback` key, and reverting means restoring those blocks into `mcpServers` **and** reverting `claudeArgs` in the launcher config. Both halves, or you get an agent with no channel at all.
 
 **What migrating actually buys:** the launch-time acknowledgement prompt disappears. On the dev flag a session blocks on a keypress before it starts, so **an agent launched unattended never comes online at all**. It buys nothing against `tengu_harbor`, which sits upstream of both paths — see [[recall:reference_channels_platform_dependency]].
 
@@ -76,12 +76,12 @@ That precedence is the important part: on the Kyle box the store wins, so a stal
 Migrating an agent takes three changes together. Doing only the first is the failure that cost an iteration:
 
 1. `claudeArgs` in its `configs/<key>.json` → `["--channels", "plugin:hive-channel@wonderforge"]`
-2. **Remove the `hive` server from its workspace `.mcp.json`.** The plugin must be the *sole* definition. Two servers both named `hive` collide, the plugin's copy loses, and you get the worst failure shape available: tools keep working, so the agent looks healthy, while the channel never arms and no event ever arrives.
-3. Add `mcp__plugin_hive-channel_hive__*` to its `.claude/settings.json` allow list. Plugin-provided tools are namespaced, so the existing `mcp__hive__*` rule cannot match them and **every** Hive call prompts.
+2. **Remove the `hive` and `hive-local` servers from its workspace `.mcp.json`.** The plugin must be the *sole* definition. Two servers of one name collide, the plugin's copy loses, and you get the worst failure shape available: tools keep working, so the agent looks healthy, while the channel never arms and no event ever arrives.
+3. Add `mcp__plugin_hive-channel_hive__*` and `mcp__plugin_hive-channel_hive-local__*` to its `.claude/settings.json` allow list. Plugin-provided tools are namespaced, so the `mcp__hive__*` and `mcp__hive-local__*` rules cannot match them and **every** Hive call prompts.
 
 Two consequences that surprise people:
 
-- **Channel blocks arrive as `source="plugin:hive-channel:hive"`, not `source="hive"`.** Anything matching on the literal string — docs, hooks, parsing, the MCP server's own instructions — is wrong for a migrated agent.
+- **Channel blocks arrive as `source="plugin:hive-channel:hive-local"`, not `source="hive-local"`.** Anything matching on the literal string — docs, hooks, parsing, the MCP server's own instructions — is wrong for a migrated agent.
 - **`/mcp` output is not evidence either way.** The capability report reads a different, non-override-aware allowlist than the one that actually gates delivery, so it can claim the channel capability is absent while events flow perfectly. The only proof is a real inbound block arriving.
 
 One-time machine setup, already done: the marketplace lives at `C:\Projects\wfa2\claude-plugins` (added by local path — nothing is published anywhere), and `allowedChannelPlugins` is in the managed-settings policy key. **That policy write requires elevation** — `HKCU\SOFTWARE\Policies` is ACL'd, so it is a UAC prompt, not a user-writable key. `claude-plugins/setup-channel-policy.ps1` performs it and takes `-Remove` to undo.
