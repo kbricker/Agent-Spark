@@ -1,9 +1,16 @@
 {
-  "_comment": "Plan 754.2 (2026-08-04). The `hive` server is deliberately ABSENT: it now comes from the installed plugin hive-channel@wonderforge instead. Two servers both named `hive` collide, the plugin's copy loses, and you get the worst failure shape available — tools keep working so the agent looks healthy, while the channel never arms and no event ever arrives. The plugin must be the sole definition. ROLLBACK: restore the block below into mcpServers and revert claudeArgs in virtual-launcher/configs/spark.json to [\"--dangerously-load-development-channels\", \"server:hive\", \"-n\", \"Spark\"].",
+  "_comment": "Plan 754.2 (2026-08-04). The `hive` server is deliberately ABSENT: it now comes from the installed plugin hive-channel@wonderforge instead, beside the plugin's `hive-local` channel helper (plan 1293.2). Two servers both named `hive` collide, the plugin's copy loses, and you get the worst failure shape available — tools keep working so the agent looks healthy, while the channel never arms and no event ever arrives. The plugin must be the sole definition. ROLLBACK: restore the hive and hive-local blocks below into mcpServers, and in wfa2 primary-launcher/configs/spark.json replace --channels and its plugin:hive-channel@wonderforge entry with \"--dangerously-load-development-channels\", \"server:hive-local\".",
   "_rollback": {
     "hive": {
+      "type": "http",
+      "url": "https://hive.wonderforge.io/mcp",
+      "headers": {
+        "X-Api-Key": "${HIVE_API_KEY}"
+      }
+    },
+    "hive-local": {
       "command": "node",
-      "args": ["C:/Projects/wfa2/McpBridge/dist/index.js"],
+      "args": ["C:/Projects/wfa2/claude-plugins/plugins/hive-channel/hive-local.mjs"],
       "env": {
         "HIVE_URL": "https://hive.wonderforge.io",
         "HIVE_API_KEY": "${HIVE_API_KEY}",
