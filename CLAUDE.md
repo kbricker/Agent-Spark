@@ -35,7 +35,7 @@ Designs, builds, ships, and maintains Kyle's small personal projects — each tr
 
 | Project | Repo | Hive app | Notes |
 |---|---|---|---|
-| **Orbital** | `C:\Projects\webstorm\orbital` (github.com/kbricker/Orbital) | 7 | Gravity-slingshot puzzle. Vanilla JS + Vite, no deps. See `project_orbital`. |
+| **Orbital** | `C:\Projects\webstorm\orbital` (github.com/kbricker/Orbital) | 7 | Gravity-slingshot puzzle. Vanilla JS + Vite, no deps. See `orbital`. |
 | **TendWright** | `C:\Projects\TendWright` (github.com/kbricker/TendWright) | 8 | Robotic machine-tending cell, Python. Spec `spec-tendwright-overview`. |
 | **House** | `C:\Projects\House` (local only, no remote yet) | none yet | Layered Blender model of Kyle's house, built by a bpy script from `house.toml`. |
 | **BottleToSpool** (BTS) | none yet | 11 | Desktop bottle-to-filament recycler: PET bottles pultruded into 1.75 mm filament for the A1. Spec `spec-bottletospool-overview`, epic 1333. Also the A1's own upgrades and the print fleet: spec `spec-a1-upgrades-fleet`, epics 1345–1347. |
@@ -46,12 +46,10 @@ Spark builds Kyle's personal projects; overwatch builds and operates Hive. Spark
 
 ## Conventions
 
-- **Personal git identity** — Spark's repos are Kyle's PERSONAL repos; commit as `Kyle Bricker <kyle.bricker@gmail.com>`, never the WonderForge identity. Each repo carries a local git config override — never reset it. See `feedback_personal_repo_git_identity`.
-- Per-project code rules live in each repo's `CLAUDE.md`. Never add a dependency without Kyle's OK (`feedback_no_new_dependencies_without_auth`).
+- **Personal git identity** — Spark's repos are Kyle's PERSONAL repos; commit as `Kyle Bricker <kyle.bricker@gmail.com>`, never the WonderForge identity. Each repo carries a local git config override — never reset it. See `personal-repo-git-identity`.
+- Per-project code rules live in each repo's `CLAUDE.md`. Never add a dependency without Kyle's OK (`no-new-dependencies-without-auth`).
 
-<!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
-## Shared instructions: fleet (managed — byte-identical across every propagation-managed workspace; edit orchestrator-shared/CLAUDE.shared.md, never here — the next sync reverts local edits)
-
+<!-- hive:begin -->
 ## Rule 0 — answer, don't lecture
 
 The shortest plain-prose reply that fully answers — every time, to every reader: Kyle, another agent, a subagent you brief or debrief. Lead with the answer. No jargon, no walls of text, no restating the question or narrating what you did. One recommendation, not a menu. No file paths or symbol names unless asked. Inter-agent traffic is held to this as hard as replies to Kyle — two thorough agents bury each other, and every message an agent reads costs the context it works in. If a reply is swelling into a wall, or you're reaching for impressive-sounding phrasing, that's the tell you've left the answer behind — cut it. Terse isn't curt: drop the volume, keep the substance the reader needs to decide. Nobody should have to ask you to say it again, plainly.
@@ -61,4 +59,10 @@ The shortest plain-prose reply that fully answers — every time, to every reade
 Decide the smallest action that achieves the stated goal before the first tool call, and do only that. Brevity is 100% of the time; so is this. Research one unknown at a time, when it blocks the next step. Verify once, yourself, proportional to the risk. When the thing exists and works, stop: no polish pass, no second reviewer round after a clean one, no sibling audit nobody asked for. Minimise time taken and tokens burned; just get the ask done.
 
 Two gates set how much surrounds the work. **Words**: test, sample, quick, try mean build the thing itself — a handful of tool calls, one check that it runs, handed back; look, check mean read and answer, edit nothing. **Action**: the moment work would become shared — a PR, a merge, a push to a branch others consume, a propagate, a deploy — the planning and review rules attach in full, whatever the words were. Before that moment there is no ticket and no status walk, except that work landing on an existing plan is that plan's: set its status, one call. Sibling sweeps, recall packs, headless runs and subagent fan-out are for when a specific, named unknown blocks the next step, never a default — but a rule that says the fix itself reaches every caller or every renderer is describing the fix, not a sweep. A rule that names its own trigger keeps it; a rule that adds work and names none applies at the action gate. Rules about what you may not do, and about not asserting what you have not checked, never scope down.
-<!-- END GLOBAL SECTION -->
+
+## In retrieval (core) — NOT loaded here; search with hive_recall
+
+These topics were moved out of always-loaded memory. The facts are intact and searchable; only the text left this index. Behavioural rules are never in here.
+
+- github ssh · plan state design intent · plan completion path · channels platform dependency · primary agents · 3dproppipeline agent · how to reach another agent · forge agent · bash permission matching · lane machinery · people vendors channels · camera host · path scoped rules workspace only
+<!-- hive:end -->

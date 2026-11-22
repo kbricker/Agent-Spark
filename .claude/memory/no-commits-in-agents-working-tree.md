@@ -1,0 +1,13 @@
+---
+name: no-commits-in-agents-working-tree
+description: "About to commit in a clone an agent works in? Check the current branch first — never commit into its working tree"
+source: core/no-commits-in-agents-working-tree@73
+metadata:
+  type: feedback
+---
+
+While spark was mid-plan on TendWright, I committed a CLAUDE.md edit in `C:\Projects\TendWright` assuming it was on `main` — it landed on spark's feature branch (`plan618/bench-toolkit`) instead, and the push failed on missing upstream (2026-07-21).
+
+**Why:** Repos like TendWright are a single checkout shared with the working agent. When the agent is mid-plan, the tree sits on their feature branch; any commit I make lands there, tangling my change into their work and risking state confusion.
+
+**How to apply:** Before committing in any repo an agent works in, run `git branch --show-current`. If it's a plan/feature branch (or the agent is working per Hive status), don't commit — either message the agent to include the change, or wait for the branch to merge. Related: [[fast-track-is-default]]

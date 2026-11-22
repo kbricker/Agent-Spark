@@ -11,7 +11,7 @@ store — the durable, fleet-wide corpus that feeds the task-ripeness mining (#6
 The #624 mining proved the cost of not doing this: internal review was 26 of 1,590
 findings in six months of data because its catches lived only in session transcripts.
 
-The rule (always-loaded memory `feedback_log_review_findings`): **a review is not
+The rule (always-loaded memory `log-review-findings`): **a review is not
 finished until its surviving findings are in the store.** This skill is the procedure.
 
 ## When to invoke
@@ -73,4 +73,4 @@ Per finding:
 ## Relationships
 
 - `fast-track-plan` step 9 invokes this at review-settle.
-- Memory `feedback_log_review_findings` is the always-loaded one-line rule pointing here.
+- Memory `log-review-findings` is the always-loaded one-line rule pointing here.

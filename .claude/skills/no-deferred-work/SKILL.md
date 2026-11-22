@@ -168,7 +168,7 @@ A plan in Completed status is a claim that its goal is delivered. This skill is 
 
 ## Pairs with
 
-- `feedback_never_defer_scope.md` — the principle this skill enforces procedurally
-- `feedback_define_done_by_user_visible_behavior.md` — the "user can do the thing" validation lens
-- `feedback_no_shortcuts.md` — build it right the first time
-- `feedback_solve_the_actual_problem.md` — trace all affected paths, not just the obvious one
+- `never-defer-scope.md` — the principle this skill enforces procedurally
+- `define-done-by-user-visible-behavior.md` — the "user can do the thing" validation lens
+- `no-shortcuts.md` — build it right the first time
+- `solve-the-actual-problem.md` — trace all affected paths, not just the obvious one

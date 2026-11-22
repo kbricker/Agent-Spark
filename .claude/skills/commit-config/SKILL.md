@@ -73,7 +73,7 @@ Reconcile three questions:
 Use `git add <path>` for each intended change. **Do not** use `git add -A` or `git add .` — those scoop up anything stray, including unrelated drift from prior sessions.
 
 ```bash
-git -C <repo-path> add .claude/memory/feedback_plans_default_planning.md
+git -C <repo-path> add .claude/memory/plans-default-planning.md
 git -C <repo-path> add .claude/memory/MEMORY.md
 git -C <repo-path> add .claude/skills/commit-config/SKILL.md
 ```

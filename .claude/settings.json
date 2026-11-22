@@ -100,6 +100,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/hive-memory-offer.mjs --agent spark",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SubagentStop": [
@@ -149,6 +159,17 @@
           {
             "type": "command",
             "command": "node C:/Projects/wfa2/hooks/jev-subagent-router.mjs --agent spark --enforce",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/hive-memory-offer.mjs --agent spark",
             "timeout": 10
           }
         ]

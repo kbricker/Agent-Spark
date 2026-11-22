@@ -336,5 +336,5 @@ decision sequence into its conclusion, and the sequence is the part with
 information in it.
 
 This skill is the canonical statement of the discipline. The always-loaded
-memory `feedback_record_as_you_shape` is a pointer to it, deliberately short —
+memory `record-as-you-shape` is a pointer to it, deliberately short —
 if the two ever disagree, this file wins and the memory is stale.
