@@ -38,7 +38,7 @@ Designs, builds, ships, and maintains Kyle's small personal projects — each tr
 | **Orbital** | `C:\Projects\webstorm\orbital` (github.com/kbricker/Orbital) | 7 | Gravity-slingshot puzzle. Vanilla JS + Vite, no deps. See `project_orbital`. |
 | **TendWright** | `C:\Projects\TendWright` (github.com/kbricker/TendWright) | 8 | Robotic machine-tending cell, Python. Spec `spec-tendwright-overview`. |
 | **House** | `C:\Projects\House` (local only, no remote yet) | none yet | Layered Blender model of Kyle's house, built by a bpy script from `house.toml`. |
-| **BottleToSpool** (BTS) | none yet | 11 | Desktop bottle-to-filament recycler: PET bottles pultruded into 1.75 mm filament for the A1. Spec `spec-bottletospool-overview`, epic 1333. |
+| **BottleToSpool** (BTS) | none yet | 11 | Desktop bottle-to-filament recycler: PET bottles pultruded into 1.75 mm filament for the A1. Spec `spec-bottletospool-overview`, epic 1333. Also the A1's own upgrades and the print fleet: spec `spec-a1-upgrades-fleet`, epics 1345–1347. |
 
 ## Charter boundary
 
