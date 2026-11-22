@@ -12,6 +12,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_never_hand_kyle_a_command.md — Gate blocked you and you are about to paste Kyle a command? Never — he does not run commands; route it to overwatch or state the rule to add, and never re-ask a granted permission
 - feedback_memory_name_matches_filename.md — Writing a memory file? Its name: must equal the filename stem exactly — double-bracket links resolve by filename, a kebab-case slug dangles
 - feedback_name_printed_pieces_by_sight.md — Writing Kyle a bench or fit-check doc for printed parts? Name each piece by what he sees (tall plate, small block), never by CAD role or file name
+- feedback_rework_stls_dont_chase_designers.md — Model came as STL only? Never suggest asking the designer for STEP; Kyle reworks the meshes in Blender or FreeCAD
 
 ## Orbital
 
