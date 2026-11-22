@@ -13,6 +13,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 - feedback_memory_name_matches_filename.md — Writing a memory file? Its name: must equal the filename stem exactly — double-bracket links resolve by filename, a kebab-case slug dangles
 - feedback_name_printed_pieces_by_sight.md — Writing Kyle a bench or fit-check doc for printed parts? Name each piece by what he sees (tall plate, small block), never by CAD role or file name
 - feedback_rework_stls_dont_chase_designers.md — Model came as STL only? Never suggest asking the designer for STEP; Kyle reworks the meshes in Blender or FreeCAD
+- user_shop_tools.md — Designing a jig or a cut for Kyle? His tools: Bosch JS260 jigsaw, a 1617-series router (RA1161 fixed, RA1166 plunge, a table, RA1054 guide, RBS010 bits), the digital meter
 
 ## Orbital
 
