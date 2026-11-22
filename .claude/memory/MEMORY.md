@@ -32,6 +32,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 
 - reference_desk_pc_ultrawide_blink.md — Kyle's desk-PC screen blanks for a moment? It's the BIG screen (Dell S3425DW ultrawide), never the 27in; NOT the cable — an active cable (2026-11-19) still blinks, then stays dark; a DDC watcher saw no dropout in 8 h; next: old cable, same port, while it watches, else Dell warranty
 - reference_desk_pc_monitor2_wake_drop.md — Kyle's 27in (Dell S2725DS) drops ~10 s at most display wakes from screen-off — he never notices it, not his blink; diagnosed via Kernel-PnP 1010 + Kernel-Power 566 + DDPM logs
+- reference_kyles_chrome_over_cdp.md — Need a page or file behind Kyle's login? Playwright over CDP into his signed-in Chrome: ws URL from DevToolsActivePort (http 404s), he clicks Allow when it waits, so one job per connection
 
 <!-- BEGIN GLOBAL SECTION (managed by propagate-shared-config — do not edit by hand) -->
 ## Global (managed by propagate-shared-config — copies of `wfa2/orchestrator-shared/memory/`; edit canonical, never these, the next sync reverts local edits silently)
