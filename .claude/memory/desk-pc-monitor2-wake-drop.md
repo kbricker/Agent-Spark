@@ -1,7 +1,7 @@
 ---
 name: desk-pc-monitor2-wake-drop
 description: "Kyle's 27in (Dell S2725DS) drops ~10 s at most display wakes from screen-off — he never notices it, not his blink; diagnosed via Kernel-PnP 1010 + Kernel-Power 566 + DDPM logs"
-source: spark/desk-pc-monitor2-wake-drop@19
+source: spark/desk-pc-monitor2-wake-drop@21
 metadata:
   type: reference
 ---

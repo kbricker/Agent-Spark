@@ -1,7 +1,7 @@
 ---
 name: orbital
 description: "Orbital — gravity-slingshot puzzle game, Spark's first project; repo (github.com/kbricker/Orbital, personal SSH) + Hive …"
-source: spark/orbital@19
+source: spark/orbital@21
 metadata:
   type: project
 ---

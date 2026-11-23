@@ -1,7 +1,7 @@
 ---
 name: channel-handoff-continuity
 description: "Kyle messages from the Hive channel mid-task? Same conversation on a new transport — not a new request, don't restart"
-source: orchestrator/channel-handoff-continuity@8
+source: orchestrator/channel-handoff-continuity@12
 metadata:
   type: feedback
 ---

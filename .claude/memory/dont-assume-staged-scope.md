@@ -1,7 +1,7 @@
 ---
 name: dont-assume-staged-scope
 description: "About to commit the staged/modified files? Don't assume they're all yours — if the scope is ambiguous, ask Kyle"
-source: core/dont-assume-staged-scope@73
+source: core/dont-assume-staged-scope@88
 metadata:
   type: feedback
 ---

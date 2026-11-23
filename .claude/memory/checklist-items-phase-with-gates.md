@@ -1,15 +1,15 @@
 ---
 name: checklist-items-phase-with-gates
 description: "Writing a plan's checklist? Phase by status gate — at-or-after-merge is VALIDATION; unchecked TASKs block CodeReview"
-source: core/checklist-items-phase-with-gates@73
+source: core/checklist-items-phase-with-gates@88
 metadata:
   type: feedback
 ---
 
 The Hive plan state machine refuses `→ CodeReview` while any **task**-type
 checklist item is unchecked. So a task item describing work that can only happen
-at or after merge — merging itself, propagation, notifying agents, deploying,
-live round-trips — cannot be satisfied when the gate checks it, and the plan
+at or after merge — merging itself, notifying agents, deploying, live
+round-trips — cannot be satisfied when the gate checks it, and the plan
 deadlocks. The only ways out are checking something that is not done, or
 checklist surgery mid-flight.
 

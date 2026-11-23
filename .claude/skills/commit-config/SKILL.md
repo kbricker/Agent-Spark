@@ -1,6 +1,6 @@
 ---
 name: commit-config
-description: Commit and push changes to your own workspace config repo after edits — memory files, skills, hooks, MEMORY.md, settings, CLAUDE.md, .mcp.json. Use when Kyle says "commit your config" or after a batch of config edits. Works for EVERY propagation-managed agent, not only the Primary agents — find your own row in the dispatch table rather than checking whether you are named here.
+description: Commit and push changes to your own workspace config repo after edits — memory files, skills, hooks, MEMORY.md, settings, CLAUDE.md, .mcp.json. Use when Kyle says "commit your config", after config edits, or after a delivery notice. Works for EVERY delivered agent, not only the Primary agents — find your own row in the dispatch table rather than checking whether you are named here.
 scope: global
 ---
 
@@ -21,7 +21,7 @@ This skill runs in **your own** workspace. Which agent that is depends on the se
 | 3dproppipeline | `C:\Projects\3dproppipeline` | `master` | `git@github-second.com:WonderForge/3dPropPipeline.git` |
 | finley | `C:\Projects\finley` | `master` | `git@github.com:kbricker/finley.git` — **PERSONAL account: the plain `github.com` host resolves to Kyle's `id_ed25519`, NOT the `github-second.com` WonderForge alias. Commit as `Kyle Bricker <kyle.bricker@gmail.com>` and push straight to `master`; finley takes no PRs (Kyle 2026-08-18), so there is no branch to open one from** |
 
-(verletDev retired 2026-07-09 and hivedev01 retired 2026-08-29 (782.31) — their workspaces are frozen, never commit there. **The roster authority is `composition.json`'s `managedBy` field, not this table and not a memory** — every roster transcribed into prose in this corpus has gone stale, this one included.)
+(verletDev retired 2026-07-09 and hivedev01 retired 2026-08-29 (782.31) — their workspaces are frozen, never commit there. **The roster authority is `composition.json`, not this table and not a memory** — every roster transcribed into prose in this corpus has gone stale, this one included.)
 
 When you run this skill, identify which orchestrator you are (from session context / agent key / the working directory you're in), then use the matching row's values everywhere the procedure references `<repo-path>`, `<branch>`, etc.
 
@@ -31,6 +31,7 @@ If you're running this skill and can't tell which orchestrator you are: stop, as
 
 - Kyle says "commit your config," "push your repo," "sync [orchestrator]," or similar after you've edited memory/skills/hooks/settings.
 - You just finished a batch of config edits (new memory, new skill, updated hook) and Kyle's rhythm is to keep the repo current.
+- **After a delivery notice** ("Your bundles were delivered…"): delivery writes your workspace and never commits, so a dirty tree after the notice is expected — commit it with this skill. `.claude/hive/delivery.json` records what landed (`deliveredAt` and each class's revision). Read the diff across the whole of `.claude/` and `CLAUDE.md`, never just `.claude/memory/`: a delivery can change a skill, the settings or a CLAUDE.md block.
 - **Not** for one-off debug edits you're going to revert.
 - **Not** for changes outside your own orchestrator's repo. Don't use this skill to commit wfa2, Verlet, VaEx, or another orchestrator's workspace.
 
@@ -41,6 +42,8 @@ The orchestrator repo's tracked files are:
 - `.claude/memory/*.md` — memory files
 - `.claude/memory/MEMORY.md` — memory index
 - `.claude/skills/<name>/SKILL.md` — skills
+- `.claude/agents/*.md` — subagent definitions
+- `.claude/hive/delivery.json`, `.claude/hive/launch.json` — delivery's record and the launch file
 - `.claude/hooks/*.sh` — status hooks
 - `.claude/settings.json`, `.claude/settings.local.json` — project settings
 - `CLAUDE.md` — project instructions at repo root
@@ -91,10 +94,10 @@ Example:
 
 ```bash
 git -C <repo-path> commit -m "$(cat <<'EOF'
-Plan #276: sync global memories from canonical source
+Commit knowledge delivery: core rev 74, overwatch rev 56
 
-Pulled 40 global memories from wfa2/orchestrator-shared/memory/ and
-updated MEMORY.md index accordingly.
+Delivery rewrote two memories and the MEMORY.md block; what landed is
+recorded in .claude/hive/delivery.json.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
 EOF
@@ -107,7 +110,7 @@ EOF
 git -C <repo-path> push origin <branch>
 ```
 
-Use the branch name from the dispatch table (every propagation-managed workspace: `master`).
+Use the branch name from the dispatch table (every delivered workspace: `master`).
 
 **Never** force-push. If the push is rejected because the remote is ahead, pull with `git pull --rebase origin <branch>`, resolve any conflicts, and push again. Do not `--force` or `--force-with-lease` unless Kyle explicitly says so.
 
@@ -120,7 +123,7 @@ One or two sentences: what committed, what the SHA is, and that it's pushed.
 - **Pre-commit hooks:** the global commit rules say never skip hooks. If a hook fails, fix the underlying issue and create a **new** commit — do not `--amend` the failing one.
 - **Unrelated local changes:** if `git status` shows changes in files you didn't touch in this session (stale edits from a prior session, auto-generated files), don't silently include them. Ask Kyle whether to include them, stash them, or leave them unstaged.
 - **MEMORY.md drift:** whenever you add or rename a memory file, MEMORY.md needs to be updated in the same commit so the index stays accurate. Never commit a new memory file without also updating the index.
-- **Wrong branch:** every propagation-managed workspace use `master`. The dispatch table is canonical — if in doubt, run `git -C <repo-path> branch --show-current` to verify before pushing.
+- **Wrong branch:** every delivered workspace uses `master`. The dispatch table is canonical — if in doubt, run `git -C <repo-path> branch --show-current` to verify before pushing.
 - **Wrong SSH alias:** WonderForge repos use `github-second.com`; spark uses plain `github.com` (kbricker account). Check `git -C <repo-path> remote -v` if auth errors surface.
 - **Secrets:** the `.gitignore` excludes secret files. If you ever see `secrets.json` or `appsettings.Development.json` staged, unstage immediately — something is broken.
 

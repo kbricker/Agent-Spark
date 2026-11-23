@@ -1,7 +1,7 @@
 ---
 name: hold-message-explicit-scope
 description: "Standing an agent down? Name every forbidden surface — a plain HOLD still lets it edit plan checklists and descriptions"
-source: orchestrator/hold-message-explicit-scope@8
+source: orchestrator/hold-message-explicit-scope@12
 metadata:
   type: feedback
 ---

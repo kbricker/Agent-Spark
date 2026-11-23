@@ -1,7 +1,7 @@
 ---
 name: log-review-findings
 description: "A review just settled? Not finished until surviving AND skipped findings are in the store via hive_review_finding_add"
-source: core/log-review-findings@73
+source: core/log-review-findings@88
 metadata:
   type: feedback
 ---

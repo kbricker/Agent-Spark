@@ -1,7 +1,7 @@
 ---
 name: camera-host
 description: "Camera host (GarageBox, `ssh camhost`, 192.168.86.142) — Dell 7070 SFF Frigate NVR; NOPASSWD sudo, BIOS needs USB flash not fwupd, setup doc in CameraHost/"
-source: spark/camera-host@19
+source: spark/camera-host@21
 metadata:
   type: reference
 ---

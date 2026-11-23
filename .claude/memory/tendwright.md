@@ -1,7 +1,7 @@
 ---
 name: tendwright
 description: "TendWright — robotic CNC machine-tending cell (Hive app 8, epic #612, rungs #604–#610 in order); MuJoCo+mink+uv stack …"
-source: spark/tendwright@19
+source: spark/tendwright@21
 metadata:
   type: project
 ---

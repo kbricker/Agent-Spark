@@ -1,7 +1,7 @@
 ---
 name: desk-pc-ultrawide-blink
 description: "Kyle's desk-PC screen blanks for a moment? It's the BIG screen (Dell S3425DW ultrawide), never the 27in; NOT the cable — an active cable (2026-11-19) still blinks, then stays dark; a DDC watcher saw no dropout in 8 h; next: old cable, same port, while it watches, else Dell warranty"
-source: spark/desk-pc-ultrawide-blink@19
+source: spark/desk-pc-ultrawide-blink@21
 metadata:
   type: reference
 ---

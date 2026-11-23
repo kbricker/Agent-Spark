@@ -1,7 +1,7 @@
 ---
 name: personal-repo-git-identity
 description: "Committing in a Spark project? Kyle's PERSONAL repo — commit as Kyle Bricker <kyle.bricker@gmail.com>, never WonderForge"
-source: spark/personal-repo-git-identity@19
+source: spark/personal-repo-git-identity@21
 metadata:
   type: feedback
 ---

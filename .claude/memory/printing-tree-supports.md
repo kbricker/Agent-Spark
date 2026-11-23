@@ -1,7 +1,7 @@
 ---
 name: printing-tree-supports
 description: "Designing a part for 3D print? Kyle always uses tree supports — don't contort CAD toward support-free geometry"
-source: spark/printing-tree-supports@19
+source: spark/printing-tree-supports@21
 metadata:
   type: user
 ---

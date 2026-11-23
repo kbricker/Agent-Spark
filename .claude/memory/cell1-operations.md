@@ -1,7 +1,7 @@
 ---
 name: cell1-operations
 description: "cell1 (TendWright hardware runtime, Minisforum UM350) — hardware identity, no BIOS update exists, MUJOCO_GL=egl …"
-source: spark/cell1-operations@19
+source: spark/cell1-operations@21
 metadata:
   type: reference
 ---

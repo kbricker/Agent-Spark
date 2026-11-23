@@ -1,7 +1,7 @@
 ---
 name: kyles-chrome-over-cdp
 description: "Need a page or file behind Kyle's login? Playwright over CDP into his signed-in Chrome: ws URL from DevToolsActivePort (http 404s), he clicks Allow when it waits, so one job per connection"
-source: spark/kyles-chrome-over-cdp@19
+source: spark/kyles-chrome-over-cdp@21
 metadata:
   type: reference
 ---

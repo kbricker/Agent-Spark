@@ -1,14 +1,14 @@
 ---
 name: fast-track-is-default
 description: "Working a plan? Fast-track: Opus subagents implement, you orchestrate, no other pipeline. Governs plans, not asks"
-source: core/fast-track-is-default@73
+source: core/fast-track-is-default@88
 metadata:
   type: feedback
 ---
 
 Fast-track is the orchestration path for all plans, on every agent, and you orchestrate only — Opus subagents implement (step 4); the step 5.5 review is astra's on a `codexLane` agent and a Claude subagent pass elsewhere; you shape, brief, adjudicate, commit, push, merge and deploy (Kyle 2026-11-12) — spawning Agent/Task subagents at your discretion for the fan-out around that, leveraging the shared prompt cache. **There is no second path.** Work too large for one context gets decomposed across subagents, not handed to a different pipeline.
 
-It governs work that *is* a plan. It does not turn every request into one: whether a plan exists is decided by `always-plan` — the plan appears at the action gate (PR, merge, shared push, propagate, deploy) or on plan / ship, not before, and a test / sample / quick / try ask gets the thing itself with one check that it runs. Never open a plan in order to have somewhere to run this procedure.
+It governs work that *is* a plan. It does not turn every request into one: whether a plan exists is decided by `always-plan` — the plan appears at the action gate (PR, merge, shared push, class write, deploy) or on plan / ship, not before, and a test / sample / quick / try ask gets the thing itself with one check that it runs. Never open a plan in order to have somewhere to run this procedure.
 
 **Why:** Kyle set this rule on 2026-04-19 during an orchestrator-comparison discussion. Reasoning: spawning a separate agent process has real startup cost, breaks cache sharing, and for the size of most plans is overkill. Fast-track + fan-out via subagents keeps the cache warm, parallelises where useful, and shaves the spawn/clone/kill cycle entirely. The separate-process pipeline it replaced was retired outright on 2026-08-16. The plan-only scope was added 2026-09-11 (plan 1027) after a quick test ask was walked through the full procedure.
 

@@ -1,7 +1,7 @@
 ---
 name: agent-branch
 description: "Before any agent does work, first instruct it to checkout the correct branch — step 1 for all agents"
-source: orchestrator/agent-branch@8
+source: orchestrator/agent-branch@12
 metadata:
   type: feedback
 ---

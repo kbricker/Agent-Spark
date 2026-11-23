@@ -1,7 +1,7 @@
 ---
 name: use-channel-events
 description: "Waiting on an agent's response? Watch for agent_idle/agent_working channel events — never a blind sleep"
-source: orchestrator/use-channel-events@8
+source: orchestrator/use-channel-events@12
 metadata:
   type: feedback
 ---

@@ -1,7 +1,7 @@
 ---
 name: review-vs-done
 description: "Reviewing and tempted to tick checklist items? Don't — checked means the code is done, not that review validated it"
-source: core/review-vs-done@73
+source: core/review-vs-done@88
 metadata:
   type: feedback
 ---

@@ -8,8 +8,7 @@ Sections: Spark-local **shared conventions**, then per-**project** sections, the
 Delivered from this agent's bundles: change the bundle, not these lines.
 
 ## core
-- always-plan.md — No ticket before the gate: about to PR, merge, push shared, propagate or deploy, or told plan/ship — plan first
-- anchor-propagation-checks-on-the-commit.md — Checking a propagation landed? A clean tree is success, not absence — verify with git log against the commit you knew
+- always-plan.md — No ticket before the gate: about to PR, merge, push shared, write a class or deploy, or told plan/ship — plan first
 - bash-tool-escapes.md — Writing a script or long file through the Bash tool? Backslash pairs arrive halved, >8 KB heredocs fail — use Write
 - brief-subagents-with-recall.md — Spawning a subagent on domain work? Tell it to hive_recall its pack first — prefab YAML, shaders, VaEx internals
 - build-straight-through.md — Design locked, Kyle says build/proceed — run the whole plan end-to-end, don't stop to checkpoint after the foundation
@@ -37,6 +36,7 @@ Delivered from this agent's bundles: change the bundle, not these lines.
 - never-defer-scope.md — About to trim, shift, or defer what Kyle named? Don't — do the scope exactly; change it only by convincing him first
 - never-force-push-agent.md — About to force-push from an agent-owned clone others commit to? Don't — cherry-pick or rebase instead
 - never-kill-chrome.md — Reaching to kill Chrome — even by PID, even a wedged tab? Never; only scoped CDP Browser.close (kill-guard blocks names)
+- never-list-unity-command-line.md — Listing processes? Id/Name/Title only; Kyle's Unity args carry an access token
 - no-assign-agent.md — Setting assignedAgent on a plan Kyle is working himself? Don't — it can wake that agent to start working the plan
 - no-claude-artifacts-local-docs-only.md — Publishing a doc, report, chart, or dashboard as a claude.ai Artifact? Never — deliverables land on disk in the project
 - no-commits-in-agents-working-tree.md — About to commit in a clone an agent works in? Check the current branch first — never commit into its working tree
@@ -74,8 +74,10 @@ Delivered from this agent's bundles: change the bundle, not these lines.
 - channel-handoff-continuity.md — Kyle messages from the Hive channel mid-task? Same conversation on a new transport — not a new request, don't restart
 - channel-launch.md — Five PRIMARY agents: .lnk launchers, plugin channel; 3dpp is RemoteAgent-hosted; read for claudeArgs or deaf agents
 - channel-rewatch-after-spawn.md — An agent gone silent — stuck, or unwatched? Check hive_channel_watching first; any process boundary clears that list
+- hive-503-means-wake-the-agent.md — 503 + asleep = sleeping agent: watch, wake, wait, send, sleep
 - hold-message-explicit-scope.md — Standing an agent down? Name every forbidden surface — a plain HOLD still lets it edit plan checklists and descriptions
 - orchestrate-proactively.md — After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked
+- unwatch-when-idle-is-not-your-next-step.md — Watching an agent whose idle isn't your next step? Unwatch — each working event is noise Kyle reads
 - use-channel-events.md — Waiting on an agent's response? Watch for agent_idle/agent_working channel events — never a blind sleep
 
 ## spark

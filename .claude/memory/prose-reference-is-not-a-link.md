@@ -1,7 +1,7 @@
 ---
 name: prose-reference-is-not-a-link
 description: "Wrote 'see the X above'? Prose isn't a link — set the questionId/index marker in the same edit or it fails silently"
-source: core/prose-reference-is-not-a-link@73
+source: core/prose-reference-is-not-a-link@88
 metadata:
   type: feedback
 ---

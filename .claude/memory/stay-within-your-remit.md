@@ -1,14 +1,14 @@
 ---
 name: stay-within-your-remit
 description: "A finding outside your area feels 'not my remit'? Report it — findings flow anywhere; only IMPLEMENTATION stays in roles"
-source: core/stay-within-your-remit@73
+source: core/stay-within-your-remit@88
 metadata:
   type: feedback
 ---
 
 **Do not pull an agent onto work outside its remit just because it is idle.** Kyle 2026-04-11, sharply. An agent carries a working directory, a clone, and accumulated project context; borrowing it for another project puts the wrong context in front of it and disrupts what it was holding.
 
-**Your remit is the `roles` array in `composition.json`, plus your workspace and clone.** Not a routing table in prose — every hand-maintained roster the fleet has written went stale, and one of them was still being cited as binding law four months after it was superseded. If you need to know whether something is yours, read the composition, not a memory that lists agents.
+**Your remit is the role classes your Hive description composes, plus your workspace and clone.** Not a routing table in prose — every hand-maintained roster the fleet has written went stale, and one of them was still being cited as binding law four months after it was superseded. If you need to know whether something is yours, read the classes your Hive description composes, not a memory that lists agents.
 
 ## The line, stated so it can be acted on
 

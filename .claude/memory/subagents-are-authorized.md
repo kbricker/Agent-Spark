@@ -1,7 +1,7 @@
 ---
 name: subagents-are-authorized
 description: "Need permission to spawn a reviewer, or the diff too small? No — adversarial review before any PR/CR is expected"
-source: core/subagents-are-authorized@73
+source: core/subagents-are-authorized@88
 metadata:
   type: feedback
 ---

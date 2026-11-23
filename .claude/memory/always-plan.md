@@ -1,12 +1,12 @@
 ---
 name: always-plan
-description: "No ticket before the gate: about to PR, merge, push shared, propagate or deploy, or told plan/ship — plan first"
-source: core/always-plan@73
+description: "No ticket before the gate: about to PR, merge, push shared, write a class or deploy, or told plan/ship — plan first"
+source: core/always-plan@88
 metadata:
   type: feedback
 ---
 
-Plan when the work is about to become shared — you are opening a PR, merging, pushing to a branch others consume, propagating, or deploying — or when the asker says plan, ship, PR, or merge. Research first, write the formal plan (`hive_plan_create`) with the affected paths and edge cases enumerated, align with Kyle when scope is non-trivial, and build against it. The plan is the quality gate; the reviewer is not there to catch what a shallow spec missed.
+Plan when the work is about to become shared — you are opening a PR, merging, pushing to a branch others consume, writing a knowledge class, or deploying — or when the asker says plan, ship, PR, or merge. Research first, write the formal plan (`hive_plan_create`) with the affected paths and edge cases enumerated, align with Kyle when scope is non-trivial, and build against it. The plan is the quality gate; the reviewer is not there to catch what a shallow spec missed.
 
 Before that gate there is no ticket. A test / sample / quick / try ask is delivered as the thing itself; look / check is answered, not built. If the thing is then promoted to ship, write the plan at that point — its description says what already exists and what was decided getting there, which is the shaping record for the quick phase — and review the built thing against the plan's enumeration. Where the enumeration finds a path the quick build missed, that is rework, not a polish loop. This is not the 2026-03-26 failure below: that was no formal plan at all, a quick description handed straight to a reviewer.
 

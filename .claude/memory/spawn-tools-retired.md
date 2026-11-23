@@ -1,7 +1,7 @@
 ---
 name: spawn-tools-retired
 description: "hive_spawn_agent still shows in the tool list? It's retired — never call it; fan out subagents instead"
-source: core/spawn-tools-retired@73
+source: core/spawn-tools-retired@88
 metadata:
   type: feedback
 ---

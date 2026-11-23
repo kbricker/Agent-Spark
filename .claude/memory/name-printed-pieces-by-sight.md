@@ -1,7 +1,7 @@
 ---
 name: name-printed-pieces-by-sight
 description: "Writing Kyle a bench or fit-check doc for printed parts? Name each piece by what he sees (tall plate, small block), never by CAD role or file name"
-source: spark/name-printed-pieces-by-sight@19
+source: spark/name-printed-pieces-by-sight@21
 metadata:
   type: feedback
 ---

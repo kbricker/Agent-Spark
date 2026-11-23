@@ -1,7 +1,7 @@
 ---
 name: untrusted-dir-drops-permissions
 description: "Allow rules inert? Read hasTrustDialogAccepted in ~/.claude.json first — untrusted dirs void .claude/settings.json"
-source: core/untrusted-dir-drops-permissions@73
+source: core/untrusted-dir-drops-permissions@88
 metadata:
   type: reference
 ---

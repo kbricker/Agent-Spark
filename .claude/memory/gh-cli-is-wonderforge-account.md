@@ -1,7 +1,7 @@
 ---
 name: gh-cli-is-wonderforge-account
 description: "Using gh on a kbricker personal repo (Spark)? It's authed as kyle-wf (WonderForge) and can't create PRs there"
-source: core/gh-cli-is-wonderforge-account@73
+source: core/gh-cli-is-wonderforge-account@88
 metadata:
   type: reference
 ---

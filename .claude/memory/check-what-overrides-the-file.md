@@ -1,7 +1,7 @@
 ---
 name: check-what-overrides-the-file
 description: "About to edit a config/memory/index file? Ask what ASSEMBLES it first — a generated block or .d/ drop-in silently wins"
-source: core/check-what-overrides-the-file@73
+source: core/check-what-overrides-the-file@88
 metadata:
   type: feedback
 ---
@@ -18,10 +18,10 @@ Same shape both times: **the agent knew the file's conventional role and therefo
 
 **How to apply:**
 
-- **Before editing a config file, ask what assembles it.** Look for a fence or `DO NOT EDIT` comment, a `.d/` sibling directory, a template it is generated from, or a sync/propagate step that rewrites it. Two commands, and it decides whether the edit is real.
+- **Before editing a config file, ask what assembles it.** Look for a fence or `DO NOT EDIT` comment, a `.d/` sibling directory, a template it is generated from, or a sync or delivery step that rewrites it. Two commands, and it decides whether the edit is real. In a Hive workspace the delivered blocks of CLAUDE.md and MEMORY.md, and every delivered memory and skill, come from knowledge classes: a hand edit is kept, but that file stops receiving its class's changes, and an edited memory is offered to the knowledge inbox.
 - **Later layers win.** `*.d/` drop-ins are sourced after the base file; generators overwrite hand edits wholesale. Editing the base and hoping is not a plan.
 - **The failure is silent, which is what makes it expensive.** A rejected edit teaches you something. An edit that applies cleanly and has no effect sends someone to reboot a machine and come back confused.
 - **Generated fields have one source.** If a value appears in two places — an index hook and a frontmatter field, a summary and its origin — find out which is generated. Editing the generated copy is the same mistake in miniature.
-- When the authoritative layer is outside your charter (canonical shared config, another agent's repo), propose the change to its owner rather than editing your synced copy.
+- When the authoritative layer is outside your charter (a knowledge class, another agent's repo), propose the change to its owner rather than editing your delivered copy.
 
 Related: [[verify-before-asserting]] and [[research-before-asking]] are the same underlying habit — acting on how something usually works instead of checking this instance. Those two are about knowledge; this one is about the artifact directly under your hands, which is why it stings more.
