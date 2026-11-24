@@ -1,7 +1,7 @@
 ---
 name: fix-workflow-problems-when-found
 description: "Hit a workflow or process defect mid-task? Fix it now or ticket it — breaking context is worth it; don't just note it"
-source: core/fix-workflow-problems-when-found@89
+source: core/fix-workflow-problems-when-found@91
 metadata:
   type: feedback
 ---

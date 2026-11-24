@@ -1,7 +1,7 @@
 ---
 name: refer-to-plans-by-display-number
 description: "Naming a parented plan to a reader? Use its display number (664.1), not the bare id (654) — bare id stays the API arg"
-source: core/refer-to-plans-by-display-number@89
+source: core/refer-to-plans-by-display-number@91
 metadata:
   type: feedback
 ---

@@ -1,7 +1,7 @@
 ---
 name: space-web-sims
 description: "docs/space-web-sims.md in the spark workspace is a PARKED future project — never commit it to the Agent-Spark repo (public)"
-source: spark/space-web-sims@21
+source: spark/space-web-sims@22
 metadata:
   type: project
 ---

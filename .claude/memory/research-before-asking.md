@@ -1,7 +1,7 @@
 ---
 name: research-before-asking
 description: "Asking Kyle to look, or experimenting to learn how an engine or library works? Usually it's documented — read first"
-source: core/research-before-asking@89
+source: core/research-before-asking@91
 metadata:
   type: feedback
 ---

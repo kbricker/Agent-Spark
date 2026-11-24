@@ -1,7 +1,7 @@
 ---
 name: unwatch-when-idle-is-not-your-next-step
 description: "Watching an agent whose idle isn't your next step? Unwatch — each working event is noise Kyle reads"
-source: orchestrator/unwatch-when-idle-is-not-your-next-step@12
+source: orchestrator/unwatch-when-idle-is-not-your-next-step@13
 metadata:
   type: feedback
 ---

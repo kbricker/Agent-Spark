@@ -1,7 +1,7 @@
 ---
 name: no-unrequested-ux
 description: "An obvious UX nicety feels implied? Not authorized — plans list only behaviors Kyle named; never ship inferred ones"
-source: core/no-unrequested-ux@89
+source: core/no-unrequested-ux@91
 metadata:
   type: feedback
 ---

@@ -1,7 +1,7 @@
 ---
 name: bench-task-lists-are-dated
 description: "Writing a TendWright bench task list? Dated file docs/bench-tasks-YYYY-MM-DD.md, one per session — never one rolling doc"
-source: spark/bench-task-lists-are-dated@21
+source: spark/bench-task-lists-are-dated@22
 metadata:
   type: feedback
 ---

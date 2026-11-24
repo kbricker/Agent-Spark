@@ -1,7 +1,7 @@
 ---
 name: lab-control-authority
 description: "spark may actuate ONLY: cell1 wake (WoL from desk) + shutdown, mains, bench light, ARM POWER (default OFF, per-task; ON anywhere, OFF only from cell1) — powering the arm is mine, MOVING it unattended never is; check each gate first; topology: TendWright/docs/lab-inventory.md"
-source: spark/lab-control-authority@21
+source: spark/lab-control-authority@22
 metadata:
   type: reference
 ---

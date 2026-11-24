@@ -1,7 +1,7 @@
 ---
 name: dont-gate-on-manual-validation
 description: "Closure blocked on a check only Kyle can run, or that can't happen? Ship non-breaking work to use; new ticket if wrong"
-source: core/dont-gate-on-manual-validation@89
+source: core/dont-gate-on-manual-validation@91
 metadata:
   type: feedback
 ---

@@ -1,7 +1,7 @@
 ---
 name: never-hand-kyle-a-command
 description: "Gate blocked you and you are about to paste Kyle a command? Never — he does not run commands; route it to overwatch or state the rule to add, and never re-ask a granted permission"
-source: spark/never-hand-kyle-a-command@21
+source: spark/never-hand-kyle-a-command@22
 metadata:
   type: feedback
 ---

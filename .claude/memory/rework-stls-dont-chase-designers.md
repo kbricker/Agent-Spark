@@ -1,7 +1,7 @@
 ---
 name: rework-stls-dont-chase-designers
 description: "Model came as STL only? Never suggest asking the designer for STEP; Kyle reworks the meshes in Blender or FreeCAD"
-source: spark/rework-stls-dont-chase-designers@21
+source: spark/rework-stls-dont-chase-designers@22
 metadata:
   type: feedback
 ---

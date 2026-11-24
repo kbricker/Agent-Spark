@@ -1,7 +1,7 @@
 ---
 name: test-everything-mechanically-testable
 description: "Handing Kyle something to try? Run every machine-runnable check yourself first — his time is for eye/flow/UX/gameplay"
-source: core/test-everything-mechanically-testable@89
+source: core/test-everything-mechanically-testable@91
 metadata:
   type: feedback
 ---

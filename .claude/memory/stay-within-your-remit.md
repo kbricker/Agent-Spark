@@ -1,7 +1,7 @@
 ---
 name: stay-within-your-remit
 description: "A finding outside your area feels 'not my remit'? Report it — findings flow anywhere; only IMPLEMENTATION stays in roles"
-source: core/stay-within-your-remit@89
+source: core/stay-within-your-remit@91
 metadata:
   type: feedback
 ---

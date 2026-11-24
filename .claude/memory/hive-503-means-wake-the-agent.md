@@ -1,7 +1,7 @@
 ---
 name: hive-503-means-wake-the-agent
 description: "503 + asleep = sleeping agent: watch, wake, wait, send, sleep"
-source: orchestrator/hive-503-means-wake-the-agent@12
+source: orchestrator/hive-503-means-wake-the-agent@13
 metadata:
   type: feedback
 ---

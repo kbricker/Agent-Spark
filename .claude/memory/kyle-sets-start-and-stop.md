@@ -1,7 +1,7 @@
 ---
 name: kyle-sets-start-and-stop
 description: "About to suggest wrapping up, or start the next thing unprompted? Kyle signals go and stop explicitly — wait for both"
-source: core/kyle-sets-start-and-stop@89
+source: core/kyle-sets-start-and-stop@91
 metadata:
   type: feedback
 ---

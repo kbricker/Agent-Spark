@@ -1,7 +1,7 @@
 ---
 name: memory-name-matches-filename
 description: "Writing a memory file? Its name: must equal the filename stem exactly — double-bracket links resolve by filename, a kebab-case slug dangles"
-source: spark/memory-name-matches-filename@21
+source: spark/memory-name-matches-filename@22
 metadata:
   type: feedback
 ---

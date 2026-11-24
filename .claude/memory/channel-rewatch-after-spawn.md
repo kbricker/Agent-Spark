@@ -1,7 +1,7 @@
 ---
 name: channel-rewatch-after-spawn
 description: "An agent gone silent — stuck, or unwatched? Check hive_channel_watching first; any process boundary clears that list"
-source: orchestrator/channel-rewatch-after-spawn@12
+source: orchestrator/channel-rewatch-after-spawn@13
 metadata:
   type: feedback
 ---

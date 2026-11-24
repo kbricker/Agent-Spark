@@ -1,7 +1,7 @@
 ---
 name: shop-tools
 description: "Designing a jig or a cut for Kyle? His tools: Bosch JS260 jigsaw, a 1617-series router (RA1161 fixed, RA1166 plunge, RA1181 table, RA1054 guide, RBS010 bits), the digital meter"
-source: spark/shop-tools@21
+source: spark/shop-tools@22
 metadata:
   type: user
 ---

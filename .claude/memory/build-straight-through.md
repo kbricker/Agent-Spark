@@ -1,7 +1,7 @@
 ---
 name: build-straight-through
 description: "Design locked, Kyle says build/proceed — run the whole plan end-to-end, don't stop to checkpoint after the foundation"
-source: core/build-straight-through@89
+source: core/build-straight-through@91
 metadata:
   type: feedback
 ---

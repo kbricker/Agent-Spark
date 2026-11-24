@@ -1,7 +1,7 @@
 ---
 name: no-commits-in-agents-working-tree
 description: "About to commit in a clone an agent works in? Check the current branch first — never commit into its working tree"
-source: core/no-commits-in-agents-working-tree@89
+source: core/no-commits-in-agents-working-tree@91
 metadata:
   type: feedback
 ---

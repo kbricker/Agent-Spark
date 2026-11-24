@@ -1,7 +1,7 @@
 ---
 name: printing-tpu-by-object
 description: "Printing TPU for Kyle? Glue the plate as a release layer; several parts print by object — on the A1 tall parts go front to back, ~10 cm apart, 3 per plate"
-source: spark/printing-tpu-by-object@21
+source: spark/printing-tpu-by-object@22
 metadata:
   type: user
 ---

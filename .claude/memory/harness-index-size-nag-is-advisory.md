@@ -1,7 +1,7 @@
 ---
 name: harness-index-size-nag-is-advisory
 description: "'Compact MEMORY.md' nag, or at the 25,000 cap? Nag is harness noise; at the cap never drop a line and keep its file"
-source: core/harness-index-size-nag-is-advisory@89
+source: core/harness-index-size-nag-is-advisory@91
 metadata:
   type: feedback
 ---
