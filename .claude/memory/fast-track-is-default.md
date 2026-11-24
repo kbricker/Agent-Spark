@@ -1,7 +1,7 @@
 ---
 name: fast-track-is-default
 description: "Working a plan? Fast-track: Opus subagents implement, you orchestrate, no other pipeline. Governs plans, not asks"
-source: core/fast-track-is-default@88
+source: core/fast-track-is-default@89
 metadata:
   type: feedback
 ---

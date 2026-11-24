@@ -1,7 +1,7 @@
 ---
 name: subscription-not-tokens
 description: "Weighing an option that bills per-token API? Rule it out early — fleet work stays on the subscription, don't cost it"
-source: core/subscription-not-tokens@88
+source: core/subscription-not-tokens@89
 metadata:
   type: feedback
 ---

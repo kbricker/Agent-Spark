@@ -1,7 +1,7 @@
 ---
 name: brief-subagents-with-recall
 description: "Spawning a subagent on domain work? Tell it to hive_recall its pack first — prefab YAML, shaders, VaEx internals"
-source: core/brief-subagents-with-recall@88
+source: core/brief-subagents-with-recall@89
 metadata:
   type: feedback
 ---

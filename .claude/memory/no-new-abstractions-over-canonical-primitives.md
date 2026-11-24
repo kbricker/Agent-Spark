@@ -1,7 +1,7 @@
 ---
 name: no-new-abstractions-over-canonical-primitives
 description: "Tempted to wrap repetition in a new helper for DRY? Use the canonical primitive already there, compose inline instead"
-source: core/no-new-abstractions-over-canonical-primitives@88
+source: core/no-new-abstractions-over-canonical-primitives@89
 metadata:
   type: feedback
 ---

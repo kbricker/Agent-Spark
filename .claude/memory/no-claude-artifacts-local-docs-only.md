@@ -1,7 +1,7 @@
 ---
 name: no-claude-artifacts-local-docs-only
 description: "Publishing a doc, report, chart, or dashboard as a claude.ai Artifact? Never — deliverables land on disk in the project"
-source: core/no-claude-artifacts-local-docs-only@88
+source: core/no-claude-artifacts-local-docs-only@89
 metadata:
   type: feedback
 ---

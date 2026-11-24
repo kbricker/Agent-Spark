@@ -1,7 +1,7 @@
 ---
 name: prove-the-check-ran
 description: "A check came back green? Prove it actually ran — a verification that never applied looks identical to correct code"
-source: core/prove-the-check-ran@88
+source: core/prove-the-check-ran@89
 metadata:
   type: feedback
 ---

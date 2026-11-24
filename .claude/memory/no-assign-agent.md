@@ -1,7 +1,7 @@
 ---
 name: no-assign-agent
 description: "Setting assignedAgent on a plan Kyle is working himself? Don't — it can wake that agent to start working the plan"
-source: core/no-assign-agent@88
+source: core/no-assign-agent@89
 metadata:
   type: feedback
 ---

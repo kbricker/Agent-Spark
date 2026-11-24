@@ -1,7 +1,7 @@
 ---
 name: pair-directive-briefs-with-dissent
 description: "Writing a confident technical claim into a subagent brief? Pair it with an explicit invitation to contradict it"
-source: core/pair-directive-briefs-with-dissent@88
+source: core/pair-directive-briefs-with-dissent@89
 metadata:
   type: feedback
 ---

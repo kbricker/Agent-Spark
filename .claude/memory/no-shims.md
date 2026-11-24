@@ -1,7 +1,7 @@
 ---
 name: no-shims
 description: "Moving or renaming code? Delete the old location and update every caller in the same change — no forwarder stub"
-source: core/no-shims@88
+source: core/no-shims@89
 metadata:
   type: feedback
 ---

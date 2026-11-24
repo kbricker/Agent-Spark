@@ -1,7 +1,7 @@
 ---
 name: bash-tool-escapes
 description: "Writing a script or long file through the Bash tool? Backslash pairs arrive halved, >8 KB heredocs fail — use Write"
-source: core/bash-tool-escapes@88
+source: core/bash-tool-escapes@89
 metadata:
   type: reference
 ---

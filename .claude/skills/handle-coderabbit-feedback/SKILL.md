@@ -61,32 +61,34 @@ When a channel event arrives carrying a CR message, classify it by matching the 
 
 | Signal | Body pattern | Meaning | Next action |
 |---|---|---|---|
-| **Clean review** | `No actionable comments were generated in the recent review.` | CR reviewed, found nothing actionable | Exit loop — merge |
+| **Clean review** | `No actionable comments were generated in the recent review.` | CR reviewed, found nothing actionable — in the review it last finished | Exit loop — merge, but only when that review covered the head you are merging: the summary comment's `between <commit> and <commit>` ends at the PR's head. The line stays in the summary when a later run is limited, skipped or paused |
 | **Clean review (alt)** | `Actionable comments posted: 0` | Same, older phrasing | Exit loop — merge |
 | **Findings review** | `Actionable comments posted: N` with N≥1 | CR posted N actionable items | Read findings via `gh pr view <n> --comments --repo <owner>/<repo>`, fix, push |
 | **Inline-only review** | Literal text `(Empty review body — findings are inline. Run 'gh pr view ...' to fetch them.)` | CR review body is empty; findings are inline comments only | Fetch with the suggested `gh` command, treat as findings review |
 | **Inline comment** | Message starts with `CodeRabbit inline comment` (may include `(edited)` suffix before `on **<repo>#<pr>**`) | Single inline code finding (new or updated — edits often mean "addressed" markers) | Part of an inline-only review; already covered by the parent review event, but useful as a per-finding prompt |
 | **Terminal ack** | Body ends with `Resolving.` / `Resolving all open comments now.` / `[resolve]` | CR is acknowledging a resolve command; no new review coming for this HEAD | Treat as end-of-loop for this iteration; if no clean-review signal yet, verify via `gh pr view --comments` before merging |
-| **Rate limit** | Contains `Rate limit exceeded` (relay emits it with the verbatim wait line when CR provided one — either `Please wait **N minutes and M seconds**` or the newer `Next review available in:** **N minutes**`) | CR is rate-limited; has specified a wait duration | Trigger the rate-limit retry sub-procedure below |
+| **Rate limit** | Starts with `Rate limit exceeded.`, then CR's own line that states the wait, e.g. `Or wait 22 minutes for your next included review.` (a reply may come without one) | CR did not review this head; it can after the wait | Trigger the rate-limit retry sub-procedure below. Never tick `Run on-demand review` or `Ask an admin to make reviews automatic` in CR's notice: paying for reviews is Kyle's decision |
+| **Review skipped** | Contains `Review skipped`, with CR's reason where it gives one, or a count of files (a count alone is not the reason) | CR did not review this head and names no wait | Read the notice on the PR. No reason in it: post `@coderabbitai review` once, and the reply states it. More files than CR's limit: split the PR. A cause you cannot clear: surface to Kyle. Never retry on a timer |
 | **In-progress** | `Currently processing new changes` | CR is actively reviewing | Wait for the next event — this is a progress ping, not terminal |
-| **Paused** | `Reviews paused` | CR has stopped reviewing this PR | Post `@coderabbitai resume` once and watch for review activity; escalate to Kyle only if resume changes nothing |
+| **Paused** | `Reviews paused` (a clean line after it belongs to an earlier review) | CR has stopped reviewing this PR | Post `@coderabbitai resume` once and watch for review activity; escalate to Kyle only if resume changes nothing |
 
-**Note (relay contract, plan #646):** the webhook handler sanitizes and classifies before dispatch — you receive clean signal-only messages, never raw CodeRabbit markup. Specifically: `Currently processing new changes` is filtered outright; review events relay only on `action=submitted` (no more submitted+edited double posts); a CR review body collapses to its `Actionable comments posted: N` line; walkthrough/banner comments with no signal content are suppressed entirely; rate-limit and paused comments arrive as the clean one-liners in the table above. HTML comments and `<details>` blocks never reach you — patterns that referenced them are retired.
+**Note (relay contract, plan #646):** the webhook handler sanitizes and classifies before dispatch — you receive clean signal-only messages, never raw CodeRabbit markup. Specifically: `Currently processing new changes` is filtered outright; review events relay only on `action=submitted` (no more submitted+edited double posts); a CR review body collapses to its `Actionable comments posted: N` line; walkthrough/banner comments with no signal content are suppressed entirely; rate-limit, skipped and paused comments arrive as the clean one-liners in the table above, and a limit, skip or pause is named first even when the same comment still holds an older clean line (plan 1078). HTML comments and `<details>` blocks never reach you — patterns that referenced them are retired.
 
 ## Rate-limit retry sub-procedure
 
 **First check whether a retry is needed at all.** If the PR is not merge-blocked on the clean review (long-lived ticket branch, more slices coming), skip the retry entirely — the next work push auto-triggers a cumulative review that covers the rate-limited diff for free. Only retry when the PR is actually waiting to merge.
 
-When the Rate limit signal arrives, the message will contain a wait line in one of two phrasings (CR changed format ~2026-07; the relay passes either through verbatim):
+When the Rate limit signal arrives, the message holds CR's own line that states the wait, passed through as written. CR rewords it (three phrasings so far):
 
 ```text
 Please wait **N minutes and M seconds** before requesting another review.
 **Next review available in:** **N minutes**
+**Or wait N minutes for your next included review.**
 ```
 
 Steps:
 
-1. **Parse the duration.** Try legacy regex `Please wait \*\*(\d+) minutes? and (\d+) seconds?\*\*` → `N*60 + M` seconds; else `Next review available in:\*\*\s*\*\*(\d+) minutes?` → `N*60` seconds. If neither matches, default to 15 minutes and note it.
+1. **Parse the duration from the numbers, not the wording.** Read the wait the line states in hours, minutes and seconds (`1 hour and 5 minutes` → 3,900 seconds). A line that states none, or no line: default to 15 minutes and note it.
 2. **Track retry count.** Keep a mental counter for this PR's rate-limit hits (from TaskCreate metadata, a skill-local variable, or just conversation state). Cap at **3 attempts**. On the 4th rate-limit for the same PR, escalate to Kyle — something is structurally wrong (too many commits, quota exhausted for the hour, org config).
 3. **Schedule a wake-up.** `ScheduleWakeup delaySeconds=<total_seconds + 30>, reason="CR rate-limited on PR #<n>, retry after wait"`. The +30s is slack to avoid racing the rate-limit window.
 4. **On wake-up:** post `@coderabbitai review` on the PR (this one IS a manual trigger — there's no new commit, so CR won't auto-review; plain `review` is incremental and cheaper than `full review`, and it's the command CR's own limit message names). Wait for the next event.

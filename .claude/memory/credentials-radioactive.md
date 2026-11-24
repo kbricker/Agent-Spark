@@ -1,7 +1,7 @@
 ---
 name: credentials-radioactive
 description: "Task would have you read, paste, or handle a key or token? Stop — credentials are radioactive, route it to forge"
-source: core/credentials-radioactive@88
+source: core/credentials-radioactive@89
 metadata:
   type: feedback
 ---
