@@ -1,7 +1,7 @@
 ---
 name: check-docs-on-harness-friction
 description: "Read Claude Code docs when shaping any ticket about agent behaviour — docs first, before measuring, not just on friction"
-source: core/check-docs-on-harness-friction@96
+source: core/check-docs-on-harness-friction@97
 metadata:
   type: feedback
 ---

@@ -1,7 +1,7 @@
 ---
 name: verify-before-asserting
 description: "Stating as fact something unchecked this turn? Verify — another agent agreeing, or your own past words, isn't proof"
-source: core/verify-before-asserting@96
+source: core/verify-before-asserting@97
 metadata:
   type: feedback
 ---

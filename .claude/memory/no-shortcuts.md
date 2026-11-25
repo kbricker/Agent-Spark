@@ -1,7 +1,7 @@
 ---
 name: no-shortcuts
 description: "The quick way tempting? Build Hive right the first time — sloppy architecture means upkeep that steals game-dev time"
-source: core/no-shortcuts@96
+source: core/no-shortcuts@97
 metadata:
   type: feedback
 ---

@@ -1,7 +1,7 @@
 ---
 name: check-for-an-existing-ticket-before-growing-scope
 description: "If Kyle has no context for the question you're about to ask, the scope is yours not his — search for an existing ticket"
-source: core/check-for-an-existing-ticket-before-growing-scope@96
+source: core/check-for-an-existing-ticket-before-growing-scope@97
 metadata:
   type: feedback
 ---

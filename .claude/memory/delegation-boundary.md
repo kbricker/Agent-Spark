@@ -1,7 +1,7 @@
 ---
 name: delegation-boundary
 description: "Handing work off or spawning an agent? Inline for tight loops, subagent by default, named agent only if it earns it"
-source: core/delegation-boundary@96
+source: core/delegation-boundary@97
 metadata:
   type: feedback
 ---

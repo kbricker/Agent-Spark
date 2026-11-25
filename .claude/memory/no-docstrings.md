@@ -1,7 +1,7 @@
 ---
 name: no-docstrings
 description: "Adding a function docstring, or CodeRabbit wants one? Never — 100% rule; ignore the warning, don't sweep existing ones"
-source: core/no-docstrings@96
+source: core/no-docstrings@97
 metadata:
   type: feedback
 ---

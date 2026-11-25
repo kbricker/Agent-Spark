@@ -1,7 +1,7 @@
 ---
 name: no-new-dependencies-without-auth
 description: "Adding a package or dependency? Only with a damn-good reason and Kyle's explicit yes — propose via the no-new-deps skill"
-source: core/no-new-dependencies-without-auth@96
+source: core/no-new-dependencies-without-auth@97
 metadata:
   type: feedback
 ---

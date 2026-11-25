@@ -1,7 +1,7 @@
 ---
 name: define-done-by-user-visible-behavior
 description: "Marking done because the on-disk shape is right? Not done until the user can actually do the thing the plan promised"
-source: core/define-done-by-user-visible-behavior@96
+source: core/define-done-by-user-visible-behavior@97
 metadata:
   type: feedback
 ---

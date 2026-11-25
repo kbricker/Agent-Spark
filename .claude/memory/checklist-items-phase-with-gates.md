@@ -1,7 +1,7 @@
 ---
 name: checklist-items-phase-with-gates
 description: "Writing a plan's checklist? Phase by status gate — at-or-after-merge is VALIDATION; unchecked TASKs block CodeReview"
-source: core/checklist-items-phase-with-gates@96
+source: core/checklist-items-phase-with-gates@97
 metadata:
   type: feedback
 ---

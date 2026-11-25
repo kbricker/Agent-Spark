@@ -1,7 +1,7 @@
 ---
 name: never-force-push-agent
 description: "About to force-push from an agent-owned clone others commit to? Don't — cherry-pick or rebase instead"
-source: core/never-force-push-agent@96
+source: core/never-force-push-agent@97
 metadata:
   type: feedback
 ---

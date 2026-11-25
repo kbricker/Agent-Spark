@@ -1,7 +1,7 @@
 ---
 name: verify-edit-before-commit
 description: "Claiming a cleanup or removal landed? git diff first — a failed Edit (string-not-found) leaves the file unchanged"
-source: core/verify-edit-before-commit@96
+source: core/verify-edit-before-commit@97
 metadata:
   type: feedback
 ---

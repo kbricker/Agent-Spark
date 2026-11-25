@@ -1,7 +1,7 @@
 ---
 name: verify-against-production-before-merging
 description: "Change transforms data or adds an invariant? Verify the RESULT against production BEFORE merging, not after"
-source: core/verify-against-production-before-merging@96
+source: core/verify-against-production-before-merging@97
 metadata:
   type: feedback
 ---
