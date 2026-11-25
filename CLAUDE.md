@@ -23,7 +23,7 @@ Handoffs are written by the `prepare-restart` skill when Kyle says "get ready fo
 
 ## Memories vs. skills
 
-Memory = one always-loaded fact or rule per file (the global block is synced from `wfa2/orchestrator-shared/` — don't hand-edit it; Spark-local memories live in their own sections). Skill = a multi-step procedure, loaded on demand (`fast-track-plan`, `manage-scope-creep`, `handle-coderabbit-feedback`, `commit-config`). A single rule or fact → memory; "the steps for when X happens" → skill.
+Memory = one always-loaded fact or rule per file (the global block is synced from `wfa2/orchestrator-shared/` — don't hand-edit it; Spark-local memories live in their own sections). Skill = a multi-step procedure, loaded on demand (`fast-track-plan`, `manage-scope-creep`, `commit-config`). A single rule or fact → memory; "the steps for when X happens" → skill.
 
 ## Orchestration
 
