@@ -1,7 +1,7 @@
 ---
 name: read-the-assembled-artifact
 description: "Your diff looks right? Read the assembled file in place — correct text goes false by adjacency and no diff shows it"
-source: core/read-the-assembled-artifact@91
+source: core/read-the-assembled-artifact@94
 metadata:
   type: feedback
 ---

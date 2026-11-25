@@ -1,7 +1,7 @@
 ---
 name: plans-default-planning
 description: "New discovery or finding? SEARCH for a home first — a new ticket is the last resort; status Planning, never Backlog"
-source: core/plans-default-planning@91
+source: core/plans-default-planning@94
 metadata:
   type: feedback
 ---

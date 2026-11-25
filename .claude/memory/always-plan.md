@@ -1,7 +1,7 @@
 ---
 name: always-plan
 description: "No ticket before the gate: about to PR, merge, push shared, write a class or deploy, or told plan/ship — plan first"
-source: core/always-plan@91
+source: core/always-plan@94
 metadata:
   type: feedback
 ---

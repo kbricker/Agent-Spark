@@ -1,7 +1,7 @@
 ---
 name: channel-launch
 description: "Five PRIMARY agents: .lnk launchers, plugin channel; 3dpp is RemoteAgent-hosted; read for claudeArgs or deaf agents"
-source: orchestrator/channel-launch@13
+source: orchestrator/channel-launch@14
 metadata:
   type: reference
 ---

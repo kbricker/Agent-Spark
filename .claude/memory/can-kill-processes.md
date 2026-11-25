@@ -1,7 +1,7 @@
 ---
 name: can-kill-processes
 description: "Reaching for taskkill? Kill only what you started, by PID — image-name kills are denied and provenance is still on you"
-source: core/can-kill-processes@91
+source: core/can-kill-processes@94
 metadata:
   type: feedback
 ---

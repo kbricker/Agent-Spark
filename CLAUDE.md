@@ -64,5 +64,9 @@ Two gates set how much surrounds the work. **Words**: test, sample, quick, try m
 
 These topics were moved out of always-loaded memory. The facts are intact and searchable; only the text left this index. Behavioural rules are never in here.
 
-- github ssh · plan state design intent · plan completion path · channels platform dependency · primary agents · 3dproppipeline agent · how to reach another agent · forge agent · bash permission matching · lane machinery · people vendors channels · camera host · path scoped rules workspace only
+- github ssh · plan state design intent · plan completion path · channels platform dependency · primary agents · 3dproppipeline agent · how to reach another agent · forge agent · bash permission matching · people vendors channels · path scoped rules workspace only
+
+## In retrieval (orchestrator) — NOT loaded here; search with hive_recall
+
+- lane machinery
 <!-- hive:end -->

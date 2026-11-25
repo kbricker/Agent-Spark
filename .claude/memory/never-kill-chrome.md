@@ -1,7 +1,7 @@
 ---
 name: never-kill-chrome
 description: "Reaching to kill Chrome — even by PID, even a wedged tab? Never; only scoped CDP Browser.close (kill-guard blocks names)"
-source: core/never-kill-chrome@91
+source: core/never-kill-chrome@94
 metadata:
   type: feedback
 ---

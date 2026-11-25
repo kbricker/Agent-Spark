@@ -52,6 +52,7 @@ Delivered from this agent's bundles: change the bundle, not these lines.
 - plans-default-planning.md — New discovery or finding? SEARCH for a home first — a new ticket is the last resort; status Planning, never Backlog
 - prose-reference-is-not-a-link.md — Wrote 'see the X above'? Prose isn't a link — set the questionId/index marker in the same edit or it fails silently
 - prove-the-check-ran.md — A check came back green? Prove it actually ran — a verification that never applied looks identical to correct code
+- read-architectural-asks-literally.md — Kyle redirected scope with an architectural critique? Re-read his exact words — don't snap to the nearest familiar fix
 - read-the-assembled-artifact.md — Your diff looks right? Read the assembled file in place — correct text goes false by adjacency and no diff shows it
 - record-as-you-shape.md — A question, answer, or decision just happened? hive_plan_log_add it now, not later — batching loses the WHY record
 - refer-to-plans-by-display-number.md — Naming a parented plan to a reader? Use its display number (664.1), not the bare id (654) — bare id stays the API arg

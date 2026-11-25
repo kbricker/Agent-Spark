@@ -1,7 +1,7 @@
 ---
 name: orchestrate-proactively
 description: "After dispatching work to agents, always watch for completion and drive the pipeline forward without being asked"
-source: orchestrator/orchestrate-proactively@13
+source: orchestrator/orchestrate-proactively@14
 metadata:
   type: feedback
 ---

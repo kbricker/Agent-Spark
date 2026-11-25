@@ -1,7 +1,7 @@
 ---
 name: kyle-reads-and-directs
 description: "About to build Kyle a button, or leave him a command to run? Don't — he reads and directs; agents do all housekeeping"
-source: core/kyle-reads-and-directs@91
+source: core/kyle-reads-and-directs@94
 metadata:
   type: feedback
 ---
