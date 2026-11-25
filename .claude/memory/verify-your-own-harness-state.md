@@ -1,7 +1,7 @@
 ---
 name: verify-your-own-harness-state
 description: "A claim about your own session — restarted, gated, schema changed? Check the tool itself before you accept it"
-source: core/verify-your-own-harness-state@94
+source: core/verify-your-own-harness-state@96
 metadata:
   type: feedback
 ---

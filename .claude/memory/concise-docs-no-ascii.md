@@ -1,7 +1,7 @@
 ---
 name: concise-docs-no-ascii
 description: "Writing or compressing a doc for Kyle? It's a correctness pass, not style — bullets over prose, never ASCII diagrams"
-source: core/concise-docs-no-ascii@94
+source: core/concise-docs-no-ascii@96
 metadata:
   type: feedback
 ---

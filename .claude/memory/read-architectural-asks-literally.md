@@ -1,7 +1,7 @@
 ---
 name: read-architectural-asks-literally
 description: "Kyle redirected scope with an architectural critique? Re-read his exact words — don't snap to the nearest familiar fix"
-source: core/read-architectural-asks-literally@94
+source: core/read-architectural-asks-literally@96
 metadata:
   type: feedback
 ---

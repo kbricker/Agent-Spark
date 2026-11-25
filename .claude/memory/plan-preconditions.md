@@ -1,7 +1,7 @@
 ---
 name: plan-preconditions
 description: "Moving a plan past Planning? Name each stateful surface's lifecycle and each async flow's staleness/single-flight guard"
-source: core/plan-preconditions@94
+source: core/plan-preconditions@96
 metadata:
   type: feedback
 ---

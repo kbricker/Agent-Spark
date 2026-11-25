@@ -1,7 +1,7 @@
 ---
 name: correct-the-assertions-not-just-the-log
 description: "Logged a change to a plan? A reader acts on its description and checklist — a log entry does not update those"
-source: core/correct-the-assertions-not-just-the-log@94
+source: core/correct-the-assertions-not-just-the-log@96
 metadata:
   type: feedback
 ---

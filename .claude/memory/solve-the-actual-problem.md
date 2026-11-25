@@ -1,7 +1,7 @@
 ---
 name: solve-the-actual-problem
 description: "Fixing the obvious path? Trace every affected path first — address the root problem, not just the literal ask"
-source: core/solve-the-actual-problem@94
+source: core/solve-the-actual-problem@96
 metadata:
   type: feedback
 ---

@@ -39,7 +39,7 @@ If the change targets the Hive platform, the deploy is `/deploy-hive`. For VaEx,
 ### 1. Confirm the branch is ready for testing
 
 - All Task checklist items checked off
-- PR exists and CodeRabbit review is clean (or in the process of being handled — see `handle-coderabbit-feedback`)
+- PR exists and CodeRabbit review is clean (or in the process of being handled — see `handle-coderabbit-feedback` where your bundles hold it)
 - CI passes
 
 Don't deploy a branch that's still red.

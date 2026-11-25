@@ -1,7 +1,7 @@
 ---
 name: enforce-user-tech-choices
 description: "When user specifies a technology stack, agents MUST follow it exactly — don't let agents substitute frameworks"
-source: core/enforce-user-tech-choices@94
+source: core/enforce-user-tech-choices@96
 metadata:
   type: feedback
 ---

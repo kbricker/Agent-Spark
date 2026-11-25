@@ -1,7 +1,7 @@
 ---
 name: output-reaches-nobody
 description: "Reply meant for another agent? From a primary session it reaches only Kyle — use hive_send_message / hive_respond"
-source: core/output-reaches-nobody@94
+source: core/output-reaches-nobody@96
 metadata:
   type: feedback
 ---

@@ -294,5 +294,5 @@ You should not pre-wake a persistent agent inside fast-track on the assumption i
 ## Related skills
 
 - `deploy-hive` — the Hive platform deploy procedure. Invoke as a sub-step for any plan touching what the deploy ships (step 7 above lists the paths).
-- `handle-coderabbit-feedback` — the CodeRabbit cleanup loop. Run this directly (you are the dev) when CR comes back with findings on a fast-track PR.
+- `handle-coderabbit-feedback` (bundle pr-workflow, the agents whose PRs CodeRabbit reviews) — the CodeRabbit cleanup loop. Run this directly (you are the dev) when CR comes back with findings on a fast-track PR.
 - `manage-scope-creep` — invoke at the first spiral signal (more items being added than resolved, CR loop not converging, scope drifting from the Fix design).

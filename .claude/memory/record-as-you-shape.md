@@ -1,7 +1,7 @@
 ---
 name: record-as-you-shape
 description: "A question, answer, or decision just happened? hive_plan_log_add it now, not later — batching loses the WHY record"
-source: core/record-as-you-shape@94
+source: core/record-as-you-shape@96
 metadata:
   type: feedback
 ---

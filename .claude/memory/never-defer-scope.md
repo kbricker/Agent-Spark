@@ -1,7 +1,7 @@
 ---
 name: never-defer-scope
 description: "About to trim, shift, or defer what Kyle named? Don't — do the scope exactly; change it only by convincing him first"
-source: core/never-defer-scope@94
+source: core/never-defer-scope@96
 metadata:
   type: feedback
 ---

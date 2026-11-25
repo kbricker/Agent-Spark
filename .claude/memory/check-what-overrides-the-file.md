@@ -1,7 +1,7 @@
 ---
 name: check-what-overrides-the-file
 description: "About to edit a config/memory/index file? Ask what ASSEMBLES it first — a generated block or .d/ drop-in silently wins"
-source: core/check-what-overrides-the-file@94
+source: core/check-what-overrides-the-file@96
 metadata:
   type: feedback
 ---
