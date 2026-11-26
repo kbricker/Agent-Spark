@@ -43,6 +43,11 @@
             "type": "command",
             "command": "node C:/Projects/wfa2/hooks/hive-status-working.mjs --agent spark",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node C:/Projects/wfa2/hooks/hive-prompt.mjs --agent spark",
+            "timeout": 10
           }
         ]
       },
